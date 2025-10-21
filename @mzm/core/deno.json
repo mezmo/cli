@@ -1,0 +1,15 @@
+{
+  "name": "@mzm/core",
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./crypto": "./crypto.ts",
+    "./lang": "./lang/mod.ts"
+  },
+  "imports": {
+    "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.8",
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}

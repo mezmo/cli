@@ -1,0 +1,30 @@
+{
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  },
+  "exports": "./main.ts",
+  "workspace": [
+    "./@mzm/log",
+    "./@mzm/core",
+    "./@mzm/command-log"
+  ],
+  "fmt": {
+    "useTabs": false,
+    "indentWidth": 2,
+    "lineWidth": 110,
+    "spaceSurroundingProperties": false,
+    "singleQuote": true,
+    "semiColons": false
+  },
+  "compile": {
+    "permissions": {
+      "env": true,
+      "net": true
+    }
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/crypto": "jsr:@std/crypto@^1.0.5",
+    "@std/encoding": "jsr:@std/encoding@^1.0.10"
+  }
+}
