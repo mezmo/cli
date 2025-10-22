@@ -5,6 +5,11 @@ import {CompletionsCommand, MZMCommand} from '@mzm/core'
 if (import.meta.main) {
   await new MZMCommand()
     .name('mzm')
+    .env(
+      'MZM_ACCESS_KEY=<value:string>',
+      'Platform IAM token',
+      {prefix: 'MZM_', global: true},
+    )
     .action(function () {
       this.showHelp()
     })
