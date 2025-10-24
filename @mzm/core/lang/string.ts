@@ -9,4 +9,8 @@ export default {
     if (isFinite(value)) return parseFloat(value)
     return value
   },
+  upper(str:string | undefined | null): string {
+    const val = (str === null || str === undefined) ? '' : str.toString()
+    return val.toUpperCase()
+  }
 }

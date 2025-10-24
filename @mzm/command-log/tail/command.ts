@@ -1,12 +1,13 @@
 import {MZMCommand} from '@mzm/core'
 import {WebsocketProtocol as PROTOCOL, Socket} from './web-socket.ts'
 import type {SocketOptions} from './web-socket.ts'
+import {storage} from '@mzm/config'
 import {pprint} from '@mzm/log'
 import {genHMAC} from '@mzm/core/crypto'
 import {toArray} from '@mzm/core/lang'
 import {getLogger} from '@mzm/log'
 
-const log = getLogger('tasks')
+const log = getLogger('default')
 const secret = 'e1aff34db3'
 const param: SocketOptions = {
   email: 'eric.satterwhite@mezmo.com',
@@ -38,6 +39,9 @@ const tail = new MZMCommand()
   .option('-l, --level <level:string>', 'log levels to filter by', {collect: true})
   .option('-a, --app <app:string>', 'log levels to filter by', {collect: true})
   .action(async (options: any, query?: string) => {
+    const STREAM_HOST = await storage.getOne('core.host.stream')
+    log.debug(`stream host: ${STREAM_HOST}`)
+
     const tail_params: SocketOptions = {
       ...param,
       q: query ?? '',
@@ -50,13 +54,13 @@ const tail = new MZMCommand()
     tail_params.apps = toArray(options.app).join(',')
 
     const ws = new Socket(
-      `https://tail.use.dev.mezmo.it/ws/tail`
+      `${STREAM_HOST}/ws/tail`
     , [PROTOCOL.JSON]
     , tail_params
     )
 
     ws.addEventListener('open', () => {
-      log.info('web socket connected')
+      log.info(`web socket connected: ${STREAM_HOST}`)
     })
 
     ws.addEventListener('message', messageCallback as EventListener)

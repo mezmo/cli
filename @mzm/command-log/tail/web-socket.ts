@@ -43,7 +43,6 @@ export class Socket extends EventTarget {
   }
 
   open() {
-    console.log('establishing weboscket connection %s', this.url.toString())
     this.ws = new WebSocket(this.url.toString())
     this.ws.addEventListener('open', this.onOpen.bind(this))
     this.ws.addEventListener('close', this.onClose.bind(this))
