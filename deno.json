@@ -6,7 +6,9 @@
   "workspace": [
     "./@mzm/log",
     "./@mzm/core",
-    "./@mzm/command-log"
+    "./@mzm/command-log",
+    "./@mzm/command-config",
+    "./@mzm/config"
   ],
   "fmt": {
     "useTabs": false,
@@ -19,7 +21,10 @@
   "compile": {
     "permissions": {
       "env": true,
-      "net": true
+      "net": true,
+      "read": true,
+      "write": true,
+      "sys": true
     }
   },
   "imports": {

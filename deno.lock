@@ -6,6 +6,7 @@
     "jsr:@cliffy/flags@1.0.0-rc.8": "1.0.0-rc.8",
     "jsr:@cliffy/internal@1.0.0-rc.8": "1.0.0-rc.8",
     "jsr:@cliffy/table@1.0.0-rc.8": "1.0.0-rc.8",
+    "jsr:@cliffy/table@^1.0.0-rc.8": "1.0.0-rc.8",
     "jsr:@std/assert@1": "1.0.15",
     "jsr:@std/crypto@^1.0.5": "1.0.5",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
@@ -36,7 +37,7 @@
       "dependencies": [
         "jsr:@cliffy/flags",
         "jsr:@cliffy/internal",
-        "jsr:@cliffy/table",
+        "jsr:@cliffy/table@1.0.0-rc.8",
         "jsr:@std/fmt@~1.0.2",
         "jsr:@std/text"
       ]
@@ -122,7 +123,18 @@
       ]
     },
     "members": {
+      "@mzm/command-config": {
+        "dependencies": [
+          "jsr:@cliffy/table@^1.0.0-rc.8",
+          "jsr:@std/assert@1"
+        ]
+      },
       "@mzm/command-log": {
+        "dependencies": [
+          "jsr:@std/assert@1"
+        ]
+      },
+      "@mzm/config": {
         "dependencies": [
           "jsr:@std/assert@1"
         ]
