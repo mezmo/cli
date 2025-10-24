@@ -1,5 +1,8 @@
-import {ConsoleHandler, getLogger, setup, LogLevels, LogLevelNames, getLevelName} from '@std/log'
+import {ConsoleHandler, getLogger, setup, LogLevels, getLevelName} from '@std/log'
+import type {LevelName} from '@std/log'
+import {storage} from '@mzm/config'
 
+const LOGLEVEL = await storage.getOne('core.log.level') ?? getLevelName(LogLevels.ERROR)
 setup({
   handlers: {
     console: new ConsoleHandler('DEBUG'),
@@ -8,7 +11,7 @@ setup({
   loggers: {
     // configure default logger available via short-hand methods above.
     default: {
-      level: getLevelName(LogLevels.DEBUG),
+      level: LOGLEVEL.toUpperCase() as LevelName,
       handlers: ['console'],
     },
 
