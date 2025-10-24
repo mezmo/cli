@@ -25,6 +25,7 @@ const set = new MZMCommand()
   .arguments('<key:string> <value:configvalue>')
   .action(async function (_, key: string, value: string | number | boolean) {
     await storage.set(key, value)
+    console.log(value)
   })
 
   export {set}
