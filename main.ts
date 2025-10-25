@@ -8,7 +8,7 @@ if (import.meta.main) {
     .name('mzm')
     .env(
       'MZM_ACCESS_KEY=<value:string>',
-      'Platform IAM token',
+      'Mezmo Platform IAM Access Key',
       {prefix: 'MZM_', global: true},
     )
     .action(function () {

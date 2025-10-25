@@ -5,6 +5,7 @@ import {get as GetCommand} from './get/mod.ts'
 const config = new MZMCommand()
   .name('config')
   .description('Manage the the configuration the mzm command')
+  .alias('cfg')
   .action(function () {
     this.showHelp()
   })

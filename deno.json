@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "local": "env $(cat ./env/local.env) deno run --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv main.ts"
   },
   "exports": "./main.ts",
   "workspace": [
