@@ -42,6 +42,7 @@ const tail = new MZMCommand()
     const STREAM_HOST = await storage.getOne('core.host.stream')
     log.debug(`stream host: ${STREAM_HOST}`)
 
+    // TODO(esatterwhite): to remove when IAM key support lands on livetail
     const tail_params: SocketOptions = {
       ...param,
       q: query ?? '',
@@ -55,8 +56,11 @@ const tail = new MZMCommand()
 
     const ws = new Socket(
       `${STREAM_HOST}/ws/tail`
-    , [PROTOCOL.JSON]
     , tail_params
+    , new Headers({
+        Authorization: `Token ${options.accessKey}`
+    })
+    , [PROTOCOL.JSON]
     )
 
     ws.addEventListener('open', () => {
