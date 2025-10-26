@@ -1,6 +1,7 @@
 import {MZMCommand, ArgumentValue, ValidationError} from "@mzm/core"
 import {storage} from '@mzm/config'
 import {typeOf, str} from '@mzm/core/lang'
+import type {JSValue} from '@mzm/core/lang'
 
 const VALID_TYPES: Set<string> = new Set([
   'number'
@@ -8,7 +9,7 @@ const VALID_TYPES: Set<string> = new Set([
 , 'boolean'
 ])
 
-function valueType ({label, name, value}: ArgumentValue): string | number | boolean {
+function valueType ({label, name, value}: ArgumentValue): JSValue {
   const val = str.typecast(value)
   const value_type = typeOf(val)
 
@@ -23,7 +24,7 @@ const set = new MZMCommand()
   .type('configvalue', valueType)
   .description('set one or more configuration values')
   .arguments('<key:string> <value:configvalue>')
-  .action(async function (_, key: string, value: string | number | boolean) {
+  .action(async function (_, key: string, value: JSValue) {
     await storage.set(key, value)
     console.log(value)
   })

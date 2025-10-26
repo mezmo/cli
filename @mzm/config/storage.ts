@@ -1,14 +1,15 @@
 import {debuglog} from 'node:util'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import type {JSValue} from '@mzm/core/lang'
 
 const log = debuglog('config:storage')
-type StorageValue = number | string | boolean
 let needs_init = false
 
 const home = os.homedir()
 const config_dir = path.join(home, '.config', 'mezmo')
 const config_file = path.join(config_dir, 'mzm.cfg')
+
 try {
   Deno.statSync(config_file)
 } catch (err: any) {
@@ -25,7 +26,9 @@ const kvdb = await Deno.openKv(config_file)
 globalThis.addEventListener('unload', () => {
   try {
     kvdb.close()
-  } catch {}
+  } catch {
+    log('there was a problem closing internal kvdb')
+  }
 })
 
 const store = {
@@ -52,12 +55,12 @@ const store = {
     return kvdb.list({prefix: bits})
   }
 
-, async getOne(key: string) {
+, async getOne(key: string): Promise<JSValue> {
     const record = await kvdb.get(key.split('.'))
-    return record.value
+    return record.value as JSValue
   }
 
-, set(key: string, value: StorageValue, ttl: number | undefined = undefined) {
+, set(key: string, value: JSValue, ttl: number | undefined = undefined): Promise<JSValue> {
     const options = ttl ? {expireIn: ttl} : undefined
     return kvdb.set(key.split('.'), value, options)
   }

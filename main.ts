@@ -5,12 +5,6 @@ import {CompletionsCommand, MZMCommand} from '@mzm/core'
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   await new MZMCommand()
-    .name('mzm')
-    .env(
-      'MZM_ACCESS_KEY=<value:string>',
-      'Mezmo Platform IAM Access Key',
-      {prefix: 'MZM_', global: true},
-    )
     .action(function () {
       this.showHelp()
     })
