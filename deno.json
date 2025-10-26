@@ -1,6 +1,9 @@
 {
   "tasks": {
-    "local": "env $(cat ./env/local.env) deno run --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv main.ts"
+    "local": {
+      "description": "Run the main command with environment vairables loaded from 'env/local'",
+      "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv main.ts"
+    }
   },
   "exports": "./main.ts",
   "workspace": [

@@ -1,2 +1,2 @@
 export type Separator = string | RegExp
-export type JSValue = string | Array<JSValue> | object | number | null | undefined
+export type JSValue = string | Array<JSValue> | boolean | Date | object | number | null | undefined
