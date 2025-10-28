@@ -1,6 +1,7 @@
-import {MZMCommand} from "@mzm/core"
+import {MZMCommand, Table, Cell, RowType} from "@mzm/core"
 import {storage} from '@mzm/config'
-import {Table, RowType} from '@cliffy/table'
+
+type Namespace = Record<string, RowType[]>
 
 const get = new MZMCommand()
   .name('get')
@@ -12,18 +13,29 @@ const get = new MZMCommand()
   .action(async function(_, name: string) {
     const output  = new Table()
     output.header(['Namespace', 'Key', 'Value'])
+    const namespaces: Namespace = {}
     const body:RowType[] = []
     const entries = await storage.get(name)
     for await (const entry of entries) {
       if (!entry) continue
       const record: Record<any, any> = {...entry}
-      const [namespace, ...key_path] = record.key
-      body.push(
-        [namespace, key_path.join('.'), record.value]
+      const namespace = record.key[0]
+      const group = (namespaces[namespace] = namespaces[namespace] ?? [])
+
+      group.push(
+        [record.key.join('.'), record.value]
       )
     }
 
-    output.body(body).padding(5).render()
+    for (const [namespace, rows] of Object.entries(namespaces)) {
+      const first_row = rows.shift()
+      if (!first_row) continue
+      body.push([new Cell(namespace).rowSpan(rows.length + 1), ...first_row])
+      for (const row of rows) {
+        body.push(row)
+      }
+    }
+    output.body(body).padding(8).render()
   })
 
   export {get}

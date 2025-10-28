@@ -9,11 +9,6 @@ import {debuglog} from 'node:util'
 const log = getLogger('default')
 const debug = debuglog('cmd:log')
 
-//TODO(esatterwhite) add a temp storage interface
-async function lastID() {
-  return ''
-}
-
 const StartPrefernce = new EnumType(['head', 'tail'])
 const search = new MZMCommand()
   .name('search')
@@ -67,7 +62,7 @@ const search = new MZMCommand()
     if (options.level) params.levels = toArray(options.level).join(',')
     if (options.app) params.apps = toArray(options.app).join(',')
 
-    if (options.next) params.pagination_id = await lastID() ?? ''
+    if (options.next) params.pagination_id = await storage.getOne('search.page.next')
 
     const API_HOST = await storage.getOne('core.host.api')
     const controller = new AbortController()
@@ -84,25 +79,19 @@ const search = new MZMCommand()
     do {
       try {
         const API_HOST = await storage.getOne('core.host.api')
-        const url = `${API_HOST}/v2/export?` + new URLSearchParams(params).toString()
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Token ${options.accessKey}`
-          }
-        })
+        const response = await client.get('v2/export', {params})
 
         // the error response from this endpoint is just plain text :|
-        if (response.status !== 200) {
-          return console.log(response.status === 200)
-        }
+        if (response.status !== 200) return console.log(await response.json())
 
-        const body = await response.json()
-        const {pagination_id: next, lines} = body
+        const {pagination_id: next, lines} = response.data
         params.pagination_id = next
 
+        if (next) await storage.set('search.page.next', next, 1000 * 60)
         if (!lines.length) return console.log('nothing to display')
 
         for (const line of lines) console.log(pprint(line))
+        if (!options.all) controller.abort()
       } catch (err) {
         log.error('Unable to retrieve search results')
         return log.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
