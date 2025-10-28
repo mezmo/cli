@@ -1,6 +1,7 @@
 //@ts-nocheck
 import {MZMCommand, EnumType} from '@mzm/core'
 import {toArray} from '@mzm/core/lang'
+import {client} from '@mzm/core/resource'
 import {pprint, getLogger} from '@mzm/log';
 import {storage} from '@mzm/config'
 import {debuglog} from 'node:util'
@@ -25,10 +26,11 @@ const search = new MZMCommand()
   .option('-l, --level <level:string>', 'log levels to filter by', {collect: true})
   .option('-a, --app <app:string>', 'log levels to filter by', {collect: true})
   .option('-n, --limit <lines:number>', 'Maximum Number of lines to request', {default: 10})
-  .option('-v, --with-view', 'Search with with a predefined view')
+  .option('-v, --with-view [name:string]', 'Search with with a predefined view')
   .group('Pagination options')
   .option('-p, --prefer <prefer:preference>', 'Get lines from the beginning of the interval rather than the end', {default: 'tail'})
   .option('--next', 'Get next chunk of lines (after last search). This is a convenience wrapper around the --from and --to parameters.')
+  .option('--all', 'Automatically scroll through all pages until search results are exhausted')
   .option('--timeframe <timeframe>', 'Natural Language Timeframe via Chrono. Wrap in quotes. IE "today 5PM to 7PM" or "yesterday at 3PM to now" or "May 26 at 4PM UTC". If only one time is given, "from" is assumed.')
   .option('--from <from:number>', 'Unix/Natural Language timestamp of beginning of search timeframe. Wrap in quotes if NL. Ignored if --timeframe used.')
   .option('--to <to:number>', 'Unix/Natural Language timestamp of end of search timeframe. Wrap in quotes if NL. Ignored if --timeframe used.')
@@ -44,17 +46,18 @@ const search = new MZMCommand()
     if (options.limit) params.size = options.limit
     if (options.to) params.to = new Date(parseInt(options.to)).getTime().toString()
 
-
     if (options.withView) {
       try {
-        const view = await this.promptView(options.accessKey)
+        const view = options.withView === true
+        ? await this.promptView()
+        : await this.findView(options.withView)
         params.query = view.query
         options.host = view.hosts
         options.tag = view.tags
         options.level = view.levels
         options.app = view.apps
       } catch (err) {
-        log.error('Unable to retrieve veiws')
+        log.error('Unable to retrieve views')
         return log.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
       }
     }

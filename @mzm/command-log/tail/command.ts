@@ -39,7 +39,7 @@ const tail = new MZMCommand()
   .option('-t, --tag <tag:string>', 'tags to filter by', {collect: true})
   .option('-l, --level <level:string>', 'log levels to filter by', {collect: true})
   .option('-a, --app <app:string>', 'log levels to filter by', {collect: true})
-  .option('-v, --with-view', 'Stream logs matching a predefined view')
+  .option('-v, --with-view [name:string]', 'Stream logs matching a predefined view')
   .action(async function(options: any, query?: string) {
     const STREAM_HOST = await storage.getOne('core.host.stream')
     log.debug(`stream host: ${STREAM_HOST}`)
@@ -53,14 +53,18 @@ const tail = new MZMCommand()
 
     if (options.withView) {
       try {
-        const view = await this.promptView(options.accessKey)
-        tail_params.q = view.query
+        const view = options.withView === true
+        ? await this.promptView()
+        : await this.findView(options.withView)
+
+        if (view.query) tail_params.q = view.query
         options.host = view.hosts
         options.tag = view.tags
         options.level = view.levels
         options.app = view.apps
       } catch (err) {
-        log.error('Unable to retrieve veiws')
+        log.error('Unable to retrieve views')
+        console.dir(err)
         return log.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
       }
     }

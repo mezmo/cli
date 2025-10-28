@@ -4,4 +4,6 @@ export type View = {
 , name: string
 , viewid: string
 , query: string
+, hosts?: Array<string>
+, apps?: Array<string>
 }

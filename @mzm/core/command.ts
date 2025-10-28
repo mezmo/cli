@@ -1,8 +1,14 @@
 import {Command} from '@cliffy/command'
 import {Select} from '@cliffy/prompt/select'
+import {levenshteinDistance, compareSimilarity} from '@std/text'
 import {toTitleCase} from '@std/text/unstable-to-title-case'
 import {default as resource} from './resource/mod.ts'
 import type {View} from './resource/mod.ts'
+
+type ViewMatch = {
+  exact: View | undefined
+, potential: Array<View>
+}
 
 export class MZMCommand extends Command {
   constructor() {
@@ -16,8 +22,8 @@ export class MZMCommand extends Command {
     )
   }
 
-  async promptView() {
-    const views = await this.views()
+  async promptView(seed?: Array<View>, message: string = 'Select A View') {
+    const views = seed ?? await this.views()
     const categories = new Map()
     for (const view of views) {
       const category_name = view.category[0] ?? 'Primary'
@@ -32,7 +38,7 @@ export class MZMCommand extends Command {
     }
 
     const view = await Select.prompt({
-      message: 'Select A View'
+      message: message
     , groupIcon: '\u00BB '
     , groupOpenIcon: '\u00AB '
     , maxRows: 20
@@ -51,5 +57,32 @@ export class MZMCommand extends Command {
   async views(): Promise<Array<View>> {
     const {data} = await resource.view.list()
     return data
+  }
+
+  // the api doesn't support filtering
+  async findView(match: string): Promise<View> {
+    const views = await this.views()
+    const potential_matches: Array<View> = []
+    const to_match = match.toLowerCase()
+    for (const view of views) {
+      if (view.viewid === match) return view
+      const name = view.name.toLowerCase()
+
+      if (name === to_match) return view
+
+      const distance = levenshteinDistance(name, to_match)
+      if (distance <= 20) {
+        potential_matches.push(view)
+      }
+    }
+
+    const comparator = compareSimilarity(to_match)
+    const view = await this.promptView(
+      potential_matches.sort((a: View, b: View) => {
+        return comparator(a.name, b.name)
+      })
+    , 'Select A Similar View'
+    )
+    return view
   }
 }
