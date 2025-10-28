@@ -2,7 +2,7 @@
   "tasks": {
     "local": {
       "description": "Run the main command with environment vairables loaded from 'env/local'",
-      "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv main.ts"
+      "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv --unstable-temporal main.ts"
     }
   },
   "exports": "./main.ts",
@@ -11,6 +11,7 @@
     "./@mzm/core",
     "./@mzm/command-log",
     "./@mzm/command-config",
+    "./@mzm/command-get",
     "./@mzm/config"
   ],
   "fmt": {
