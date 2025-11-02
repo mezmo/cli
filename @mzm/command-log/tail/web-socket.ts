@@ -4,10 +4,6 @@ export enum WebsocketProtocol {
 }
 
 export type SocketOptions = {
-  email: string
-  id: string // account id
-  ts: string // (+ new Date())
-  hmac?: string
   q?: string
   hosts?: string
   tags?: string
@@ -36,8 +32,11 @@ export class Socket extends EventTarget {
     this.controller = new AbortController()
     this.headers = extra_headers
 
+    // workaround for duplicate header problemA
+    // SEE https://github.com/denoland/deno/issues/26866
+    this.headers.set('X-User-Agent', '@mzm-cli/0.0.0')
     this.headers.set('User-Agent', '@mzm-cli/0.0.0')
-    if (options) this.options
+
     if (protocols) this.protocols = protocols
 
     this.ws = null
@@ -84,12 +83,12 @@ export class Socket extends EventTarget {
     this.dispatchEvent(new Event('open'))
   }
   private onClose(evt: CloseEvent) {
-    console.log('closed: reconnecting')
+    //console.log('closed: reconnecting')
     this.dispatchEvent(new CustomEvent('close', {detail: evt}))
     this.reconnect()
   }
   private onError(evt: ErrorEvent | Event) {
-    console.log('error: reconnecting')
+    console.log('error: %s reconnecting', (evt as ErrorEvent).message)
     this.reconnect()
   }
   private onMessage(evt: MessageEvent) {

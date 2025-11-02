@@ -26,7 +26,7 @@ export class MZMCommand extends Command {
     const views = seed ?? await this.views()
     const categories = new Map()
     for (const view of views) {
-      const category_name = view.category[0] ?? 'Primary'
+      const category_name = view.category[0] ?? 'Uncategorized'
       const category = categories.get(category_name) ?? {
         name: toTitleCase(category_name)
       , options: [
@@ -43,8 +43,8 @@ export class MZMCommand extends Command {
     , groupOpenIcon: '\u00AB '
     , maxRows: 20
     , options: Array.from(categories.values()).sort((a, b) => {
-        if (a.name === 'Primary') return -1
-        if (b.name === 'Primary') return 1
+        if (a.name === 'Uncategorized') return -1
+        if (b.name === 'Uncategorized') return 1
 
         if (a.name > b.name) return 1
         if (a.name < b.name) return -1
@@ -55,7 +55,7 @@ export class MZMCommand extends Command {
   }
 
   async views(): Promise<Array<View>> {
-    const {data} = await resource.view.list()
+    const {data} = await resource.v1.view.list()
     return data
   }
 

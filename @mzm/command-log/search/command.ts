@@ -78,7 +78,6 @@ const search = new MZMCommand()
 
     do {
       try {
-        const API_HOST = await storage.getOne('core.host.api')
         const response = await client.get('v2/export', {params})
 
         // the error response from this endpoint is just plain text :|
