@@ -11,4 +11,3 @@ export default new MZMCommand()
     this.showHelp()
   })
   .command('view', ViewCommand)
-

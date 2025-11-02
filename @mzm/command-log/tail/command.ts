@@ -1,20 +1,13 @@
-//@ts-nocheck
 import {MZMCommand} from '@mzm/core'
+import type {RequestError} from '@mzm/core'
 import {WebsocketProtocol as PROTOCOL, Socket} from './web-socket.ts'
 import type {SocketOptions} from './web-socket.ts'
 import {storage} from '@mzm/config'
 import {pprint} from '@mzm/log'
-import {genHMAC} from '@mzm/core/crypto'
 import {toArray} from '@mzm/core/lang'
 import {getLogger} from '@mzm/log'
 
 const log = getLogger('default')
-const secret = 'e1aff34db3'
-const param: SocketOptions = {
-  email: 'eric.satterwhite@mezmo.com',
-  id: '89ebb17ca0',
-  ts: Date.now().toString(),
-}
 
 function messageCallback(event: CustomEvent) {
   const payload = JSON.parse(event.detail)
@@ -42,19 +35,20 @@ const tail = new MZMCommand()
   .option('-v, --with-view [name:string]', 'Stream logs matching a predefined view')
   .action(async function(options: any, query?: string) {
     const STREAM_HOST = await storage.getOne('core.host.stream')
+    const headers = new Headers()
     log.debug(`stream host: ${STREAM_HOST}`)
 
     // TODO(esatterwhite): to remove when IAM key support lands on livetail
     const tail_params: SocketOptions = {
-      ...param,
-      q: query ?? '',
-      hmac: await genHMAC(secret, new URLSearchParams(param).toString()),
+      q: query ?? ''
     }
 
     if (options.withView) {
       try {
         const view = options.withView === true
+        //@ts-ignore work around for command subclassing
         ? await this.promptView()
+        //@ts-ignore work around for command subclassing
         : await this.findView(options.withView)
 
         if (view.query) tail_params.q = view.query
@@ -63,22 +57,25 @@ const tail = new MZMCommand()
         options.level = view.levels
         options.app = view.apps
       } catch (err) {
+        const error = err as RequestError
         log.error('Unable to retrieve views')
         console.dir(err)
-        return log.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
+        //@ts-ignore these errors are mostly defined as unknown
+        return log.error(`[${error.response?.data?.code}] ${error.response?.data.error}`)
       }
     }
+
     tail_params.hosts = toArray(options.host).join(',')
     tail_params.tags = toArray(options.tag).join(',')
     tail_params.levels = toArray(options.level).join(',')
     tail_params.apps = toArray(options.app).join(',')
 
+    if (options.accessKey) headers.append('Authorization', `Token ${options.accessKey}`)
+
     const ws = new Socket(
       `${STREAM_HOST}/ws/tail`
     , tail_params
-    , new Headers({
-        Authorization: `Token ${options.accessKey}`
-    })
+    , headers
     , [PROTOCOL.JSON]
     )
 

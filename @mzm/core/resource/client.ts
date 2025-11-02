@@ -1,5 +1,5 @@
 import {createClient} from '@anitrend/request-client'
-import type {RequestConfig, RequestInterceptor} from '@anitrend/request-client'
+import type {RequestConfig} from '@anitrend/request-client'
 import {storage} from '@mzm/config'
 
 import {debuglog} from 'node:util'

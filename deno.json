@@ -12,6 +12,7 @@
     "./@mzm/command-log",
     "./@mzm/command-config",
     "./@mzm/command-get",
+    "./@mzm/command-create",
     "./@mzm/config"
   ],
   "fmt": {

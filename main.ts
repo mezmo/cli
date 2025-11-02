@@ -2,6 +2,7 @@ import {LogCommand} from '@mzm/command-log'
 import {ConfigCommand} from '@mzm/command-config'
 import {CompletionsCommand, MZMCommand} from '@mzm/core'
 import {default as GetCommand} from '@mzm/command-get'
+import {default as CreateCommand} from '@mzm/command-create'
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -13,5 +14,6 @@ if (import.meta.main) {
     .command('log', LogCommand)
     .command('config', ConfigCommand)
     .command('get', GetCommand)
+    .command('create', CreateCommand)
     .parse(Deno.args)
 }

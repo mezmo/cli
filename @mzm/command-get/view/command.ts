@@ -4,24 +4,22 @@ import type {View} from '@mzm/core/resource'
 type Namespace = Record<string, RowType[]>
 
 const OutputFormat = new EnumType(['table', 'json', 'yaml'])
-
 export default new MZMCommand()
   .name('view')
-  .type('format', OutputFormat)
   .description('Interact with views - Predefined sets of log queries')
   .arguments('[view-id:string]')
   .option('-c, --category <category:string>', 'Specific viescategories to include', {collect: true})
   .option('-q, --quiet', 'output only the resource identifiers', {default: false})
-  .option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
+  .type('format', OutputFormat).option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
   .action(async function(options: any, view_id?: string) {
-    const output = new Table()
+    const output = new Table().padding(8)
 
     const body: RowType[] = []
     if (view_id) {
       output.header(['Category', 'Name', 'Apps', 'Hosts', 'Query'])
-      const response = await resource.view.get(view_id)
-      const view: View = response.data as View
+      const view: View | null = await resource.v1.view.get(view_id)
 
+      if (!view) return output.render()
       if (options.quiet) return console.log(view.viewid)
       switch(options.output) {
         case 'json': {
@@ -32,18 +30,18 @@ export default new MZMCommand()
         }
         case 'table': {
           body.push([
-            toTitleCase((view.category[0] ?? 'Primary'))
+            toTitleCase((view.category[0] ?? 'Uncategorized'))
           , view.name
           , view.apps?.join?.(', ')
           , view.hosts?.join?.(', ')
           , view.query
           ])
-          return output.body(body).padding(8).render()
+          return output.body(body).render()
         }
       }
     }
 
-    const {data: views} = await resource.view.list()
+    const {data: views} = await resource.v1.view.list()
     switch(options.output) {
       case 'json': {
         return console.log(JSON.stringify(views, null, 2))
@@ -56,9 +54,8 @@ export default new MZMCommand()
         if (options.quiet) return console.log(views.map((view: View) => {return view.viewid}).join(' '))
         const categories: Namespace = {}
         for (const view of views) {
-          const category = toTitleCase(view.category[0] ?? 'Primary')
+          const category = toTitleCase(view.category[0] ?? 'Uncategorized')
           const group = (categories[category] = categories[category] ?? [])
-
           group.push(
             [view.name, view.viewid]
           )
@@ -72,7 +69,7 @@ export default new MZMCommand()
             body.push(row)
           }
         }
-        output.body(body).padding(8).render()
+        output.body(body).render()
       }
     }
   })
