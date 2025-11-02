@@ -3,6 +3,38 @@
     "local": {
       "description": "Run the main command with environment vairables loaded from 'env/local'",
       "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv --unstable-temporal main.ts"
+    }, 
+    "clean": {
+      "command": "rm -rf dist mzm"
+    },
+
+    "setup": {
+      "command": "mkdir -p dist"
+    },
+    "compile:cmd": {
+      "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal"
+    },
+
+    "compile:linux": {
+      "command": "deno run compile:cmd -o dist/linux/mzm --target x86_64-unknown-linux-gnu main.ts"
+    },
+    "compile:osx": {
+      "command": "deno run compile:cmd -o dist/osx/mzm --target x86_64-apple-darwin main.ts"
+    },
+    "compile:windows": {
+      "command": "deno run compile:cmd -o dist/windows/mzm.exe --target x86_64-pc-windows-msvc main.ts"
+    },
+
+    "compile:local": {
+      "command": "deno run compile:cmd -o mzm  main.ts"
+    },
+    "compile": {
+      "command": "deno run compile:windows & deno run compile:osx & deno run compile:linux & deno run compile:local",
+      "dependencies": ["clean", "setup"]
+    },
+    "build": {
+      "command": "deno compile -P -o mzm -r --no-npm --unstable-kv --unstable-temporal main.ts",
+      "dependencies": ["clean", "setup"]
     }
   },
   "exports": "./main.ts",
