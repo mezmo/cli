@@ -16,11 +16,11 @@ export default new MZMCommand()
   , 'Environment variable, or vallback to vi on unix platform and notepad on windows.'
   , 'The default format is yaml. To edit in JSON, specifiy "-o json"'
   ].join(EOL))
-  .arguments('<resource:string>')
+  .arguments('<resource-id:string>')
   .option('-o, --output [format:editformat]', 'output only the resource identifiers', {default: 'yaml'})
   .example(
     'basic example'
-  , 'mzm edit -ojson v1/view/abacadaba'
+  , 'mzm edit -ojson v1/view/7fb51dc261'
   )
   .action(async function(options: any, resource_id: string) {
     const editor = Deno.env.get('EDITOR') ?? DEFAULT_EDITOR

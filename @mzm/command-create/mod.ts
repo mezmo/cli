@@ -8,9 +8,12 @@ import {parse} from '@mzm/core/resource'
 const log = getLogger('default')
 export default new MZMCommand()
   .name('create')
+  .usage('<options>')
   .description([
     'Create multiple resources from a file or stdin.'
+  , 'JSON and YAML formats are accepted'
   ].join(EOL))
+  .example('Create a new resource from a spec file:', 'mzm create -f spec.yaml')
   .option('-f, --file <file:string>', 'Path to a resource definition file.')
   .action(async function (options: any) {
     if (typeof options.file !== 'string') {
@@ -30,8 +33,17 @@ export default new MZMCommand()
     }
 
     if (!Object.hasOwnProperty.call(resource, version)) {
-      const types = Object.keys(resource).sort().join(', ')
-      throw new ValidationError(`Unknown resource type ${kind}. Must be one of: ${types}`)
+      const versions = Object.keys(resource).sort().join(', ')
+      throw new ValidationError(`Unknown version. Must be one of: ${versions}`)
+    }
+
+    //@ts-ignore workaround for module indexing
+    if (!resource[version][kind]) {
+      //@ts-ignore workaround for module indexing
+      const types = Object.keys(resource[version]).join(', ')
+      throw new ValidationError(
+        `Unknown resource type ${version}/${kind}. Must be one of: ${types}`
+      )
     }
 
     try {
