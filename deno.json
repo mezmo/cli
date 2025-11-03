@@ -3,49 +3,58 @@
     "local": {
       "description": "Run the main command with environment vairables loaded from 'env/local'",
       "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv --unstable-temporal main.ts"
-    }, 
+    },
+    "version": {
+      "description": "print the version number"
+    , "command": "cat package.json | awk '/version/ {gsub(/[\",]/,\"\"); print $2}'"
+    },
     "clean": {
+      "description": "Remove build artifacts",
       "command": "rm -rf dist mzm"
     },
 
     "setup": {
+      "description": "Prepare the staging area for a new build",
       "command": "mkdir -p dist"
     },
     "compile:cmd": {
+      "description": "echos out the command command for compiling a build. not used directly",
       "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal"
     },
 
     "compile:linux": {
+      "description": "compile a linux x86 binary",
       "command": "deno run compile:cmd -o dist/linux/mzm --target x86_64-unknown-linux-gnu main.ts"
     },
     "compile:osx": {
+      "description": "compile a osx binary",
       "command": "deno run compile:cmd -o dist/osx/mzm --target x86_64-apple-darwin main.ts"
     },
     "compile:windows": {
+      "description": "compile windows binary",
       "command": "deno run compile:cmd -o dist/windows/mzm.exe --target x86_64-pc-windows-msvc main.ts"
     },
 
     "compile:local": {
+      "description": "compile a binary in the cwd for the host platform. for easy testing",
       "command": "deno run compile:cmd -o mzm  main.ts"
     },
     "compile": {
       "command": "deno run compile:windows & deno run compile:osx & deno run compile:linux & deno run compile:local",
-      "dependencies": ["clean", "setup"]
-    },
-    "build": {
-      "command": "deno compile -P -o mzm -r --no-npm --unstable-kv --unstable-temporal main.ts",
+      "description": "Runs all compliation targets",
       "dependencies": ["clean", "setup"]
     }
   },
   "exports": "./main.ts",
   "workspace": [
-    "./@mzm/log",
-    "./@mzm/core",
-    "./@mzm/command-log",
     "./@mzm/command-config",
-    "./@mzm/command-get",
     "./@mzm/command-create",
-    "./@mzm/config"
+    "./@mzm/command-delete",
+    "./@mzm/command-get",
+    "./@mzm/command-log",
+    "./@mzm/config",
+    "./@mzm/core",
+    "./@mzm/log"
   ],
   "fmt": {
     "useTabs": false,
