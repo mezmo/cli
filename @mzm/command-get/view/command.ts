@@ -7,11 +7,27 @@ const OutputFormat = new EnumType(['table', 'json', 'yaml'])
 export default new MZMCommand()
   .name('view')
   .description('Interact with views - Predefined sets of log queries')
+  .example(
+    'List all views:'
+  , 'mzm get view'
+  )
+  .example(
+    'list all views in json format:'
+  , 'mzm get view -o json'
+  )
+  .example(
+    'Get a specific view by id:'
+  , 'mzm get view 3f4bca174'
+  )
+  .example(
+    'Get a specific view by name: '
+  , 'mzm get view "my first view"'
+  )
   .arguments('[view-id:string]')
   .option('-c, --category <category:string>', 'Specific viescategories to include', {collect: true})
   .option('-q, --quiet', 'output only the resource identifiers', {default: false})
   .type('format', OutputFormat)
-  .option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
+  .option('-o, --output [format:format]', 'Print the outout in a specific format', {default: 'table'})
   .action(async function(options: any, view_id?: string) {
     const output = new Table().padding(8)
 

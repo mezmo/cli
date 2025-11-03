@@ -25,6 +25,7 @@ function closeCallback(event: CustomEvent) {
 }
 const tail = new MZMCommand()
   .name('tail')
+  .usage('[query] [options]')
   .description('Stream logs matching a given search query')
   .arguments('[query:string]')
   .group('Filtering options')

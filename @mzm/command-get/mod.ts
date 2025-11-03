@@ -4,6 +4,15 @@ import {default as ViewCommand} from './view/mod.ts'
 
 export default new MZMCommand()
   .name('get')
+  .usage('<resource> [name|id]')
+  .example(
+    'List all views:'
+  , 'mzm get view'
+  )
+  .example(
+    'Get a specific view by id:'
+  , 'mzm get view 3f4bca174'
+  )
   .description([
     'Prints a table of the most important information about the specified resources.'
   ].join(EOL))
