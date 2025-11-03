@@ -4,6 +4,7 @@ import {CompletionsCommand, MZMCommand} from '@mzm/core'
 import {default as GetCommand} from '@mzm/command-get'
 import {default as CreateCommand} from '@mzm/command-create'
 import {default as DeleteCommand} from '@mzm/command-delete'
+import {default as EditCommand} from '@mzm/command-edit'
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -12,10 +13,11 @@ if (import.meta.main) {
       this.showHelp()
     })
     .command('completions', new CompletionsCommand())
-    .command('log', LogCommand)
     .command('config', ConfigCommand)
-    .command('get', GetCommand)
     .command('create', CreateCommand)
     .command('delete', DeleteCommand)
+    .command('edit', EditCommand)
+    .command('get', GetCommand)
+    .command('log', LogCommand)
     .parse(Deno.args)
 }

@@ -1,6 +1,6 @@
 import {EOL} from 'node:os'
 import * as path from '@std/path'
-import {MZMCommand, yaml, ValidationError} from '@mzm/core'
+import {MZMCommand, ValidationError} from '@mzm/core'
 import {getLogger} from '@mzm/log'
 import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
@@ -18,7 +18,8 @@ export default new MZMCommand()
     }
     const file: string = options.file
     const location: string = path.isAbsolute(file) ? options.file : path.join(Deno.cwd(), file)
-    const definition = await parse(location)
+    const content = await Deno.readTextFile(location)
+    const definition = parse(content)
 
     if (!definition) return
 
@@ -36,7 +37,7 @@ export default new MZMCommand()
     try {
       //@ts-ignore workaround for module indexing
       const result = await (resource)[version][kind].create(definition.spec)
-      console.dir(result)
+      console.log(result.pk)
     } catch (err) {
       console.dir(err)
     }

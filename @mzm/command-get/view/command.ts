@@ -10,7 +10,8 @@ export default new MZMCommand()
   .arguments('[view-id:string]')
   .option('-c, --category <category:string>', 'Specific viescategories to include', {collect: true})
   .option('-q, --quiet', 'output only the resource identifiers', {default: false})
-  .type('format', OutputFormat).option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
+  .type('format', OutputFormat)
+  .option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
   .action(async function(options: any, view_id?: string) {
     const output = new Table().padding(8)
 
@@ -19,8 +20,9 @@ export default new MZMCommand()
       output.header(['Category', 'Name', 'Apps', 'Hosts', 'Query'])
       const view: View | null = await resource.v1.view.get(view_id)
 
+      if (options.quiet) return view && console.log(view.viewid)
+
       if (!view) return output.render()
-      if (options.quiet) return console.log(view.viewid)
       switch(options.output) {
         case 'json': {
           return console.log(JSON.stringify(view, null, 2))

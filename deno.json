@@ -50,6 +50,7 @@
     "./@mzm/command-config",
     "./@mzm/command-create",
     "./@mzm/command-delete",
+    "./@mzm/command-edit",
     "./@mzm/command-get",
     "./@mzm/command-log",
     "./@mzm/config",
@@ -70,7 +71,8 @@
       "net": true,
       "read": true,
       "write": true,
-      "sys": true
+      "sys": true,
+      "run": true
     }
   },
   "imports": {
