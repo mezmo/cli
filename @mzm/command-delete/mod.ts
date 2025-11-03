@@ -1,11 +1,9 @@
 import {EOL} from 'node:os'
 import * as path from '@std/path'
 import {MZMCommand, yaml, ValidationError} from '@mzm/core'
-import {getLogger} from '@mzm/log'
 import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
 
-const log = getLogger('default')
 export default new MZMCommand()
   .name('delete')
   .description([
@@ -18,7 +16,8 @@ export default new MZMCommand()
     }
     const file: string = options.file
     const location: string = path.isAbsolute(file) ? options.file : path.join(Deno.cwd(), file)
-    const definition = await parse(location)
+    const content = await Deno.readTextFile(location)
+    const definition = parse(content)
 
     if (!definition) return
 
@@ -29,17 +28,17 @@ export default new MZMCommand()
     }
 
     if (!Object.hasOwnProperty.call(resource, version)) {
-      const types = Object.keys(resource).sort().join(', ')
-      throw new ValidationError(`Unknown resource type ${kind}. Must be one of: ${types}`)
+      const versions = Object.keys(resource).sort().join(', ')
+      throw new ValidationError(`Unknown version type ${version}. Must be one of: ${versions}`)
     }
 
     try {
       //@ts-ignore workaround for module indexing
       const spec = await resource[version][kind].getBySpec(definition.spec)
 
-      console.log('deleting resource %o', spec)
       //@ts-ignore workaround for module indexing
-      const result = await (resource)[version][kind].removeBySpec(spec)
+      await (resource)[version][kind].removeBySpec(spec)
+      if (spec.pk) console.log(spec.pk)
     } catch (err) {
       console.dir(err)
     }

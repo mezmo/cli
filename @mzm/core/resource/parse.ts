@@ -4,17 +4,8 @@ import type {IResourceDefinition} from './types.ts'
 
 const log = getLogger('default')
 
-export default async function parse(file: string): Promise<IResourceDefinition> {
+export default function parse(content: string): IResourceDefinition {
   let definition: IResourceDefinition = {type: '', spec: {}}
-  let content = ''
-    try {
-      content = await Deno.readTextFile(file)
-    } catch (error) {
-      if (error instanceof Deno.errors.NotFound) {
-        log.error(`Unable to read ${location}`)
-        return definition
-      }
-    }
   try {
     definition = yaml.parse(content) as IResourceDefinition
   } catch (err) {
