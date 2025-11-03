@@ -184,6 +184,12 @@
           "jsr:@std/path@^1.1.2"
         ]
       },
+      "@mzm/command-delete": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@std/path@^1.1.2"
+        ]
+      },
       "@mzm/command-get": {
         "dependencies": [
           "jsr:@std/assert@1"
