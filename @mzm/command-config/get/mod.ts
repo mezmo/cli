@@ -1,4 +1,5 @@
 import {MZMCommand, Table, Cell, RowType} from "@mzm/core"
+import {typeOf} from "@mzm/core/lang"
 import {storage} from '@mzm/config'
 
 type Namespace = Record<string, RowType[]>
@@ -22,9 +23,10 @@ const get = new MZMCommand()
       const namespace = record.key[0]
       const group = (namespaces[namespace] = namespaces[namespace] ?? [])
 
-      group.push(
-        [record.key.join('.'), record.value]
-      )
+      group.push([
+        record.key.join('.')
+      , typeOf(record.value) === 'object' ? '<object>' : record.value
+      ])
     }
 
     for (const [namespace, rows] of Object.entries(namespaces)) {

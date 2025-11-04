@@ -28,11 +28,15 @@ if (!config_exists) {
   log('setting inital value for core.stream-host')
   await store.set('core.host.stream', 'https://tail.mezmo.com')
 
-  log('setting inital value for core.search.limit')
-  await store.set('core.search.limit', 100)
-
   log('setting initial value for core.log.level')
   await store.set('core.log.level', 'ERROR')
+
+  log('setting initial value for search.page.ttl')
+  await store.set('search.page.ttl', 1000 * 60)
+
+  log('setting inital value for search.page.limit')
+  await store.set('search.page.limit', 100)
+
 }
 
 export default store

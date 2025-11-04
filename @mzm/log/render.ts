@@ -1,4 +1,5 @@
 import {colors} from '@cliffy/ansi/colors'
+import * as util from 'node:util'
 import type {LogLine} from './types.ts'
 
 const ERROR_REGEX = /err(?:or)?|crit(?:ical)?|fatal|severe|emerg(?:ENCY)?/i
@@ -25,8 +26,9 @@ const THEME = {
   },
 }
 
-export function pprint(line: LogLine, ) {
+export function pprint(line: LogLine, json: boolean = false) {
   if (!line._host) return ''
+  if (json) return JSON.stringify(line)
   const timestamp = new Date(line._ts).toString()
   const host = line._host
   const app = line._app
