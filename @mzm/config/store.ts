@@ -52,6 +52,11 @@ export default class Store {
     const options = ttl ? {expireIn: ttl} : undefined
     return this.#kvdb.set(key.split('.'), value, options)
   }
+
+  unset(key: string): Promise<void> {
+    return this.#kvdb.delete(key.split('.'))
+  }
+
   close() {
     try {
       this.#kvdb.close()
