@@ -10,10 +10,10 @@ import {getLogger} from '@mzm/log'
 const log = getLogger('default')
 
 function messageCallback(event: CustomEvent) {
-  const payload = JSON.parse(event.detail)
+  const payload = JSON.parse(event.detail.data)
   // ignore meta message
   if (payload.e === 'meta') return
-  for (const line of payload.p) console.log(pprint(line))
+  for (const line of payload.p) console.log(pprint(line, event.detail.json))
 }
 
 function closeCallback(event: CustomEvent) {
@@ -23,10 +23,19 @@ function closeCallback(event: CustomEvent) {
   log.error('lost connection')
   log.error(`[${event.detail.code}]: ${event.detail.reason}`)
 }
+
 const tail = new MZMCommand()
   .name('tail')
   .usage('[query] [options]')
   .description('Stream logs matching a given search query')
+  .example(
+    'Tail error logs for a specific application:'
+  , 'mzm log tail -a <app> -l error'
+  )
+  .example(
+    'Tail for a specific application with a query filter:'
+  , 'mzm log tail -a <app> "level:-(debug OR trace) missing cred"'
+  )
   .arguments('[query:string]')
   .group('Filtering options')
   .option('-H, --host <hostname:string>', 'Host name to filter the log stream', {collect: true})
@@ -34,6 +43,7 @@ const tail = new MZMCommand()
   .option('-l, --level <level:string>', 'log levels to filter by', {collect: true})
   .option('-a, --app <app:string>', 'log levels to filter by', {collect: true})
   .option('-v, --with-view [name:string]', 'Stream logs matching a predefined view')
+  .option('-j, --json', 'Output raw JSON')
   .action(async function(options: any, query?: string) {
     const STREAM_HOST = await storage.getOne('core.host.stream')
     const headers = new Headers()
@@ -77,6 +87,7 @@ const tail = new MZMCommand()
       `${STREAM_HOST}/ws/tail`
     , tail_params
     , headers
+    , options.json
     , [PROTOCOL.JSON]
     )
 

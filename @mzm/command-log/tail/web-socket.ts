@@ -21,16 +21,19 @@ export class Socket extends EventTarget {
   headers: Headers
   reconnect_timer: number | undefined
   reconnect_delay: number = 2000
+  json: boolean = false
   constructor(
     url: string,
     options: SocketOptions,
     extra_headers: Headers,
+    json: boolean = false,
     protocols: WebsocketProtocol[],
   ) {
     super()
     this.url = new URL(url)
     this.controller = new AbortController()
     this.headers = extra_headers
+    this.json = json
 
     // workaround for duplicate header problemA
     // SEE https://github.com/denoland/deno/issues/26866
@@ -92,6 +95,6 @@ export class Socket extends EventTarget {
     this.reconnect()
   }
   private onMessage(evt: MessageEvent) {
-    this.dispatchEvent(new CustomEvent('message', {detail: evt.data}))
+    this.dispatchEvent(new CustomEvent('message', {detail: {data: evt.data, json: this.json}}))
   }
 }

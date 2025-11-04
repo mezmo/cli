@@ -38,6 +38,15 @@ export default class Store {
     const record = await this.#kvdb.get(key.split('.'))
     return record.value as JSValue
   }
+  async getMany(...keys: Array<string>) {
+    const items = keys.map((item) => {
+      return item.split('.')
+    })
+    const results = await this.#kvdb.getMany(items)
+    return results.map((record) => {
+      return record.value
+    })
+  }
 
   set(key: string, value: JSValue, ttl: number | undefined = undefined): Promise<JSValue> {
     const options = ttl ? {expireIn: ttl} : undefined
