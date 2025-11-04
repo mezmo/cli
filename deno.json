@@ -1,4 +1,5 @@
 {
+  "name": "@mezmo/cli",
   "tasks": {
     "local": {
       "description": "Run the main command with environment vairables loaded from 'env/local'",

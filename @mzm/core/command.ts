@@ -13,6 +13,7 @@ type ViewMatch = {
 , potential: Array<View>
 }
 
+//FIXME(esatterwhite): move the view specific stuff to the resource package
 export class MZMCommand extends Command {
   constructor() {
     super()

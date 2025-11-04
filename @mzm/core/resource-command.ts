@@ -23,12 +23,12 @@ export default class ResourceCommand extends MZMCommand {
     this.type('format', OutputFormat).option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
   }
   async list<Type>(params?: Record<string, string>): Promise<Array<Type>> {
-    const {data} = await (resource as any)[this.#resource_version][this.#resource].list(params)
+    const {data} = await (resource as unknown)[this.#resource_version][this.#resource].list(params)
     return data as Type[]
   }
 
   async get<Type>(identifer: string, params?: Record<string, string>): Promise<Type> {
-    const result = await (resource as any)[this.#resource_version][this.#resource].get(identifer)
+    const result = await (resource as unknown)[this.#resource_version][this.#resource].get(identifer)
     return result as Type
   }
 
