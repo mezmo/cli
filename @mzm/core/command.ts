@@ -1,9 +1,12 @@
+import {debuglog} from 'node:util'
 import {Command} from '@cliffy/command'
 import {Select} from '@cliffy/prompt/select'
 import {levenshteinDistance, compareSimilarity} from '@std/text'
 import {toTitleCase} from '@std/text/unstable-to-title-case'
 import {default as resource} from './resource/mod.ts'
 import type {View} from './resource/mod.ts'
+
+const debug = debuglog('core:command')
 
 type ViewMatch = {
   exact: View | undefined
@@ -64,14 +67,26 @@ export class MZMCommand extends Command {
     const views = await this.views()
     const potential_matches: Array<View> = []
     const to_match = match.toLowerCase()
+    debug(`looking for view ${to_match}`)
     for (const view of views) {
       if (view.viewid === match) return view
       const name = view.name.toLowerCase()
 
-      if (name === to_match) return view
+      if (name === to_match) {
+        debug('found exact name match: %s', view.name)
+        return view
+      }
 
-      const distance = levenshteinDistance(name, to_match)
-      if (distance <= 20) {
+      const name_includes = name.includes(to_match)
+      const name_distance = levenshteinDistance(
+        name.replace(/\s+/g, '')
+      , to_match.replace(/\s+/g, '')
+      )
+
+      const name_close = name_distance <= Math.floor(match.length / 2)
+
+      if (name_includes || name_close) {
+        debug(`adding potential match: ${name}`)
         potential_matches.push(view)
       }
     }
@@ -83,6 +98,7 @@ export class MZMCommand extends Command {
       })
     , 'Select A Similar View'
     )
+    debug('view selected %s', view.name)
     return view
   }
 }
