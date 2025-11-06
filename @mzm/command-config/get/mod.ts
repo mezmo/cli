@@ -15,11 +15,11 @@ const get = new MZMCommand()
     const output  = new Table()
     output.header(['Namespace', 'Key', 'Value'])
     const namespaces: Namespace = {}
-    const body:RowType[] = []
+    const body: RowType[] = []
     const entries = await storage.get(name)
     for await (const entry of entries) {
       if (!entry) continue
-      const record: Record<any, any> = {...entry}
+      const record: Record<string, any> = {...entry}
       const namespace = record.key[0]
       const group = (namespaces[namespace] = namespaces[namespace] ?? [])
 
