@@ -1,5 +1,6 @@
 //@ts-nocheck work arround for command extension with views
 //TODO(esatterwhite): move views functions to core/resource
+import {EOL} from 'node:os'
 import {debuglog} from 'node:util'
 import {MZMCommand, EnumType} from '@mzm/core'
 import {toArray} from '@mzm/core/lang'
@@ -21,7 +22,10 @@ const search = new MZMCommand()
   .name('search')
   .usage('[query] [options]')
   .type('preference', StartPrefernce)
-  .description('Perform paginated search queries over indexed historical data')
+  .description([
+    'Perform paginated search queries over indexed historical data.'
+  , 'If the --to and --from flags are omitted the last 2 hours will be searched.'
+  ].join(EOL))
   .example(
     'Start new paginated search query:'
   , 'mzm log search --from=1762198107863 --to=1762198113902 pod:bzp-logs'
@@ -69,13 +73,16 @@ const search = new MZMCommand()
   .option('-j, --json', 'Output raw JSON')
   .action(async function(options: any, query?: string) {
     const params: Record<string, string> = {
-      query: query ?? ''
+      query: query ?? '_account:*'
     }
     params.prefer = options.prefer;
 
-    if (options.from) params.from = new Date(parseInt(options.from)).getTime().toString()
     if (options.limit) params.size = options.limit
+    if (options.from) params.from = new Date(parseInt(options.from)).getTime().toString()
+    else params.from = DEFAULT_FROM.epochMilliseconds
+
     if (options.to) params.to = new Date(parseInt(options.to)).getTime().toString()
+    else params.to = DEFAULT_TO.epochMilliseconds
 
     if (options.withView) {
       try {
