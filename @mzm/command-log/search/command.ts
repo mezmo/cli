@@ -143,15 +143,15 @@ const search = new MZMCommand()
         // the error response from this endpoint is just plain text :|
         if (response.status !== 200) return console.log(await response.json())
 
-        const {pagination_id: next, lines} = response.data
+        const {pagination_id, lines} = response.data
 
-        if (next) {
+        if (pagination_id) {
           const ttl: number = await storage.getOne('search.page.ttl')
           await Promise.all([
-            storage.set('search.page.next', next, ttl)
+            storage.set('search.page.next', pagination_id, ttl)
           , storage.set('search.page.params', params, ttl)
           ])
-          params.pagination_id = next
+          params.pagination_id = pagination_id
         } else {
           await storage.unset('search.page.next')
           await storage.unset('search.page.params')
@@ -160,7 +160,7 @@ const search = new MZMCommand()
         if (!lines.length) return console.log('nothing to display')
 
         for (const line of lines) console.log(pprint(line, options.json))
-        if (!options.all || !next) controller.abort()
+        if (!options.all || !pagination_id) controller.abort()
       } catch (err) {
         log.error('Unable to retrieve search results')
         console.dir(err)
