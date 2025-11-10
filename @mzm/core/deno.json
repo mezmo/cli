@@ -7,7 +7,8 @@
     ".": "./mod.ts",
     "./crypto": "./crypto.ts",
     "./lang": "./lang/mod.ts",
-    "./resource": "./resource/mod.ts"
+    "./resource": "./resource/mod.ts",
+    "./resource/types": "./resource/types.ts"
   },
   "imports": {
     "@anitrend/request-client": "jsr:@anitrend/request-client@^0.1.3",

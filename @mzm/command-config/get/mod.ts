@@ -11,7 +11,7 @@ const get = new MZMCommand()
   .example('Get list of keys:', 'mzm config get core.*')
   .arguments('<key:string>')
   .description('get one or more configuration values')
-  .action(async function(_, name: string) {
+  .action(async function(_: unknown, name: string) {
     const output  = new Table()
     output.header(['Namespace', 'Key', 'Value'])
     const namespaces: Namespace = {}
@@ -22,10 +22,24 @@ const get = new MZMCommand()
       const record: Record<string, any> = {...entry}
       const namespace = record.key[0]
       const group = (namespaces[namespace] = namespaces[namespace] ?? [])
+      let display = ''
 
+      switch (typeOf(record.value)) {
+        case 'object': {
+          display = '<object>'
+          break
+        }
+        case 'array': {
+          display = `<list: ${record.value.length}>`
+          break
+        }
+        default: {
+          display = record.value
+        }
+      }
       group.push([
         record.key.join('.')
-      , typeOf(record.value) === 'object' ? '<object>' : record.value
+      , display
       ])
     }
 

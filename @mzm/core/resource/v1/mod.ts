@@ -1,3 +1,4 @@
 import * as view from './view/mod.ts'
+import * as conversation from './conversation/mod.ts'
 
-export default {view}
+export default {view, conversation}

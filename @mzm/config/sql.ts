@@ -22,32 +22,37 @@ type StringTemplate = (arg1: TemplateStringsArray, ...arg2: Array<SQLInputValue>
 export function SQL(db: DatabaseSync): StringTemplate {
   return function(strings: TemplateStringsArray, ...values: QueryParams): QueryEngine {
     const sql = strings.join('?')
-    const stmt = db.prepare(sql)
-    return {
-      query: stmt
-    , values(...replaced: QueryParams): QueryEngine {
-        values = replaced
-        return this
-      }
+    try {
+      const stmt = db.prepare(sql)
+      return {
+        query: stmt
+      , values(...replaced: QueryParams): QueryEngine {
+          values = replaced
+          return this
+        }
 
-    , run(): StatementResultingChanges {
-        //@ts-ignore ignore polymorphic warnings
-        return stmt.run(...values)
-      }
+      , run(): StatementResultingChanges {
+          //@ts-ignore ignore polymorphic warnings
+          return stmt.run(...values)
+        }
 
-    , get(...vals: QueryParams): Record<string, SQLOutputValue> | undefined {
-        //@ts-ignore ignore polymorphic warnings
-        const inputs = vals.length ? vals : values
-        //@ts-ignore ignore polymorphic warnings
-        return stmt.get(...inputs)
-      }
+      , get(...vals: QueryParams): Record<string, SQLOutputValue> | undefined {
+          //@ts-ignore ignore polymorphic warnings
+          const inputs = vals.length ? vals : values
+          //@ts-ignore ignore polymorphic warnings
+          return stmt.get(...inputs)
+        }
 
-    , all(...vals: QueryParams): Array<Record<string, SQLOutputValue>> {
-        //@ts-ignore ignore polymorphic warnings
-        const inputs = vals.length ? vals : values
-        //@ts-ignore ignore polymorphic warnings
-        return stmt.all(...inputs)
+      , all(...vals: QueryParams): Array<Record<string, SQLOutputValue>> {
+          //@ts-ignore ignore polymorphic warnings
+          const inputs = vals.length ? vals : values
+          //@ts-ignore ignore polymorphic warnings
+          return stmt.all(...inputs)
+        }
       }
+    } catch (err) {
+      console.dir(sql)
+      throw new Error('unable to compile sql statement')
     }
   }
 }

@@ -5,6 +5,7 @@ import {default as GetCommand} from '@mzm/command-get'
 import {default as CreateCommand} from '@mzm/command-create'
 import {default as DeleteCommand} from '@mzm/command-delete'
 import {default as EditCommand} from '@mzm/command-edit'
+import {default as AskCommand} from '@mzm/command-ask'
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -12,6 +13,7 @@ if (import.meta.main) {
     .action(function () {
       this.showHelp()
     })
+    .command('ask', AskCommand)
     .command('completions', new CompletionsCommand())
     .command('config', ConfigCommand)
     .command('create', CreateCommand)

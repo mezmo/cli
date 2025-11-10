@@ -2,7 +2,7 @@ import {ConsoleHandler, getLogger, setup, LogLevels, getLevelName} from '@std/lo
 import type {LevelName} from '@std/log'
 import {storage} from '@mzm/config'
 import {str} from '@mzm/core/lang'
-
+import {colors} from '@cliffy/ansi/colors'
 
 const LOGLEVEL = str.upper(
   await storage.getOne('core.log.level') as string ?? getLevelName(LogLevels.ERROR)
@@ -26,5 +26,5 @@ setup({
   },
 })
 
-export {getLogger}
+export {getLogger, colors}
 export {pprint} from './render.ts'
