@@ -1,8 +1,10 @@
 import {debuglog} from 'node:util'
+import {DatabaseSync} from 'node:sqlite'
 import * as os from 'node:os'
 import * as path from '@std/path'
 import {exists} from '@std/fs/exists'
 import {default as Store} from './store.ts'
+import {SQL} from './sql.ts'
 
 const log = debuglog('config:storage')
 
@@ -17,8 +19,17 @@ if (!config_exists) {
 }
 
 log('opening configuration store: %s', config_file)
+
+// low level sqlite interface
+const db: DatabaseSync = new DatabaseSync(config_file)
+
+// deno high level Key/Value interface for sqlite 
 const kvdb = await Deno.openKv(config_file)
 
+// sql tag wrapper + query interace for easier prepared statements
+const sql = SQL(db)
+
+// primary configuration settings interace
 const store = new Store(kvdb)
 
 if (!config_exists) {
@@ -40,4 +51,4 @@ if (!config_exists) {
 }
 
 export default store
-export {kvdb}
+export {kvdb, sql, db as sqlite}

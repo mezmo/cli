@@ -1,1 +1,1 @@
-export {default as storage} from './storage.ts'
+export {default as storage, kvdb, sql, sqlite} from './storage.ts'
