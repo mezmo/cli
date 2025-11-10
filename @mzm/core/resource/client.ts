@@ -21,6 +21,12 @@ const client = createClient({
 , responseType: 'json'
 })
 
+const aura = createClient({
+  baseURL: await storage.getOne('core.host.api') as string
+, timeout: 1000 * 60 * 10
+, responseType: 'json'
+})
+
 // add auth key just before request as to not
 // print it when introspecting objects inline
 client.interceptors.request.use((config: ApiRequest): RequestConfig => {
@@ -30,8 +36,19 @@ client.interceptors.request.use((config: ApiRequest): RequestConfig => {
   , 'Authorization': `Token ${ACCESS_KEY}`
   ,  ...headers
   }
-  log(`[${method}] ${baseURL}/${url}?${new URLSearchParams(params as Record<string, string>).toString()}`)
+  return config as RequestConfig
+})
+
+// There is probably a way to 
+aura.interceptors.request.use((config: ApiRequest): RequestConfig => {
+  const {headers = {}, method, baseURL, url, params = {}} = config
+  config.headers = {
+    'Content-Type': 'application/json'
+  , 'Authorization': `Bearer ${ACCESS_KEY}`
+  ,  ...headers
+  }
   return config as RequestConfig
 })
 
 export default client
+export {aura}

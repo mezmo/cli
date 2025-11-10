@@ -1,5 +1,6 @@
 import type {JSValue, Separator} from './types.ts'
-export {default as str} from './string.ts'
+export * as str from './string.ts'
+export * as obj from './object.ts'
 export {JSValue, Separator}
 
 const CSV_SEP_EXP: RegExp = /\s*,\s*/

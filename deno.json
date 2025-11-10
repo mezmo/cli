@@ -48,6 +48,7 @@
   },
   "exports": "./main.ts",
   "workspace": [
+    "./@mzm/command-ask",
     "./@mzm/command-config",
     "./@mzm/command-create",
     "./@mzm/command-delete",
