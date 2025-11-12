@@ -23,7 +23,7 @@ export default new MZMCommand()
     'Get a specific view by name: '
   , 'mzm get view "my first view"'
   )
-  .arguments('[view-id:string]')
+  .arguments('[id:string]')
   .option('-c, --category <category:string>', 'Specific viescategories to include', {collect: true})
   .option('-q, --quiet', 'output only the resource identifiers', {default: false})
   .type('format', OutputFormat)
