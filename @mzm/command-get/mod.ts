@@ -1,6 +1,7 @@
 import {EOL} from 'node:os'
 import {MZMCommand} from '@mzm/core'
 import {default as ViewCommand} from './view/mod.ts'
+import {default as ConversationCommand} from './conversation/mod.ts'
 
 export default new MZMCommand()
   .name('get')
@@ -20,3 +21,4 @@ export default new MZMCommand()
     this.showHelp()
   })
   .command('view', ViewCommand)
+  .command('conversation', ConversationCommand)

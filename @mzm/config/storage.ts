@@ -56,7 +56,7 @@ if (!config_exists) {
     CREATE TABLE IF NOT EXISTS conversation(
       conversation_session_id TEXT PRIMARY KEY
     , created_at INTEGER NOT NULL DEFAULT (unixepoch())
-    , active BOOLEAN NULL DEFAULT NULL
+    , active BOOLEAN NOT NULL DEFAULT FALSE
     );
     CREATE TABLE IF NOT EXISTS conversation_history(
       created_at INTEGER NOT NULL DEFAULT (unixepoch())

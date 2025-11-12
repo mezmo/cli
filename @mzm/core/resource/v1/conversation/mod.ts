@@ -6,7 +6,7 @@ import type {ChatResponse, ChatHistory, Conversation} from './types.ts'
 import {ChatRole} from './types.ts'
 
 const debug = debuglog('core:resource:conversation')
-const deactivate_current = sql`UPDATE conversation SET active = NULL WHERE active = 1`
+const deactivate_current = sql`UPDATE conversation SET active = FALSE WHERE active = TRUE`
 
 export async function create(user_question: string): Promise<ChatResponse> {
   try {
@@ -139,11 +139,13 @@ SELECT
 FROM conversation_history
 INNER JOIN message_counts
     ON message_counts.conversation_session_id = conversation_history.conversation_session_id
-WHERE conversation_history.first_message IS TRUE AND conversation_history.role = 'user'
+WHERE conversation_history.first_message IS TRUE
+AND conversation_history.role = 'user'
+AND active >= :active_only -- BOOLEANS are really number so you can compare TRUE / FALSE as if they have a value
 ;
 `
-export async function list(): Promise<Array<ChatHistory>> {
-  return conversation_list.all() as Array<ChatHistory>
+export async function list(active_only: boolean = false): Promise<Array<ChatHistory>> {
+  return conversation_list.all({active_only: active_only ? 1 : 0}) as Array<ChatHistory>
 }
 
 let conversation_get = sql`
