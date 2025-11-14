@@ -5,19 +5,29 @@
       "description": "Run the main command with environment vairables loaded from 'env/local'",
       "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv --unstable-temporal main.ts"
     },
+    "test": {
+      "command": "deno test --unstable-kv --unstable-temporal --coverage",
+      "description": "Runs the test suite with code coverage enabled"
+    },
+    "reports": {
+      "command": "deno coverage --detailed --html --lcov",
+      "description": "Generates detailed coverage reports after tests",
+      "dependencies": ["clean", "test"]
+    },
     "version": {
       "description": "print the version number"
     , "command": "cat package.json | awk '/version/ {gsub(/[\",]/,\"\"); print $2}'"
     },
     "clean": {
       "description": "Remove build artifacts",
-      "command": "rm -rf dist mzm"
+      "command": "rm -rf dist mzm coverage"
     },
 
     "setup": {
       "description": "Prepare the staging area for a new build",
       "command": "mkdir -p dist"
     },
+
     "compile:cmd": {
       "description": "echos out the command command for compiling a build. not used directly",
       "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal"
