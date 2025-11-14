@@ -5,6 +5,9 @@ import * as path from '@std/path'
 import {exists} from '@std/fs/exists'
 import {default as Store} from './store.ts'
 import {SQL} from './sql.ts'
+import {Migrate} from '@marianmeres/migrate'
+import {parse, SemVer} from '@std/semver'
+import * as migrations from './migration/mod.ts'
 
 const log = debuglog('config:storage')
 
@@ -26,55 +29,37 @@ const db: DatabaseSync = new DatabaseSync(config_file)
 // deno high level Key/Value interface for sqlite 
 const kvdb = await Deno.openKv(config_file)
 
+
 // sql tag wrapper + query interace for easier prepared statements
 const sql = SQL(db)
 
 // primary configuration settings interace
 const store = new Store(kvdb)
+const migrator = new Migrate({
+  getActiveVersion: async function getActiveVersion(context: Record<string, unknown>) {
+    const database: DatabaseSync = context.db as DatabaseSync
+    const result = database.prepare('PRAGMA user_version').get() as {user_version: number | undefined}
+    const major = result.user_version
+    if (!major) return
+    log('current active version: %d', major)
+    return `${major}.0.0`
+  }
+, setActiveVersion: async function setActiveVersion(version: string | undefined, context: Record<string, unknown>) {
+    if (!version) return
+    const parsed:SemVer = parse(version)
+    const database: DatabaseSync = context.db as DatabaseSync
+    log('setting active version %d', parsed.major)
+    database.exec(`PRAGMA user_version = ${parsed.major}`)
+    return version
+  }
+}, {db, store})
 
-if (!config_exists) {
-  log('setting inital value for core.api-host')
-  await store.set('core.host.api', 'https://api.mezmo.com')
-
-  log('setting inital value for core.stream-host')
-  await store.set('core.host.stream', 'https://tail.mezmo.com')
-
-  log('setting initial value for core.log.level')
-  await store.set('core.log.level', 'ERROR')
-
-  log('setting initial value for search.page.ttl')
-  await store.set('search.page.ttl', 1000 * 60)
-
-  log('setting inital value for search.page.limit')
-  await store.set('search.page.limit', 100)
-
-  db.exec(`
-    DROP TABLE IF EXISTS conversation_history;
-    DROP TABLE IF EXISTS conversation;
-  `)
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS conversation(
-      conversation_session_id TEXT PRIMARY KEY
-    , created_at INTEGER NOT NULL DEFAULT (unixepoch())
-    , active BOOLEAN NOT NULL DEFAULT FALSE
-    );
-    CREATE TABLE IF NOT EXISTS conversation_history(
-      created_at INTEGER NOT NULL DEFAULT (unixepoch())
-    , conversation_history_id TEXT PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(8))))
-    , role TEXT NOT NULL
-    , content TEXT NOT NULL
-    , conversation_session_id TEXT NOT NULL
-    , first_message BOOLEAN DEFAULT FALSE
-    , FOREIGN KEY (conversation_session_id)
-      REFERENCES conversation(conversation_session_id)
-      ON DELETE CASCADE
-    );
-
-    CREATE UNIQUE INDEX conversation_active_uniq ON conversation(active) WHERE active = 1;
-    CREATE INDEX conversation_history_session_id_idx ON conversation_history(conversation_session_id);
-    CREATE INDEX conversation_session_id_idx ON conversation(conversation_session_id);
-  `)
+for (const [version, migration] of Object.entries(migrations)) {
+  log('adding migration version: %s', version)
+  migrator.addVersion(version, migration.up, migration.down)
 }
+
+await migrator.up('latest')
 
 export default store
 export {kvdb, sql, db as sqlite}
