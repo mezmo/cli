@@ -3,7 +3,7 @@
 import {EOL} from 'node:os'
 import {debuglog} from 'node:util'
 import {MZMCommand, EnumType} from '@mzm/core'
-import {toArray} from '@mzm/core/lang'
+import {toArray, date} from '@mzm/core/lang'
 import {client} from '@mzm/core/resource'
 import {pprint, getLogger} from '@mzm/log';
 import {storage} from '@mzm/config'
@@ -27,24 +27,32 @@ const search = new MZMCommand()
   , 'If the --to and --from flags are omitted the last 2 hours will be searched.'
   ].join(EOL))
   .example(
-    'Start new paginated search query:'
-  , 'mzm log search --from=1762198107863 --to=1762198113902 pod:bzp-logs'
+    'Start new paginated search query using unix timestamps:'
+  , 'mzm log search --from=1762198107863 --to=1762198113902 pod:widget-server'
+  )
+  .example(
+    'Start new paginated using natural language time frames:'
+  , 'mzm log search --from "last wednesday" --to "now" --with-view'
   )
   .example(
     'Start new paginated with a view:'
-  , 'mzm log search --from=1762198107863 --to=1762198113902 --with-view'
+  , 'mzm log search --from=1762198107863 --with-view'
   )
   .example(
     'Start new paginated with a subset of views:'
-  , 'mzm log search --from=1762198107863 --to=1762198113902 --with-view proxy'
+  , 'mzm log search --from 1762198107863 --to 1762198113902 --with-view proxy'
   )
   .example(
-    'Start new paginated with a specific view'
-  , 'mzm log search --from=1762198107863 --to=1762198113902 --with-view a2dfe012b'
+    'Start new paginated with a specific view:'
+  , 'mzm log search --from "yesterday at 3pm" --to "now" --with-view a2dfe012b'
+  )
+  .example(
+    'Start new paginated using a sub command to find a view by name:'
+  , 'mzm log search --from "yesterday at 3pm" --to "now" --with-view $(mzm get view "only errors" -q)'
   )
   .example(
     'Start search query and page throuh all results:'
-  , 'mzm log search --from=1762198107863 --to=1762198113902 --all pod:bzp-logs'
+  , 'mzm log search --from "one hour ago" --all pod:widget-server'
   )
   .example(
     'Get the next page of the last search query:'
@@ -66,9 +74,8 @@ const search = new MZMCommand()
   .option('-p, --prefer <prefer:preference>', 'Get lines from the beginning of the interval rather than the end', {default: 'tail'})
   .option('--next', 'Get next chunk of lines (after last search). This is a convenience wrapper around the --from and --to parameters.')
   .option('--all', 'Automatically scroll through all pages until search results are exhausted')
-//  .option('--timeframe <timeframe:number>', 'Natural Language Timeframe via Chrono. Wrap in quotes. IE "today 5PM to 7PM" or "yesterday at 3PM to now" or "May 26 at 4PM UTC". If only one time is given, "from" is assumed.')
-  .option('--from <from:number>', 'Unix timestamp of beginning of search timeframe.')
-  .option('--to <to:number>', 'Unix timestamp of end of search timeframe.')
+  .option('--from <from:string>', 'Unix timestamp of beginning of search timeframe.')
+  .option('--to <to:string>', 'Unix timestamp of end of search timeframe.')
   .group('Output Options')
   .option('-j, --json', 'Output raw JSON')
   .action(async function(options: any, query?: string) {
@@ -78,11 +85,11 @@ const search = new MZMCommand()
     params.prefer = options.prefer;
 
     if (options.limit) params.size = options.limit
-    if (options.from) params.from = new Date(parseInt(options.from)).getTime().toString()
+    if (options.from) params.from = date.toDateTime(options.from).epochMilliseconds
     else params.from = DEFAULT_FROM.epochMilliseconds
 
-    if (options.to) params.to = new Date(parseInt(options.to)).getTime().toString()
-    else params.to = DEFAULT_TO.epochMilliseconds
+    if (options.to) params.to = date.toDateTime(options.to).epochMilliseconds
+    else params.from = DEFAULT_FROM.epochMilliseconds
 
     if (options.withView) {
       try {
