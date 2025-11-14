@@ -12,6 +12,10 @@
     "jsr:@cliffy/table@1.0.0-rc.8": "1.0.0-rc.8",
     "jsr:@cliffy/table@^1.0.0-rc.8": "1.0.0-rc.8",
     "jsr:@littletof/charmd@~0.1.2": "0.1.2",
+    "jsr:@marianmeres/item-collection@^1.2.11": "1.2.19",
+    "jsr:@marianmeres/migrate@^1.0.2": "1.0.2",
+    "jsr:@marianmeres/pubsub@^2.1.1": "2.2.0",
+    "jsr:@marianmeres/searchable@^2.2.1": "2.2.1",
     "jsr:@std/assert@1": "1.0.15",
     "jsr:@std/assert@^1.0.15": "1.0.15",
     "jsr:@std/assert@~1.0.6": "1.0.15",
@@ -33,6 +37,7 @@
     "jsr:@std/path@^1.1.2": "1.1.2",
     "jsr:@std/path@~1.0.6": "1.0.9",
     "jsr:@std/regexp@^1.0.1": "1.0.1",
+    "jsr:@std/semver@^1.0.6": "1.0.6",
     "jsr:@std/testing@^1.0.16": "1.0.16",
     "jsr:@std/text@^1.0.16": "1.0.16",
     "jsr:@std/text@~1.0.7": "1.0.16",
@@ -99,6 +104,25 @@
         "jsr:@std/fmt@0.223.0"
       ]
     },
+    "@marianmeres/item-collection@1.2.19": {
+      "integrity": "0fd594a1c5c7c6410ba0ed21910a426ecf83577a90d50fb50ccea4de52e78184",
+      "dependencies": [
+        "jsr:@marianmeres/pubsub",
+        "jsr:@marianmeres/searchable"
+      ]
+    },
+    "@marianmeres/migrate@1.0.2": {
+      "integrity": "635e0bca4e2ecfccad9637194df2ece2fc6fcc6af46e7ba3b2844a21d89a5782",
+      "dependencies": [
+        "jsr:@marianmeres/item-collection"
+      ]
+    },
+    "@marianmeres/pubsub@2.2.0": {
+      "integrity": "7edf68b6ea2aac8cbfb1c253c60a21917e2d296c6ec21c88a40b5a03d70875ad"
+    },
+    "@marianmeres/searchable@2.2.1": {
+      "integrity": "05348848d300a891e06e730f7bba103fa10f29588323f28893d8c3f18f1efc17"
+    },
     "@std/assert@1.0.15": {
       "integrity": "d64018e951dbdfab9777335ecdb000c0b4e3df036984083be219ce5941e4703b",
       "dependencies": [
@@ -152,6 +176,9 @@
     },
     "@std/regexp@1.0.1": {
       "integrity": "5179d823465085c5480dafb44438466e83c424fadc61ba31f744050ecc0f596d"
+    },
+    "@std/semver@1.0.6": {
+      "integrity": "b7c98ae2843547cf3f7ac37f3995889e6e4cee0a97b57b57f17f62722843303c"
     },
     "@std/testing@1.0.16": {
       "integrity": "a917ffdeb5924c9be436dc78bc32e511760e14d3a96e49c607fc5ecca86d0092",
@@ -247,9 +274,11 @@
       },
       "@mzm/config": {
         "dependencies": [
+          "jsr:@marianmeres/migrate@^1.0.2",
           "jsr:@std/assert@^1.0.15",
           "jsr:@std/fs@^1.0.19",
           "jsr:@std/path@^1.1.2",
+          "jsr:@std/semver@^1.0.6",
           "jsr:@std/testing@^1.0.16"
         ]
       },
