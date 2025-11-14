@@ -1,4 +1,4 @@
-### Empathy {#empathy}
+### Empathy
 
 Command-line tools are a programmer’s creative toolkit, so they should be enjoyable to use.
 This doesn’t mean turning them into a video game, or using lots of emoji (though there’s nothing inherently wrong with emoji 😉).

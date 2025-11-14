@@ -1,4 +1,4 @@
-### Robustness {#robustness-guidelines}
+### Robustness
 
 **Validate user input.**
 Everywhere your program accepts data from the user, it will eventually be given bad data.

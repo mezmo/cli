@@ -1,4 +1,4 @@
-### Help {#help}
+### Help
 
 **Display extensive help text when asked.**
 Display help when passed `-h` or `--help` flags.

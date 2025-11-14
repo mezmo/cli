@@ -18,7 +18,7 @@ $  docker-compose up
 Your program should expect to be started in a situation where clean-up has not been run.
 (See [Crash-only software: More than meets the eye](https://lwn.net/Articles/191059/).)
 
-### Configuration {#configuration}
+### Configuration
 
 Command-line tools have lots of different types of configuration, and lots of different ways to supply it (flags, environment variables, project-level config files).
 The best way to supply each piece of configuration depends on a few factors, chief among them _specificity_, _stability_ and _complexity_.

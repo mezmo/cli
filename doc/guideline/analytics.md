@@ -1,4 +1,4 @@
-### Analytics {#analytics}
+### Analytics
 
 Usage metrics can be helpful to understand how users are using your program, how to make it better, and where to focus effort.
 But, unlike websites, users of the command-line expect to be in control of their environment, and it is surprising when programs do things in the background without telling them.
