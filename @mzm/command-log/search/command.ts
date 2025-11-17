@@ -89,7 +89,7 @@ const search = new MZMCommand()
     else params.from = DEFAULT_FROM.epochMilliseconds
 
     if (options.to) params.to = date.toDateTime(options.to).epochMilliseconds
-    else params.from = DEFAULT_FROM.epochMilliseconds
+    else params.to = DEFAULT_TO.epochMilliseconds
 
     if (options.withView) {
       try {
