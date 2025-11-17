@@ -191,3 +191,12 @@ export async function get(conversation_session_id: string): Promise<ChatHistory>
   payload.messages = JSON.parse(message_json as string)
   return payload
 }
+
+
+export async function remove(identifiers: Array<string>): Promise<Array<Record<string, string>>> {
+  const placholders = identifiers.map(() => {
+    return '?'
+  })
+  const query = `DELETE FROM conversation WHERE conversation_session_id IN (${placholders}) RETURNING conversation_session_id as pk`
+  return sqlite.prepare(query).all(...identifiers)
+}

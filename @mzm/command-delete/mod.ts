@@ -1,8 +1,9 @@
 import {EOL} from 'node:os'
 import * as path from '@std/path'
-import {MZMCommand, yaml, ValidationError} from '@mzm/core'
+import {MZMCommand, ValidationError} from '@mzm/core'
 import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
+import ConversationCommand from './conversation/command.ts'
 
 export default new MZMCommand()
   .name('delete')
@@ -53,3 +54,4 @@ export default new MZMCommand()
       console.dir(err)
     }
   })
+  .command('conversation', ConversationCommand)
