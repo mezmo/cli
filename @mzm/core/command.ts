@@ -24,6 +24,10 @@ export class MZMCommand extends Command {
       'Mezmo Platform IAM Access Key',
       {prefix: 'MZM_'}
     )
+    this.env(
+      'NO_COLOR=<value:boolean>',
+      'Suppress ANSI color formatting',
+    )
   }
 
   async promptView(seed?: Array<View>, message: string = 'Select A View') {

@@ -46,11 +46,7 @@ export default new MZMCommand()
       )
     }
 
-    try {
-      //@ts-ignore workaround for module indexing
-      const result = await (resource)[version][kind].create(definition.spec)
-      console.log(result.pk)
-    } catch (err) {
-      console.dir(err)
-    }
+    //@ts-ignore workaround for module indexing
+    const result = await (resource)[version][kind].create(definition.spec)
+    console.log(result.pk)
   })
