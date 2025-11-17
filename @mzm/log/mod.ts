@@ -7,9 +7,15 @@ import {colors} from '@cliffy/ansi/colors'
 const LOGLEVEL = str.upper(
   await storage.getOne('core.log.level') as string ?? getLevelName(LogLevels.ERROR)
 )
+
+class StdErrHandler extends ConsoleHandler {
+  override log(msg: string) {
+    console.error(msg)
+  }
+}
 setup({
   handlers: {
-    console: new ConsoleHandler('DEBUG'),
+    console: new StdErrHandler('DEBUG')
   },
 
   loggers: {
