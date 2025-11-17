@@ -32,11 +32,11 @@ export default new MZMCommand()
       }
       case 'table': {
         const body: RowType[] = []
-        output.header(['Active', 'Created', 'Question', 'Messages', 'ID'])
+        output.header(['ACTIVE', 'CREATED', 'QUESTION', 'MESSAGES', 'ID'])
 
         if (options.quiet) {
           const identifiers: Array<string> = conversations.map((conversation: ChatHistory) => {
-            return conversation.conversation_session_id
+            return conversation.pk
           })
           return console.log(identifiers.join(' '))
         }
@@ -47,7 +47,7 @@ export default new MZMCommand()
           , conversation.created_at
           , conversation.question
           , new Cell(conversation.message_count / 2).align('center')
-          , conversation.conversation_session_id
+          , conversation.pk
           ])
         }
         output.body(body).render()

@@ -33,7 +33,7 @@ export default new MZMCommand()
 
     const body: RowType[] = []
     if (view_id) {
-      output.header(['Category', 'Name', 'Apps', 'Hosts', 'Query'])
+      output.header(['CATEGORY', 'NAME', 'APPS', 'HOSTS', 'QUERY'])
       const view: View | null = await resource.v1.view.get(view_id)
 
       if (options.quiet) return view && console.log(view.viewid)
@@ -68,7 +68,7 @@ export default new MZMCommand()
         return console.log(yaml.stringify(views))
       }
       case 'table': {
-        output.header(['Category', 'Name', 'ID'])
+        output.header(['CATEGORY', 'NAME', 'ID'])
         if (options.quiet) return console.log(views.map((view: View) => {return view.viewid}).join(' '))
         const categories: Namespace = {}
         for (const view of views) {
