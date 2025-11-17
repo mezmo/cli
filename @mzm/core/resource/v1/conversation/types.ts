@@ -10,6 +10,7 @@ export type UserMessage = {
 
 export type ChatHistory = {
   conversation_session_id: string
+, pk: string
 , created_at: string
 , message_count: number
 , active: boolean

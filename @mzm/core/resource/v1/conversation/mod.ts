@@ -136,6 +136,7 @@ SELECT
 , message_counts.message_count
 , active
 , message_counts.conversation_session_id
+, message_counts.conversation_session_id as pk
 FROM conversation_history
 INNER JOIN message_counts
     ON message_counts.conversation_session_id = conversation_history.conversation_session_id
@@ -153,7 +154,7 @@ WITH message_counts AS (
     SELECT
       conversation_history.conversation_session_id
     , conversation.active
-    , conversation.conversation_session_id
+    , conversation.conversation_session_id as pk
     , datetime(conversation.created_at, 'unixepoch') as created_at
     , COUNT(*) as message_count
     , JSON_GROUP_ARRAY(
@@ -174,6 +175,7 @@ SELECT
 , content AS question
 , message_counts.message_count
 , active
+, message_counts.conversation_session_id AS pk
 , message_counts.conversation_session_id
 , message_counts.messages as message_json
 FROM conversation_history
