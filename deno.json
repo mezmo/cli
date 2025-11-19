@@ -28,6 +28,20 @@
       "command": "mkdir -p dist"
     },
 
+    "bundle:refractor": {
+      "description": "Compile the refractor npm package to a deno native module",
+      "command": "deno bundle --no-npm --platform deno -o @mzm/core/refractor.vnd.mjs @vendor/refractor/main.ts"
+    },
+    "bundle:chrono": {
+      "description": "Compile the chrono npm package to a deno native module",
+      "command": "deno bundle --no-npm --platform deno -o @mzm/core/chrono.vnd.mjs @vendor/chrono/main.ts"
+    },
+
+    "bundle": {
+      "description": "Compile all vendored packages to native inline deno modules"
+    , "command": "deno task bundle:chrono & deno task bundle:refractor"
+    },
+
     "compile:cmd": {
       "description": "echos out the command command for compiling a build. not used directly",
       "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal --unstable-raw-imports"

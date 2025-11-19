@@ -13,7 +13,8 @@
     "./error": "./error.ts",
     "./remote": "./remote.ts",
     "./update": "./update/mod.ts",
-    "./update/providers": "./update/providers/mod.ts"
+    "./update/providers": "./update/providers/mod.ts",
+    "./refractor": "./refractor.vnd.mjs"
   },
   "fmt": {
     "useTabs": false,
