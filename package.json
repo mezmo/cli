@@ -1,8 +1,17 @@
 {
   "name": "@mezmo/cli",
   "version": "0.0.0",
+  "scripts": {
+    "prerelease": "rm -rf dist && mkdir dist",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run --no-ci --branches=${BRANCH_NAME:-main}"
+  },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
     "@types/node": "^24.2.0",
-    "@types/web": "^0.0.281"
+    "@types/web": "^0.0.281",
+    "semantic-release": "^25.0.2"
   }
 }

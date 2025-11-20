@@ -49,6 +49,7 @@ const active_conversation = sql`
   LIMIT 1
 `
 export async function active(): Promise<Conversation> {
+  //@ts-ignore typescript is wrong
   const record: Conversation | undefined = active_conversation.get() as Conversation
   return record
 }
@@ -69,6 +70,7 @@ export async function activate(conversation_session_id:string): Promise<Conversa
     deactivate_current.run()
     const result = set_conversation_active.get({conversation_session_id})
     sqlite.exec('COMMIT')
+    //@ts-ignore typescript is wrong
     return result as Conversation
   } catch(err) {
     if (sqlite.isTransaction) sqlite.exec('ROLLBACK')
@@ -146,6 +148,7 @@ AND active >= :active_only -- BOOLEANS are really number so you can compare TRUE
 ;
 `
 export async function list(active_only: boolean = false): Promise<Array<ChatHistory>> {
+  //@ts-ignore typescript is wrong
   return conversation_list.all({active_only: active_only ? 1 : 0}) as Array<ChatHistory>
 }
 
@@ -186,6 +189,7 @@ WHERE conversation_history.first_message IS TRUE AND conversation_history.role =
 ;
 `
 export async function get(conversation_session_id: string): Promise<ChatHistory> {
+  //@ts-ignore typescript is wrong
   const record: ChatHistory = conversation_get.get({conversation_session_id}) as ChatHistory
   if (!record) return record
 
@@ -195,7 +199,7 @@ export async function get(conversation_session_id: string): Promise<ChatHistory>
 }
 
 
-export async function remove(identifiers: Array<string>): Promise<Array<Record<string, string>>> {
+export async function remove(identifiers: Array<string>): Promise<Array<Record<string, unknown>>> {
   const placholders = identifiers.map(() => {
     return '?'
   })
