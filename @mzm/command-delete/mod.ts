@@ -4,6 +4,7 @@ import {MZMCommand, ValidationError} from '@mzm/core'
 import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
 import ConversationCommand from './conversation/command.ts'
+import ViewCommand from './view/command.ts'
 
 export default new MZMCommand()
   .name('delete')
@@ -55,3 +56,4 @@ export default new MZMCommand()
     }
   })
   .command('conversation', ConversationCommand)
+  .command('view', ViewCommand)
