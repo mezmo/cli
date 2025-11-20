@@ -1,9 +1,5 @@
 import {yaml} from '../mod.ts'
-
-enum StringifyFormat {
-  JSON = 'json'
-, YAML = 'yaml'
-}
+import {StringifyFormat} from './types.ts'
 export default function stringify(content: Record<string, any>, format: StringifyFormat): string {
   switch(format) {
     case StringifyFormat.JSON: return JSON.stringify(content, null, 2)

@@ -76,7 +76,7 @@ const search = new MZMCommand()
   .option('--all', 'Automatically scroll through all pages until search results are exhausted')
   .option('--from <from:string>', 'Unix timestamp of beginning of search timeframe.')
   .option('--to <to:string>', 'Unix timestamp of end of search timeframe.')
-  .group('Output Options')
+  .group('Formatting Options')
   .option('-j, --json', 'Output raw JSON')
   .action(async function(options: any, query?: string) {
     const params: Record<string, string> = {
