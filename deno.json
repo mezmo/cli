@@ -33,17 +33,29 @@
       "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal"
     },
 
-    "compile:linux": {
+    "compile:linux:x86": {
       "description": "compile a linux x86 binary",
-      "command": "deno run compile:cmd -o dist/linux/mzm --target x86_64-unknown-linux-gnu main.ts"
+      "command": "deno run compile:cmd -o dist/mzm-linux-x86_64 --target x86_64-unknown-linux-gnu main.ts"
     },
-    "compile:osx": {
+
+    "compile:linux:arm": {
+      "description": "compile a linux x86 binary",
+      "command": "deno run compile:cmd -o dist/mzm-linux-aarch64 --target x86_64-unknown-linux-gnu main.ts"
+    },
+
+    "compile:osx:x86": {
       "description": "compile a osx binary",
-      "command": "deno run compile:cmd -o dist/osx/mzm --target x86_64-apple-darwin main.ts"
+      "command": "deno run compile:cmd -o dist/mzm-darwin-x86_64 --target x86_64-apple-darwin main.ts"
     },
+
+    "compile:osx:arm": {
+      "description": "compile a osx binary",
+      "command": "deno run compile:cmd -o dist/mzm-darwin-aarch64 --target aarch64-apple-darwin main.ts"
+    },
+
     "compile:windows": {
       "description": "compile windows binary",
-      "command": "deno run compile:cmd -o dist/windows/mzm.exe --target x86_64-pc-windows-msvc main.ts"
+      "command": "deno run compile:cmd -o dist/mzm-windows-x86_64.exe --target x86_64-pc-windows-msvc main.ts"
     },
 
     "compile:local": {
@@ -51,7 +63,7 @@
       "command": "deno run compile:cmd -o mzm  main.ts"
     },
     "compile": {
-      "command": "deno run compile:windows & deno run compile:osx & deno run compile:linux & deno run compile:local",
+      "command": "deno run compile:windows & deno run compile:osx:arm & deno run compile:osx:x86 & deno run compile:linux:x86 & deno run compile:linux:arm & deno run compile:local",
       "description": "Runs all compliation targets",
       "dependencies": ["clean", "setup"]
     }
