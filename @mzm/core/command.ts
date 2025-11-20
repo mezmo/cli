@@ -30,7 +30,7 @@ export class MZMCommand extends Command {
     )
   }
 
-  async promptView(seed?: Array<View>, message: string = 'Select A View') {
+  async promptView(seed?: Array<View>, message: string = 'Select A View'): Promise<View> {
     const views = seed ?? await this.views()
     const categories = new Map()
     for (const view of views) {
