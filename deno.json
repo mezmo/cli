@@ -6,7 +6,7 @@
       "command": "deno run --env-file=env/local.env --allow-env --allow-net --allow-sys --allow-read --allow-write --unstable-kv --unstable-temporal main.ts"
     },
     "test": {
-      "command": "deno test --unstable-kv --unstable-temporal --coverage",
+      "command": "deno test --unstable-kv --unstable-temporal --coverage --junit-path coverage/test.xml",
       "description": "Runs the test suite with code coverage enabled"
     },
     "reports": {
