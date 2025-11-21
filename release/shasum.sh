@@ -1,5 +1,5 @@
 #!/bin/bash
-set -exuo pipefail
+set -euo pipefail
 
 pushd dist
 rm -f checksum.txt
@@ -8,7 +8,7 @@ touch checksum.txt
 FILES=$(ls mzm-*)
 for FILE in $FILES
 do
-  echo "$(sha1sum ${FILE})" >> checksum.txt
+  echo "$(sha1sum ${FILE})" | tee -a checksum.txt
 done
 
 popd
