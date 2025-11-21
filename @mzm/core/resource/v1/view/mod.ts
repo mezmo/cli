@@ -22,7 +22,11 @@ type JoiResponse = {
 export async function get(view_id: string, params?: Record<string, string>): Promise<View | null> {
   try {
     const res = await client.get(`v1/config/view/${view_id}`, params)
-    if (res.status === 200) return res.data as View
+    if (res.status === 200) {
+      const view = res.data as View
+      view.pk = view.viewid
+      return view
+    }
   } catch (err) {
     const cast: RequestError = err as RequestError
     const status = cast?.response?.status

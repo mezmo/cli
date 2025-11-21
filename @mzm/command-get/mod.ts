@@ -1,7 +1,8 @@
 import {EOL} from 'node:os'
 import {MZMCommand} from '@mzm/core'
-import {default as ViewCommand} from './view/mod.ts'
-import {default as ConversationCommand} from './conversation/mod.ts'
+import ViewCommand from './view/mod.ts'
+import ConversationCommand from './conversation/mod.ts'
+import AccountCommand from './account/mod.ts'
 
 export default new MZMCommand()
   .name('get')
@@ -20,5 +21,6 @@ export default new MZMCommand()
   .action(function () {
     this.showHelp()
   })
-  .command('view', ViewCommand)
+  .command('account', AccountCommand)
   .command('conversation', ConversationCommand)
+  .command('view', ViewCommand)

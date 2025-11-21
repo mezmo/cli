@@ -1,6 +1,7 @@
  //@ts-nocheck
 import {MZMCommand} from './command.ts'
-import * as resource from './resource/mod.ts'
+import {obj as object} from '@mzm/core/lang'
+import resource from './resource/mod.ts'
 import {Table, Cell, Row} from '@cliffy/table'
 import {toTitleCase} from '@std/text/unstable-to-title-case'
 import {EnumType} from '@cliffy/command'
@@ -11,16 +12,26 @@ import type {RowType} from '@cliffy/command'
 type Namespace = Record<string, RowType[]>
 const OutputFormat = new EnumType(['table', 'json', 'yaml'])
 
+function noop(value: unknown): unknown {
+  return value
+}
+
 export default class ResourceCommand extends MZMCommand {
   #pk_field: string = 'id'
   #display_field: string = 'name'
   #group_by: string = ''
   #resource: string = ''
   #resource_version: string = 'v1'
+  #columns: Array<Record<string, string>> = []
   constructor(resource: string) {
     super()
     this.#resource = resource
-    this.type('format', OutputFormat).option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
+
+    this
+      .type('format', OutputFormat)
+      .group('Formating options')
+      .option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
+      .option('-q, --quiet', 'Only print out identifiers than formated text output')
   }
   async list<Type>(params?: Record<string, string>): Promise<Array<Type>> {
     const {data} = await (resource as unknown)[this.#resource_version][this.#resource].list(params)
@@ -44,6 +55,15 @@ export default class ResourceCommand extends MZMCommand {
 
   display(name: string): this {
     this.#display_field = name
+    return this
+  }
+  column(definition: Record<string, string>): this {
+    this.#columns.push(definition)
+    return this
+  }
+
+  apiVersion(name: string): this {
+    this.#resource_version = name
     return this
   }
 
@@ -88,6 +108,20 @@ export default class ResourceCommand extends MZMCommand {
           body.push(row)
         }
       }
+      return output.body(body).toString()
+    }
+
+    output.header(this.#columns.map((col) => {
+      return col.name
+    }))
+
+    for (const item of items) {
+      const row = []
+      for (const column of this.#columns) {
+        const render = column.render || noop
+        row.push(render(object.get(item, column.property)))
+      }
+      body.push(row)
     }
     return output.body(body).toString()
   }
