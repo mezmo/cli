@@ -49,11 +49,11 @@ module.exports = {
       changelogTitle: '## Changelog'
     }]
   , ['@semantic-release/exec', {
-      "verifyRelease": "deno task compile:local"
-    , "prepare": "deno task compile"
+      "verifyConditionsCmd": "deno task compile:local"
+    , "prepareCmd": "deno task compile"
     }]
   , ['@semantic-release/exec', {
-      "prepare": "release/shasum.sh"
+      "prepareCmd": "release/shasum.sh"
     }]
   , ['@semantic-release/npm', null]
   , ['@semantic-release/git', {
