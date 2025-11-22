@@ -34,6 +34,4 @@ Note that we use a standard [MIT](./LICENSE) license on this repo.
 The easiest way to get our attention is to comment on an existing, or open a new
 [issue][].
 
-[eslint]: https://eslint.org
-[eslint-config-logdna]: https://github.com/logdna/eslint-config-logdna
-[issue]: https://github.com/logdna/stdlib-node/issues
+[issue]: https://github.com/mezmo/cli/issues
