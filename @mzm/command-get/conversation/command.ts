@@ -10,7 +10,7 @@ export default new MZMCommand()
   .alias('chat')
   .arguments('[id:string]')
   .type('format', OutputFormat)
-  .option('-o, --output [format:format]', 'Print the outout in a specific format', {default: 'table'})
+  .option('-o, --output [format:format]', 'Print the output in a specific format', {default: 'table'})
   .option('-q, --quiet', 'Only print out identifiers than formated text output')
   .option('-a, --active', 'Get the currently active conversation')
   .action(async function(options: any, conversation_id?: string) {

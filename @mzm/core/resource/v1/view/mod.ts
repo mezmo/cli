@@ -183,9 +183,10 @@ export async function remove(view_id: string): Promise<void> {
 }
 
 export async function update(view: View): Promise<View> {
-  const {account: _account, viewid: _viewid, orgs: _orgs, presetids = [], ...update} = view
+  const {pk: _pk, account: _account, viewid: _viewid, orgs: _orgs, presetids = [], ...update} = view
 
   if (presetids.length) update.presetid = presetids[0]
+
   try {
     const res = await client.put(`v1/config/view/${view.viewid}`, update)
     return res.data as View

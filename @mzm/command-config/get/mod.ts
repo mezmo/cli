@@ -9,9 +9,9 @@ const get = new MZMCommand()
   .usage('<name>')
   .example('Get specific key:', 'mzm config get core.host.api')
   .example('Get list of keys:', 'mzm config get core.*')
-  .arguments('<key:string>')
+  .arguments('[key:string]')
   .description('get one or more configuration values')
-  .action(async function(_: unknown, name: string) {
+  .action(async function(_: unknown, name: string = '*') {
     const output  = new Table()
     output.header(['Namespace', 'Key', 'Value'])
     const namespaces: Namespace = {}
