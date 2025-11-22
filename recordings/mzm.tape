@@ -72,13 +72,19 @@ Set WindowBar ColorfulRight
 Type@0.2 "mzm" Enter
 Sleep 2s
 
-Type@0.2 "mzm config get core.*" Enter
+Type@0.2 "mzm config get search.*" Enter
 Sleep 2s
 
 Type@0.2 "mzm log" Enter
 Sleep 2s
 
-Type@0.2 "mzm log search --from=1761761669396 --to=1761761692873 --level=info foobar" Enter
+Type@0.2 "mzm log search --from '2 hours ago' --to now --prefer head --level=info foobar" Enter
+Sleep 5s
+
+Type@0.2 "mzm log search --next" Enter
+Sleep 5s
+
+Type@0.2 "mzm log search --next" Enter
 Sleep 5s
 
 Type@0.2 "mzm log tail" Enter
