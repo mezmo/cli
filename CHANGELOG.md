@@ -1,5 +1,23 @@
 ## Changelog
 
+## [1.0.1](https://github.com/mezmo/cli/compare/v1.0.0...v1.0.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* **ci**: fix release process and release rules [543a1f4](https://github.com/mezmo/cli/commit/543a1f4a90e069fdccb9b99b41f5c71793648e33) - Eric Satterwhite
+* **command**: fix a problem with the edit view command [4f1320b](https://github.com/mezmo/cli/commit/4f1320b4450216a33358afea7108bb45429207a0) - Eric Satterwhite
+
+
+### Documentation
+
+* **wiki**: update the vhs recording names [0b58be2](https://github.com/mezmo/cli/commit/0b58be2df7dab5506480553160e1ac0bbcb564ad) - Eric Satterwhite
+
+
+### Miscellaneous
+
+* doc(wiki) update the readme with something useful [b3956bc](https://github.com/mezmo/cli/commit/b3956bc2bf1e68633e2d5c1af0ca6512fdd8bc57) - Eric Satterwhite
+
 # 1.0.0 (2025-11-22)
 
 
