@@ -1,4 +1,4 @@
-import {MZMCommand} from '@mzm/core'
+import {MZMCommand, EnumType} from '@mzm/core'
 import type {RequestError} from '@mzm/core'
 import {WebsocketProtocol as PROTOCOL, Socket} from './web-socket.ts'
 import type {SocketOptions} from './web-socket.ts'
@@ -8,6 +8,7 @@ import {toArray} from '@mzm/core/lang'
 import {getLogger} from '@mzm/log'
 
 const log = getLogger('default')
+const OutputFormat = new EnumType(['json', 'pretty'])
 
 function messageCallback(event: CustomEvent) {
   const payload = JSON.parse(event.detail.data)
@@ -28,6 +29,7 @@ const tail = new MZMCommand()
   .name('tail')
   .usage('[query] [options]')
   .description('Stream logs matching a given search query')
+  .type('format', OutputFormat)
   .example(
     'Tail error logs for a specific application:'
   , 'mzm log tail -a <app> -l error'
@@ -44,7 +46,7 @@ const tail = new MZMCommand()
   .option('-a, --app <app:string>', 'log levels to filter by', {collect: true})
   .option('-v, --with-view [name:string]', 'Stream logs matching a predefined view')
   .group('Formating options')
-  .option('-j, --json', 'Output raw JSON')
+  .option('-o, --output [format:format]', 'Output raw JSON', {default: 'pretty'})
   .action(async function(options: any, query?: string) {
     const STREAM_HOST = await storage.getOne('core.host.stream')
     const headers = new Headers()
@@ -88,7 +90,7 @@ const tail = new MZMCommand()
       `${STREAM_HOST}/ws/tail`
     , tail_params
     , headers
-    , options.json
+    , options.output === 'json'
     , [PROTOCOL.JSON]
     )
 

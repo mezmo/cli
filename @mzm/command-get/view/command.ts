@@ -27,7 +27,7 @@ export default new MZMCommand()
   .option('-c, --category <category:string>', 'Specific viescategories to include', {collect: true})
   .option('-q, --quiet', 'output only the resource identifiers', {default: false})
   .type('format', OutputFormat)
-  .option('-o, --output [format:format]', 'Print the outout in a specific format', {default: 'table'})
+  .option('-o, --output [format:format]', 'Print the output in a specific format', {default: 'table'})
   .action(async function(options: any, view_id?: string) {
     const output = new Table().padding(8)
 

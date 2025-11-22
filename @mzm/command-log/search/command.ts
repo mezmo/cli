@@ -11,6 +11,7 @@ import {storage} from '@mzm/config'
 const log = getLogger('default')
 const debug = debuglog('core:command:log:search')
 const StartPrefernce = new EnumType(['head', 'tail'])
+const OutputFormat = new EnumType(['json', 'pretty'])
 const DEFAULT_PAGE_DURATION: Temporal.Duration = Temporal.Duration.from({hours: 2})
 const DEFAULT_TO: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO()
 const DEFAULT_FROM: Temporal.ZonedDateTime = (DEFAULT_TO.subtract(DEFAULT_PAGE_DURATION))
@@ -22,6 +23,7 @@ const search = new MZMCommand()
   .name('search')
   .usage('[query] [options]')
   .type('preference', StartPrefernce)
+  .type('format', OutputFormat)
   .description([
     'Perform paginated search queries over indexed historical data.'
   , 'If the --to and --from flags are omitted the last 2 hours will be searched.'
@@ -77,7 +79,7 @@ const search = new MZMCommand()
   .option('--from <from:string>', 'Unix timestamp of beginning of search timeframe.')
   .option('--to <to:string>', 'Unix timestamp of end of search timeframe.')
   .group('Formatting Options')
-  .option('-j, --json', 'Output raw JSON')
+  .option('-o, --output [format:format]', 'Print the output in a specific format', {default: 'pretty'})
   .action(async function(options: any, query?: string) {
     const params: Record<string, string> = {
       query: query ?? '_account:*'
@@ -166,7 +168,7 @@ const search = new MZMCommand()
 
         if (!lines.length) return console.log('nothing to display')
 
-        for (const line of lines) console.log(pprint(line, options.json))
+        for (const line of lines) console.log(pprint(line, options.output === 'json'))
         if (!options.all || !pagination_id) controller.abort()
       } catch (err) {
         log.error('Unable to retrieve search results')
