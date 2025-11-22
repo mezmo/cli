@@ -30,17 +30,22 @@ module.exports = {
   }
 , releaseRules: [
     {breaking: true, release: 'major'}
+  , {type: 'chore', scope: 'dep-dev', release: false}
   , {type: 'build', release: 'patch'}
   , {type: 'ci', release: 'patch'}
   , {type: 'chore', release: 'patch'}
-  , {type: 'doc', release: 'patch'}
   , {type: 'feat', release: 'minor'}
+  , {type: 'refactor', release: 'patch'}
+  , {type: 'release', release: false}
+  , {type: 'test', release: 'patch'}
+  , {type: 'doc', release: 'patch'}
+  , {type: 'doc', scope: 'wiki', release: false}
   , {type: 'fix', release: 'patch'}
   , {type: 'lib', release: 'patch'}
   , {type: 'perf', release: 'minor'}
-  , {type: 'refactor', release: 'patch'}
+  , {type: 'pkg', scope: 'setup', release: false}
   , {type: 'style', release: 'patch'}
-  , {type: 'test', release: 'patch'}
+  , {type: 'svc', scope: 'setup', release: false}
   ]
 , plugins: [
     ['@semantic-release/commit-analyzer', null]
@@ -57,7 +62,7 @@ module.exports = {
     }]
   , ['@semantic-release/npm', null]
   , ['@semantic-release/git', {
-      assets: ['package.json', 'CHANGELOG.md', '!**/node_modules/**']
+      assets: ['package.json', 'package-lock.json', 'CHANGELOG.md', '!**/node_modules/**']
     , message: `release: ${year}-${month}-${day}, `
         + 'Version <%= nextRelease.version %> [skip ci]'
     }]
