@@ -2,10 +2,10 @@ library 'magic-butler-catalogue'
 
 def PROJECT_NAME = 'mezmo-cli'
 def DEFAULT_BRANCH = 'main'
+def TRIGGER_PATTERN = ".*@logdnabot.*"
 def CURRENT_BRANCH = [env.CHANGE_BRANCH, env.BRANCH_NAME]?.find{branch -> branch != null}
 def BRANCH_ACTUAL = env.CHANGE_BRANCH ? env.CHANGE_BRANCH : env.BRANCH_NAME
-def RELEASE_ID = (DEFAULT_BRANCH == BRANCH_ACTUAL) ? env.CHANGE_ID : ''
-def TRIGGER_PATTERN = ".*@logdnabot.*"
+def CHANGE_ID = env.CHANGE_ID == null ? '' : env.CHANGE_ID
 def DRY_RUN = CURRENT_BRANCH != DEFAULT_BRANCH
 def BUILD_SLUG = slugify(env.BUILD_TAG)
 
