@@ -1,16 +1,14 @@
-import {EOL} from 'node:os'
 import {CompletionsCommand, MZMCommand} from '@mzm/core'
-import {getLogger} from '@mzm/log'
 import {debuglog} from 'node:util'
 import {LogCommand} from '@mzm/command-log'
 import {ConfigCommand} from '@mzm/command-config'
-import {default as GetCommand} from '@mzm/command-get'
-import {default as CreateCommand} from '@mzm/command-create'
-import {default as DeleteCommand} from '@mzm/command-delete'
-import {default as EditCommand} from '@mzm/command-edit'
-import {default as AskCommand} from '@mzm/command-ask'
+import GetCommand from '@mzm/command-get'
+import CreateCommand from '@mzm/command-create'
+import DeleteCommand from '@mzm/command-delete'
+import EditCommand from '@mzm/command-edit'
+import AskCommand from '@mzm/command-ask'
+import VersionCommand from '@mzm/command-version'
 
-const log = getLogger('default')
 const debug = debuglog('core:command:entry')
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
@@ -27,6 +25,7 @@ if (import.meta.main) {
     .command('edit', EditCommand)
     .command('get', GetCommand)
     .command('log', LogCommand)
+    .command('version', VersionCommand)
 
   try {
     await cmd.parse(Deno.args)
