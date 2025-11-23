@@ -19,6 +19,16 @@
         "bug",
         "video"
       ]
+    },
+    {
+      "login": "mdeltito",
+      "name": "Mike Del Tito",
+      "avatar_url": "https://avatars.githubusercontent.com/u/69520?v=4",
+      "profile": "http://mdel.io",
+      "contributions": [
+        "review",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
