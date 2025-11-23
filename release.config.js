@@ -53,6 +53,10 @@ module.exports = {
   , ['@semantic-release/changelog', {
       changelogTitle: '## Changelog'
     }]
+  , ['@semantic-release/npm', null]
+  , ['@semantic-release/exec', {
+      "prepareCmd": "release/write-info"
+    }]
   , ['@semantic-release/exec', {
       "verifyConditionsCmd": "deno task compile:local"
     , "prepareCmd": "deno task compile"
@@ -60,15 +64,15 @@ module.exports = {
   , ['@semantic-release/exec', {
       "prepareCmd": "release/shasum.sh"
     }]
-  , ['@semantic-release/npm', null]
   , ['@semantic-release/git', {
-      assets: ['package.json', 'package-lock.json', 'CHANGELOG.md', '!**/node_modules/**']
+      assets: ['package.json', 'package-lock.json', 'CHANGELOG.md', '!**/node_modules/**', 'release.info']
     , message: `release: ${year}-${month}-${day}, `
         + 'Version <%= nextRelease.version %> [skip ci]'
     }]
   , ['@semantic-release/github', {
       assets: [
-        'dist/*'
+        'dist/*',
+        '!dist/*.tgz'
       ]
     }]
   ]
