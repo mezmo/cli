@@ -30,7 +30,7 @@
 
     "compile:cmd": {
       "description": "echos out the command command for compiling a build. not used directly",
-      "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal"
+      "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal --include package.json"
     },
 
     "compile:linux:x86": {
@@ -77,6 +77,7 @@
     "./@mzm/command-edit",
     "./@mzm/command-get",
     "./@mzm/command-log",
+    "./@mzm/command-version",
     "./@mzm/config",
     "./@mzm/core",
     "./@mzm/log"

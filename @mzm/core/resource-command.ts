@@ -7,13 +7,19 @@ import {toTitleCase} from '@std/text/unstable-to-title-case'
 import {EnumType} from '@cliffy/command'
 import * as yaml from '@std/yaml'
 import {toArray} from './lang/mod.ts'
-import type {RowType} from '@cliffy/command'
+import type {RowType} from '@cliffy/table'
 
 type Namespace = Record<string, RowType[]>
 const OutputFormat = new EnumType(['table', 'json', 'yaml'])
 
-function noop(value: unknown): unknown {
-  return value
+type ColumnDefinition = {
+  name: string
+  property: string
+  render?: (value?: any) => string
+}
+
+function noop(value?: unknown): string {
+  return String(value)
 }
 
 export default class ResourceCommand extends MZMCommand {
@@ -22,7 +28,7 @@ export default class ResourceCommand extends MZMCommand {
   #group_by: string = ''
   #resource: string = ''
   #resource_version: string = 'v1'
-  #columns: Array<Record<string, string>> = []
+  #columns: Array<ColumnDefinition> = []
   constructor(resource: string) {
     super()
     this.#resource = resource
@@ -57,7 +63,7 @@ export default class ResourceCommand extends MZMCommand {
     this.#display_field = name
     return this
   }
-  column(definition: Record<string, string>): this {
+  column(definition: ColumnDefinition): this {
     this.#columns.push(definition)
     return this
   }
