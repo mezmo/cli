@@ -3,50 +3,6 @@
 A powerful command-line interface for interacting with the Mezmo observability platform.
 Manage logs, views, configurations, and leverage AI-powered assistance directly from your terminal.
 
-## Table of Contents
-
-<!-- vim-markdown-toc GFM -->
-
-* [Features](#features)
-* [Available Commands](#available-commands)
-    * [Subcommands](#subcommands)
-        * [Log Commands](#log-commands)
-        * [Get Commands](#get-commands)
-        * [Config Commands](#config-commands)
-* [Prerequisites](#prerequisites)
-    * [Environment Variables](#environment-variables)
-    * [System Access Requirements](#system-access-requirements)
-        * [File System Access](#file-system-access)
-        * [Network Access](#network-access)
-        * [Process Permissions](#process-permissions)
-        * [Security Considerations](#security-considerations)
-* [Installation](#installation)
-    * [Option 1: Download Pre-compiled Binary (Recommended)](#option-1-download-pre-compiled-binary-recommended)
-    * [Option 2: Build from Source](#option-2-build-from-source)
-    * [Option 3: Run with Deno (Development)](#option-3-run-with-deno-development)
-* [Configuration](#configuration)
-    * [Initial Setup](#initial-setup)
-    * [Shell Completions](#shell-completions)
-* [Usage](#usage)
-    * [Getting Help](#getting-help)
-    * [Working with Logs](#working-with-logs)
-    * [Managing Views](#managing-views)
-    * [AI Assistant](#ai-assistant)
-    * [Resource Management](#resource-management)
-* [Examples](#examples)
-    * [Complex Log Queries](#complex-log-queries)
-    * [Batch Operations](#batch-operations)
-    * [Automation Scripts](#automation-scripts)
-* [Development](#development)
-    * [Prerequisites](#prerequisites-1)
-    * [Setup Development Environment](#setup-development-environment)
-    * [Building](#building)
-* [Contributing](#contributing)
-* [License](#license)
-* [Support](#support)
-
-<!-- vim-markdown-toc -->
-
 ## Features
 
 - **Log Management**: Search, tail, and analyze logs in real-time
@@ -320,7 +276,7 @@ mzm create -f view.yaml
 # Edit view interactively
 mzm edit view <view-id>
 
-mzm edit view <view-id> -f updated-view.yaml
+mzm edit view "name of a view"
 ```
 
 **Delete Views**
@@ -354,10 +310,10 @@ Manage resources using declarative YAML or JSON definitions:
 
 ```bash
 # Create resources from file
-mzm create -f resources.yaml
+mzm create -f resource.yaml
 
-# Delete resources from spec file (experiment)
-mzm delete -f resources.yaml
+# Delete resources from spec file (experimental)
+mzm delete -f resource.yaml
 
 # Delete a view by id
 mzm delete view a41febfd
@@ -387,7 +343,7 @@ spec:
 mzm log search "level:error AND env:production" --from "1h ago"
 
 # Tail logs with multiple filters
-mzm log tail --app api --level error --level warn --host prod-*
+mzm log tail --app api --level error --level warn --host prod-* "level:error AND env:production"
 
 ```
 
@@ -441,7 +397,7 @@ deno task local <command>
 
 ### Building
 
-```bash`
+```bash
 # Build all platforms
 deno task compile
 
