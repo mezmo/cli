@@ -1,6 +1,6 @@
 # Mezmo CLI
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A powerful command-line interface for interacting with the Mezmo observability platform.
@@ -454,6 +454,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://codedependant.net"><img src="https://avatars.githubusercontent.com/u/148561?v=4?s=100" width="100px;" alt="Eric Satterwhite"/><br /><sub><b>Eric Satterwhite</b></sub></a><br /><a href="https://github.com/mezmo/cli/commits?author=esatterwhite" title="Code">💻</a> <a href="https://github.com/mezmo/cli/commits?author=esatterwhite" title="Tests">⚠️</a> <a href="https://github.com/mezmo/cli/commits?author=esatterwhite" title="Documentation">📖</a> <a href="https://github.com/mezmo/cli/issues?q=author%3Aesatterwhite" title="Bug reports">🐛</a> <a href="#video-esatterwhite" title="Videos">📹</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://mdel.io"><img src="https://avatars.githubusercontent.com/u/69520?v=4?s=100" width="100px;" alt="Mike Del Tito"/><br /><sub><b>Mike Del Tito</b></sub></a><br /><a href="https://github.com/mezmo/cli/pulls?q=is%3Apr+reviewed-by%3Amdeltito" title="Reviewed Pull Requests">👀</a> <a href="#ideas-mdeltito" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
