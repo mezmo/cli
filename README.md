@@ -424,9 +424,6 @@ deno task reports
 deno test @mzm/core/error.test.ts
 ```
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
@@ -437,15 +434,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: [GitHub Issues](https://github.com/mezmo/cli/issues)
 - **Email**: support@mezmo.com
 
-
 ---
 
-© 2025 Mezmo. All rights reserved.
+
+## Contributing
+
+We welcome contributions of any kind! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/emoji-key/)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -464,4 +463,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+
+---
+© 2025 Mezmo. All rights reserved.
