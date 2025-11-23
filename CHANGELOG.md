@@ -1,5 +1,26 @@
 ## Changelog
 
+# [1.1.0](https://github.com/mezmo/cli/compare/v1.0.1...v1.1.0) (2025-11-23)
+
+
+### Documentation
+
+* **wiki**: fix some formatting issues in the README [f50d68b](https://github.com/mezmo/cli/commit/f50d68b04c9975918e1da1c5f81792deb23978b5) - Eric Satterwhite
+* **wiki**: fix the contributor section of readme [c313ff2](https://github.com/mezmo/cli/commit/c313ff26fc4490dd1628679498be2bd1f00e12b5) - Eric Satterwhite
+
+
+### Features
+
+* **command**: include a version command [24957e1](https://github.com/mezmo/cli/commit/24957e140427da1ded7ac324f7169a3a982937e7) - Eric Satterwhite
+
+
+### Miscellaneous
+
+* create .all-contributorsrc [skip ci] [e8e3c6f](https://github.com/mezmo/cli/commit/e8e3c6f24afbe27e4baedb0bcf59f5bdf180edbe) - Eric Satterwhite
+* update .all-contributorsrc [skip ci] [982038e](https://github.com/mezmo/cli/commit/982038e9d264f4a3393c43a81c39931808999dbd) - Eric Satterwhite
+* update README.md [skip ci] [241a942](https://github.com/mezmo/cli/commit/241a942a1a98a3ac231d58b9c295bce6e79864ec) - Eric Satterwhite
+* update README.md [skip ci] [817dbfd](https://github.com/mezmo/cli/commit/817dbfd1dbc0d51ac3074215a19c12c355542143) - Eric Satterwhite
+
 ## [1.0.1](https://github.com/mezmo/cli/compare/v1.0.0...v1.0.1) (2025-11-22)
 
 
