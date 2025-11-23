@@ -67,7 +67,7 @@ pipeline {
       post {
         always {
           withChecks('Tests') {
-            junit checksName: 'Test Results', testResults: 'coverage/test.xml', allowEmptyResults: true
+            junit checksName: 'Tests', testResults: 'coverage/test.xml', allowEmptyResults: true
           }
           publishHTML target: [
             allowMissing: false,

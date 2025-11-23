@@ -30,7 +30,7 @@
 
     "compile:cmd": {
       "description": "echos out the command command for compiling a build. not used directly",
-      "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal --include package.json"
+      "command": "deno compile -P -r --no-npm --unstable-kv --unstable-temporal --include release.info"
     },
 
     "compile:linux:x86": {

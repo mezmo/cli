@@ -6,7 +6,7 @@ import {ResourceCommand} from '@mzm/core'
 
 const current_directory = dirname(fromFileUrl(import.meta.url))
 const project_root = join(current_directory, '..', '..')
-const pkg_file = join(project_root, 'package.json')
+const pkg_file = join(project_root, 'release.info')
 
 function renderAge(date?: string): string {
   if (!date) return ''
@@ -34,10 +34,7 @@ export default new ResourceCommand('version')
   .example('print version information in json format', 'mzm version -o json')
   .example('print version information in yaml format', 'mzm version -o json')
   .action(async function(options: any) {
-    const [stats, pkg_text] = await Promise.all([
-      Deno.stat(pkg_file)
-    , Deno.readTextFile(pkg_file)
-    ])
+    const pkg_text = await Deno.readTextFile(pkg_file)
     const pkg_json = JSON.parse(pkg_text)
     const semver = parse(pkg_json.version)
 
@@ -48,7 +45,7 @@ export default new ResourceCommand('version')
     , major: semver.major
     , minor: semver.minor
     , patch: semver.patch
-    , date: stats.ctime
+    , date: new Date(pkg_json.release_date)
     }
 
     //@ts-ignore work around for command subclassing
