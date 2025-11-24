@@ -1,5 +1,12 @@
 ## Changelog
 
+## [1.1.1](https://github.com/mezmo/cli/compare/v1.1.0...v1.1.1) (2025-11-24)
+
+
+### Bug Fixes
+
+* **command**: fix version command age [8439449](https://github.com/mezmo/cli/commit/84394495cbb3ada9aa8830e4d508b2935f8bbbc3) - Eric Satterwhite
+
 # [1.1.0](https://github.com/mezmo/cli/compare/v1.0.1...v1.1.0) (2025-11-23)
 
 
