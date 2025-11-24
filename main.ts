@@ -1,5 +1,6 @@
-import {CompletionsCommand, MZMCommand} from '@mzm/core'
+import {dirname} from '@std/path'
 import {debuglog} from 'node:util'
+import {CompletionsCommand, MZMCommand} from '@mzm/core'
 import {LogCommand} from '@mzm/command-log'
 import {ConfigCommand} from '@mzm/command-config'
 import GetCommand from '@mzm/command-get'
@@ -8,8 +9,31 @@ import DeleteCommand from '@mzm/command-delete'
 import EditCommand from '@mzm/command-edit'
 import AskCommand from '@mzm/command-ask'
 import VersionCommand from '@mzm/command-version'
+import {GithubReleasesUpgradeCommand} from '@mzm/command-upgrade'
+import {providers} from '@mzm/core/update'
 
 const debug = debuglog('core:command:entry')
+
+const upgrade = new GithubReleasesUpgradeCommand({
+  provider: new providers.GithubReleaseProvider({
+    spinner: true
+  , repository: 'mezmo/cli'
+  , asset_map: {
+      linux: {
+        ['x86_64']: 'mzm-linux-x86_64'
+      , ['aarch64']: 'mzm-linux-aarch64'
+      }
+    , darwin: {
+        ['x86_64']: 'mzm-darwin-x86_64'
+      , ['aarch64']: 'mzm-darwin-aarch64'
+      }
+    , windows: {
+        ['x86_64']: 'mzm-windows-x86_64'
+      , ['aarch64']: null
+      }
+    }
+  })
+})
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -25,6 +49,7 @@ if (import.meta.main) {
     .command('edit', EditCommand)
     .command('get', GetCommand)
     .command('log', LogCommand)
+    .command('upgrade', upgrade)
     .command('version', VersionCommand)
 
   try {

@@ -1,5 +1,219 @@
 import {assertEquals, assertExists} from '@std/assert'
-import {parse, toDateTime} from './date.ts'
+import {age, parse, toDateTime} from './date.ts'
+
+// Test the age function
+Deno.test({
+  name: 'age - returns empty string for falsy input',
+  fn: () => {
+    assertEquals(age(null as any), '')
+    assertEquals(age(undefined as any), '')
+    assertEquals(age('' as any), '')
+    assertEquals(age(0 as any), '')
+  }
+})
+
+Deno.test({
+  name: 'age - handles Date object from several days ago',
+  fn: () => {
+    const threeDaysAgo = new Date()
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+    const result = age(threeDaysAgo)
+    assertEquals(result, '3d')
+  }
+})
+
+Deno.test({
+  name: 'age - handles Date object from several hours ago',
+  fn: () => {
+    const fiveHoursAgo = new Date()
+    fiveHoursAgo.setHours(fiveHoursAgo.getHours() - 5)
+    const result = age(fiveHoursAgo)
+    // Should show hours since it's less than a day
+    assertEquals(result, '5h')
+  }
+})
+
+Deno.test({
+  name: 'age - handles Date object from several minutes ago',
+  fn: () => {
+    const thirtyMinutesAgo = new Date()
+    thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30)
+    const result = age(thirtyMinutesAgo)
+    assertEquals(result, '30m')
+  }
+})
+
+Deno.test({
+  name: 'age - handles date string from days ago',
+  fn: () => {
+    const twoDaysAgo = new Date()
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+    const result = age(twoDaysAgo.toISOString())
+    assertEquals(result, '2d')
+  }
+})
+
+Deno.test({
+  name: 'age - handles date string from hours ago',
+  fn: () => {
+    const tenHoursAgo = new Date()
+    tenHoursAgo.setHours(tenHoursAgo.getHours() - 10)
+    const result = age(tenHoursAgo.toISOString())
+    assertEquals(result, '10h')
+  }
+})
+
+Deno.test({
+  name: 'age - handles date string from minutes ago',
+  fn: () => {
+    const fifteenMinutesAgo = new Date()
+    fifteenMinutesAgo.setMinutes(fifteenMinutesAgo.getMinutes() - 15)
+    const result = age(fifteenMinutesAgo.toISOString())
+    assertEquals(result, '15m')
+  }
+})
+
+Deno.test({
+  name: 'age - prioritizes days over hours',
+  fn: () => {
+    // 1 day and 12 hours ago
+    const dateInPast = new Date()
+    dateInPast.setDate(dateInPast.getDate() - 1)
+    dateInPast.setHours(dateInPast.getHours() - 12)
+    const result = age(dateInPast)
+    assertEquals(result, '1d')
+  }
+})
+
+Deno.test({
+  name: 'age - prioritizes hours over minutes',
+  fn: () => {
+    // 2 hours and 30 minutes ago
+    const dateInPast = new Date()
+    dateInPast.setHours(dateInPast.getHours() - 2)
+    dateInPast.setMinutes(dateInPast.getMinutes() - 30)
+    const result = age(dateInPast)
+    assertEquals(result, '2h')
+  }
+})
+
+Deno.test({
+  name: 'age - handles very recent date (less than a minute)',
+  fn: () => {
+    const thirtySecondsAgo = new Date()
+    thirtySecondsAgo.setSeconds(thirtySecondsAgo.getSeconds() - 30)
+    const result = age(thirtySecondsAgo)
+    assertEquals(result, '0m')
+  }
+})
+
+Deno.test({
+  name: 'age - handles exactly one day ago',
+  fn: () => {
+    const oneDayAgo = new Date()
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+    const result = age(oneDayAgo)
+    assertEquals(result, '1d')
+  }
+})
+
+Deno.test({
+  name: 'age - handles exactly one hour ago',
+  fn: () => {
+    const oneHourAgo = new Date()
+    oneHourAgo.setHours(oneHourAgo.getHours() - 1)
+    const result = age(oneHourAgo)
+    assertEquals(result, '1h')
+  }
+})
+
+Deno.test({
+  name: 'age - handles exactly one minute ago',
+  fn: () => {
+    const oneMinuteAgo = new Date()
+    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1)
+    const result = age(oneMinuteAgo)
+    assertEquals(result, '1m')
+  }
+})
+
+Deno.test({
+  name: 'age - handles week-old date',
+  fn: () => {
+    const oneWeekAgo = new Date()
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+    const result = age(oneWeekAgo)
+    assertEquals(result, '7d')
+  }
+})
+
+Deno.test({
+  name: 'age - handles month-old date',
+  fn: () => {
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+    const result = age(oneMonthAgo)
+    // Should show approximately 30 days (may vary based on the month)
+    const days = parseInt(result.replace('d', ''))
+    assertEquals(days >= 28 && days <= 31, true)
+  }
+})
+
+Deno.test({
+  name: 'age - handles future date',
+  fn: () => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const result = age(tomorrow)
+    // Future dates will show positive values since difference(future, past) is positive
+    // The difference function calculates (now - source_date), but for future dates
+    // this becomes negative internally, but the function returns absolute values
+    assertEquals(result, '1d')
+  }
+})
+
+Deno.test({
+  name: 'age - handles ISO 8601 date string',
+  fn: () => {
+    const twoDaysAgo = new Date()
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+    const isoString = twoDaysAgo.toISOString()
+    const result = age(isoString)
+    assertEquals(result, '2d')
+  }
+})
+
+Deno.test({
+  name: 'age - handles date string in different format',
+  fn: () => {
+    const threeDaysAgo = new Date()
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+    // Use a different date format
+    const dateString = threeDaysAgo.toDateString()
+    const result = age(dateString)
+    // toDateString() loses time information, so it might be 2d or 3d depending on the time of day
+    const days = parseInt(result.replace('d', ''))
+    assertEquals(days >= 2 && days <= 3, true)
+  }
+})
+
+Deno.test({
+  name: 'age - handles invalid date string',
+  fn: () => {
+    const result = age('invalid-date')
+    // Invalid dates result in NaN when converted, which shows as NaNm
+    assertEquals(result, '')
+  }
+})
+
+Deno.test({
+  name: 'age - handles current date',
+  fn: () => {
+    const now = new Date()
+    const result = age(now)
+    assertEquals(result, '0m')
+  }
+})
 
 // Test the parse function
 Deno.test({

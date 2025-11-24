@@ -22,6 +22,8 @@ function noop(value?: unknown): string {
   return String(value)
 }
 
+export {OutputFormat}
+
 export default class ResourceCommand extends MZMCommand {
   #pk_field: string = 'id'
   #display_field: string = 'name'
