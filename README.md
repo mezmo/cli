@@ -3,6 +3,9 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+> [!CAUTION]
+> This application is still considered "beta". Its interfaces and/or its stability is subject to change in breaking ways
+
 A powerful command-line interface for interacting with the Mezmo observability platform.
 Manage logs, views, configurations, and leverage AI-powered assistance directly from your terminal.
 
