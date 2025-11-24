@@ -1,3 +1,4 @@
+import {difference} from '@std/datetime'
 import * as chrono from '../chrono.vnd.mjs'
 import {typecast} from './string.ts'
 import {typeOf} from './mod.ts'
@@ -11,6 +12,21 @@ casual.parsers.push({
     return {day: 25, month: 12}
   }
 })
+
+export function age(date: Date | string): string {
+  if (!date) return ''
+
+  const source_date = typeof date === 'string' ? new Date(date) : date
+
+  // @ts-ignore this is legal
+  if (isNaN(source_date)) return ''
+
+  const now = new Date(Temporal.Now.zonedDateTimeISO('UTC').epochMilliseconds)
+  const diff = difference(now, source_date, {units: ['days', 'hours', 'minutes']})
+  if (diff.days) return `${diff.days}d`
+  if (diff.hours) return `${diff.hours}h`
+  return `${diff.minutes}m`
+}
 
 /**
  * Parses a datetime string or number into a Date object.

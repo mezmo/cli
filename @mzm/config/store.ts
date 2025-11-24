@@ -1,5 +1,5 @@
 import {debuglog} from 'node:util'
-import type {JSValue} from '@mzm/core/lang'
+import {type JSValue, str} from '@mzm/core/lang'
 const log = debuglog('config:storage')
 
 export default class Store {
@@ -50,7 +50,7 @@ export default class Store {
 
   set(key: string, value: JSValue, ttl: number | undefined = undefined): Promise<JSValue> {
     const options = ttl ? {expireIn: ttl} : undefined
-    return this.#kvdb.set(key.split('.'), value, options)
+    return this.#kvdb.set(key.split('.'), str.typecast(value), options)
   }
 
   unset(key: string): Promise<void> {

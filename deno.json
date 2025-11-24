@@ -77,6 +77,7 @@
     "./@mzm/command-edit",
     "./@mzm/command-get",
     "./@mzm/command-log",
+    "./@mzm/command-upgrade",
     "./@mzm/command-version",
     "./@mzm/config",
     "./@mzm/core",
@@ -103,6 +104,7 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
-    "@std/encoding": "jsr:@std/encoding@^1.0.10"
+    "@std/encoding": "jsr:@std/encoding@^1.0.10",
+    "@std/path": "jsr:@std/path@^1.1.3"
   }
 }

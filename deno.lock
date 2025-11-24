@@ -20,6 +20,7 @@
     "jsr:@std/assert@^1.0.15": "1.0.15",
     "jsr:@std/assert@~1.0.6": "1.0.15",
     "jsr:@std/async@^1.0.15": "1.0.15",
+    "jsr:@std/cli@^1.0.24": "1.0.24",
     "jsr:@std/crypto@^1.0.5": "1.0.5",
     "jsr:@std/data-structures@^1.0.9": "1.0.9",
     "jsr:@std/datetime@~0.225.5": "0.225.5",
@@ -144,6 +145,12 @@
     },
     "@std/async@1.0.15": {
       "integrity": "55d1d9d04f99403fe5730ab16bdcc3c47f658a6bf054cafb38a50f046238116e"
+    },
+    "@std/cli@1.0.24": {
+      "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e",
+      "dependencies": [
+        "jsr:@std/internal@^1.0.12"
+      ]
     },
     "@std/crypto@1.0.5": {
       "integrity": "0dcfbb319fe0bba1bd3af904ceb4f948cde1b92979ec1614528380ed308a3b40"
@@ -1984,7 +1991,8 @@
     "dependencies": [
       "jsr:@std/assert@1",
       "jsr:@std/crypto@^1.0.5",
-      "jsr:@std/encoding@^1.0.10"
+      "jsr:@std/encoding@^1.0.10",
+      "jsr:@std/path@^1.1.3"
     ],
     "packageJson": {
       "dependencies": [
@@ -2039,6 +2047,12 @@
           "jsr:@std/assert@1"
         ]
       },
+      "@mzm/command-upgrade": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@std/path@^1.1.3"
+        ]
+      },
       "@mzm/command-version": {
         "dependencies": [
           "jsr:@std/assert@1",
@@ -2066,8 +2080,12 @@
           "jsr:@cliffy/prompt@^1.0.0-rc.8",
           "jsr:@cliffy/table@1.0.0-rc.8",
           "jsr:@std/assert@1",
+          "jsr:@std/cli@^1.0.24",
+          "jsr:@std/datetime@~0.225.5",
           "jsr:@std/fmt@^1.0.8",
           "jsr:@std/fs@^1.0.19",
+          "jsr:@std/path@^1.1.3",
+          "jsr:@std/semver@^1.0.7",
           "jsr:@std/testing@^1.0.16",
           "jsr:@std/text@^1.0.16",
           "jsr:@std/yaml@^1.0.10"
