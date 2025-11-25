@@ -8,11 +8,6 @@ import type {View} from './resource/mod.ts'
 
 const debug = debuglog('core:command')
 
-type ViewMatch = {
-  exact: View | undefined
-, potential: Array<View>
-}
-
 //FIXME(esatterwhite): move the view specific stuff to the resource package
 export class MZMCommand extends Command {
   constructor() {
