@@ -29,6 +29,16 @@
         "review",
         "ideas"
       ]
+    },
+    {
+      "login": "biblicalph",
+      "name": "kwabena",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3032519?v=4",
+      "profile": "https://biblicalph.github.io",
+      "contributions": [
+        "review",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
