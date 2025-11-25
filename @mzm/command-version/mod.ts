@@ -1,12 +1,8 @@
-import {join, dirname, fromFileUrl} from '@std/path'
 import {EOL} from '@std/fs'
 import {parse} from '@std/semver'
 import {difference} from '@std/datetime'
 import {ResourceCommand} from '@mzm/core'
-
-const current_directory = dirname(fromFileUrl(import.meta.url))
-const project_root = join(current_directory, '..', '..')
-const pkg_file = join(project_root, 'release.info')
+import {info} from '@mzm/core/release'
 
 function renderAge(date?: string): string {
   if (!date) return ''
@@ -34,18 +30,16 @@ export default new ResourceCommand('version')
   .example('print version information in json format', 'mzm version -o json')
   .example('print version information in yaml format', 'mzm version -o json')
   .action(async function(options: any) {
-    const pkg_text = await Deno.readTextFile(pkg_file)
-    const pkg_json = JSON.parse(pkg_text)
-    const semver = parse(pkg_json.version)
+    const version_info = await info()
+    if (options.quiet) return console.log(version_info.version)
 
-    if (options.quiet) return console.log(pkg_json.version)
-
+    const semver = parse(version_info.version)
     const to_render = {
-      version: pkg_json.version
+      version: version_info.version
     , major: semver.major
     , minor: semver.minor
     , patch: semver.patch
-    , date: new Date(pkg_json.release_date)
+    , date: new Date(version_info.release_date)
     }
 
     //@ts-ignore work around for command subclassing
