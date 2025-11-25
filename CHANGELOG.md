@@ -1,5 +1,28 @@
 ## Changelog
 
+# [1.2.0](https://github.com/mezmo/cli/compare/v1.1.1...v1.2.0) (2025-11-25)
+
+
+### Bug Fixes
+
+* **command-log**: fixes a couple typos in the search command [74bb51d](https://github.com/mezmo/cli/commit/74bb51d38ec4617902d29994ca7d099bae04691d) - Eric Satterwhite
+* **command**: fix file closing on edit command [2906811](https://github.com/mezmo/cli/commit/2906811001910fd1d5b66e25287df1fcea34adb7) - Eric Satterwhite
+
+
+### Chores
+
+* **command-version**: use release module to pull version info [e51db19](https://github.com/mezmo/cli/commit/e51db197e0128cfb22a7b0f6eb041c5bd38ecfd5) - Eric Satterwhite
+
+
+### Documentation
+
+* **wiki**: add beta banner to readme [82fbe25](https://github.com/mezmo/cli/commit/82fbe25cc4bb9c27eeeab3ac26602f7150877b70) - Eric Satterwhite
+
+
+### Features
+
+* **command-upgrade**: add a command to update the cli in place [6ff2763](https://github.com/mezmo/cli/commit/6ff27638ffa16adeb500e86493def3ac441fd425) - Eric Satterwhite
+
 ## [1.1.1](https://github.com/mezmo/cli/compare/v1.1.0...v1.1.1) (2025-11-24)
 
 
