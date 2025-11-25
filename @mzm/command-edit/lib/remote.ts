@@ -11,10 +11,10 @@ export async function load(api_version: string, type: string, identifier: string
     const source = await resource[api_version][type].get(identifier)
     const dirname = await Deno.makeTempDir({prefix: 'mzm-edit'})
     const tmpfile = path.join(dirname,`${type}.${ulid()}.${format}`)
-    const file = await Deno.open(tmpfile, {write: true, createNew: true})
+    await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
 
     await file.write(new TextEncoder().encode(stringify(source, format)))
-    file.close()
+    file[Symbol.dispose]()
 
     const cmd = new Deno.Command(editor, {
       args: [tmpfile]
