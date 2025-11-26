@@ -1,4 +1,3 @@
-import {dirname} from '@std/path'
 import {debuglog} from 'node:util'
 import {CompletionsCommand, MZMCommand} from '@mzm/core'
 import {LogCommand} from '@mzm/command-log'

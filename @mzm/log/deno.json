@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "exports": "./mod.ts",
   "imports": {
-    "@cliffy/ansi": "jsr:@cliffy/ansi@^1.0.0-rc.8",
     "@std/log": "jsr:@std/log@^0.224.14"
   }
 }
