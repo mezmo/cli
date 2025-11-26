@@ -5,6 +5,7 @@ import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
 import ConversationCommand from './conversation/command.ts'
 import ViewCommand from './view/command.ts'
+import CategoryCommand from './category/command.ts'
 
 export default new MZMCommand()
   .name('delete')
@@ -55,5 +56,6 @@ export default new MZMCommand()
       console.dir(err)
     }
   })
+  .command('category', CategoryCommand)
   .command('conversation', ConversationCommand)
   .command('view', ViewCommand)

@@ -206,9 +206,12 @@ export class CommunicationError extends GenericError {
 
   constructor(status: number, message?: string, options?: ErrorOptions) {
     super(message, options)
-    Error.captureStackTrace(this, InputError)
+    Error.captureStackTrace(this, CommunicationError)
     this.name = this.constructor.name
     this.status_code = status
+
+    if (options?.cause?.code) this.error_code = options.cause.code
+
   }
 
   /**
@@ -233,13 +236,16 @@ export class CommunicationError extends GenericError {
     , 'There was a problem communicating with the Mezmo Platform'
     , {
         cause: {
-          code: this.error_code
+          code: cast.detail.code || this.error_code
         , help: help
         , reason: cast
         , status_code: cast.status
         } as ErrorCause & {status_code: number}
       }
     )
+
+    err.status_code = cast.status || err.status_code
+    err.error_code = cast.detail.code || err.error_code
 
     return err
   }

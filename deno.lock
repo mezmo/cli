@@ -2002,7 +2002,8 @@
       },
       "@mzm/command-get": {
         "dependencies": [
-          "jsr:@std/assert@1"
+          "jsr:@std/assert@1",
+          "jsr:@std/fs@^1.0.20"
         ]
       },
       "@mzm/command-log": {

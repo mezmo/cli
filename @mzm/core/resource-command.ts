@@ -37,7 +37,7 @@ export default class ResourceCommand extends MZMCommand {
 
     this
       .type('format', OutputFormat)
-      .group('Formating options')
+      .group('Formatting options')
       .option('-o, --output [format:format]', 'output only the resource identifiers', {default: 'table'})
       .option('-q, --quiet', 'Only print out identifiers than formated text output')
   }

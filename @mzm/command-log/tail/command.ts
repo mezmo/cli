@@ -45,7 +45,7 @@ const tail = new MZMCommand()
   .option('-l, --level <level:string>', 'log levels to filter by', {collect: true})
   .option('-a, --app <app:string>', 'log levels to filter by', {collect: true})
   .option('-v, --with-view [name:string]', 'Stream logs matching a predefined view')
-  .group('Formating options')
+  .group('Formatting options')
   .option('-o, --output [format:format]', 'Output raw JSON', {default: 'pretty'})
   .action(async function(options: any, query?: string) {
     const STREAM_HOST = await storage.getOne('core.host.stream')

@@ -3,6 +3,7 @@ import {MZMCommand} from '@mzm/core'
 import ViewCommand from './view/mod.ts'
 import ConversationCommand from './conversation/mod.ts'
 import AccountCommand from './account/mod.ts'
+import CategoryCommand from './category/mod.ts'
 
 export default new MZMCommand()
   .name('get')
@@ -22,5 +23,6 @@ export default new MZMCommand()
     this.showHelp()
   })
   .command('account', AccountCommand)
+  .command('category', CategoryCommand)
   .command('conversation', ConversationCommand)
   .command('view', ViewCommand)

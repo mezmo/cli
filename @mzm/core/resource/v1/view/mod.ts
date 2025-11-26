@@ -200,7 +200,7 @@ export async function update(view: View): Promise<View> {
 
       case 400: {
         throw InputError.from(
-          `Make sure make sure your ${colors.bold(colors.yellow("category"))} spec file includes all of the required fields and that they are in the coorect format.`
+          `Make sure make sure your ${colors.bold(colors.yellow("category"))} spec file includes all of the required fields and that they are in the correct format.`
         , (cast?.response?.data as JoiResponse)?.details
         )
       }

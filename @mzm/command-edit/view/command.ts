@@ -13,7 +13,7 @@ export default new MZMCommand()
   , 'The default format is yaml. To edit in JSON, specifiy "-o json"'
   ].join(EOL))
   .arguments('[view-id]')
-  .group('Formating options')
+  .group('Formatting options')
   .option('-o, --output [format:editformat]', 'output only the resource identifiers', {default: 'yaml'})
   .example(
     'edit a view in json format:'
