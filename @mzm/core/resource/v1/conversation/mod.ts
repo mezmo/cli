@@ -1,12 +1,13 @@
 import {debuglog} from 'node:util'
 import type {RequestError} from '@anitrend/request-client'
 import {sql, sqlite} from '@mzm/config'
-import {aura as client} from '../../client.ts'
+import client from '../../client.ts'
 import type {ChatResponse, ChatHistory, Conversation} from './types.ts'
 import {ChatRole} from './types.ts'
 
 const debug = debuglog('core:resource:conversation')
 const deactivate_current = sql`UPDATE conversation SET active = FALSE WHERE active = TRUE`
+const request_config = {timeout: 1000 * 60 * 10}
 
 export async function create(user_question: string): Promise<ChatResponse> {
   try {
@@ -14,7 +15,7 @@ export async function create(user_question: string): Promise<ChatResponse> {
     const params = {messages: [{content: user_question, role: ChatRole.USER}], metadata: {}}
 
     debug('starting a new conversation')
-    const response = await client.post('v1/chat/completions', params)
+    const response = await client.post('v1/chat/completions', params, request_config)
     const bot_response: ChatResponse = response.data as ChatResponse
     const chat_session_id: string | undefined = bot_response?.metadata?.chat_session_id
     const response_content: string | undefined = bot_response?.choices?.[0].message.content
@@ -100,7 +101,7 @@ export async function proceed(user_question: string, chat_session_id: string) {
   const response = await client.post('v1/chat/completions', {
     messages: messages
   , metadata: {chat_session_id}
-  })
+  }, request_config)
 
   const bot_response: ChatResponse = response.data as ChatResponse
   const response_content: string | undefined = bot_response?.choices?.[0].message.content
