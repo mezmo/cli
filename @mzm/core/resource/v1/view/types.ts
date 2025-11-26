@@ -22,3 +22,16 @@ export interface IViewListResponse extends RequestResponse {
 export interface IViewResponse extends RequestResponse {
   data: View
 }
+
+export type JoiDetail = {
+  message: string
+, key: string
+}
+
+export type JoiResponse = {
+  details: Array<JoiDetail>
+, error: string
+, code: string
+, status: string
+}
+

@@ -1,23 +1,11 @@
 import type {RequestError} from '@anitrend/request-client'
-import type {View, IViewListResponse, IViewResponse} from './types.ts'
+import type {View, IViewListResponse, IViewResponse, JoiResponse} from './types.ts'
 import {colors} from '@cliffy/ansi/colors'
 import {default as client} from '../../client.ts'
 import {AuthorizationError, CommunicationError, InputError, GenericError} from '../../../error.ts'
 export default {get, list, create, getBySpec, remove, removeBySpec, update}
 
 export type {View}
-
-type JoiDetail = {
-  message: string
-, key: string
-}
-
-type JoiResponse = {
-  details: Array<JoiDetail>
-, error: string
-, code: string
-, status: string
-}
 
 export async function get(view_id: string, params?: Record<string, string>): Promise<View | null> {
   try {
@@ -128,7 +116,7 @@ export async function create(params?: View): Promise<View> {
 
       case 400: {
         throw InputError.from(
-          `Make sure make sure your ${colors.bold(colors.yellow("view"))} spec file includes all of the required fields and that they are in the coorect format.`
+          `Make sure make sure your ${colors.bold(colors.yellow("view"))} spec file includes all of the required fields and that they are in the correct format.`
         , (cast?.response?.data as JoiResponse)?.details
         )
       }
@@ -205,14 +193,14 @@ export async function update(view: View): Promise<View> {
 
       case 403: {
         throw AuthorizationError.from(
-          'Make sure you have the appropriate permissions to read views in the appropriate account'
+          'Make sure you have the appropriate permissions to read categories in the appropriate account'
         , cast?.response?.data
         )
       }
 
       case 400: {
         throw InputError.from(
-          `Make sure make sure your ${colors.bold(colors.yellow("view"))} spec file includes all of the required fields and that they are in the coorect format.`
+          `Make sure make sure your ${colors.bold(colors.yellow("category"))} spec file includes all of the required fields and that they are in the coorect format.`
         , (cast?.response?.data as JoiResponse)?.details
         )
       }
