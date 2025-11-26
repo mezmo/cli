@@ -1,5 +1,29 @@
 ## Changelog
 
+# [1.3.0](https://github.com/mezmo/cli/compare/v1.2.0...v1.3.0) (2025-11-26)
+
+
+### Bug Fixes
+
+* **core**: remove the extraneous aura request client [6265787](https://github.com/mezmo/cli/commit/6265787827a14552eac8a9a7696d4ee5dbb14812) - Eric Satterwhite
+* **resource**: moving some stray view types in to the right module [8b8cdbe](https://github.com/mezmo/cli/commit/8b8cdbeb1f9f3e48670c79e251dc4eeb48164beb) - Eric Satterwhite
+
+
+### Chores
+
+* **deps**: update and stream line dependencies. [8c9a7ad](https://github.com/mezmo/cli/commit/8c9a7adbe9b9208ce54cd02ed19035bbc053bd18) - Eric Satterwhite
+
+
+### Features
+
+* **category**: adds ability to interact with categories [c7ed909](https://github.com/mezmo/cli/commit/c7ed90983ab31093c8311873683b0669b21cfa16) - Eric Satterwhite
+
+
+### Miscellaneous
+
+* update .all-contributorsrc [skip ci] [ca2ce28](https://github.com/mezmo/cli/commit/ca2ce28a4f4975f298efae16817fafe50ce1ac76) - Eric Satterwhite
+* update README.md [skip ci] [3b89ef0](https://github.com/mezmo/cli/commit/3b89ef0800dc755fa402cc2114262a5f06a6fd36) - Eric Satterwhite
+
 # [1.2.0](https://github.com/mezmo/cli/compare/v1.1.1...v1.2.0) (2025-11-25)
 
 
