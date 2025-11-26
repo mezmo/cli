@@ -1,5 +1,4 @@
-import {colors} from '@cliffy/ansi/colors'
-import * as util from 'node:util'
+import {colors} from '@mzm/core'
 import type {LogLine} from './types.ts'
 
 const ERROR_REGEX = /err(?:or)?|crit(?:ical)?|fatal|severe|emerg(?:ENCY)?/i

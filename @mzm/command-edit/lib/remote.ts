@@ -1,4 +1,4 @@
-import * as path from '@std/path'
+import {join} from '@std/path'
 import {ulid} from '@std/ulid'
 import {default as resource, parse, stringify, StringifyFormat} from '@mzm/core/resource'
 
@@ -10,7 +10,7 @@ export async function load(api_version: string, type: string, identifier: string
    //@ts-ignore work around for array index typing
     const source = await resource[api_version][type].get(identifier)
     const dirname = await Deno.makeTempDir({prefix: 'mzm-edit'})
-    const tmpfile = path.join(dirname,`${type}.${ulid()}.${format}`)
+    const tmpfile = join(dirname,`${type}.${ulid()}.${format}`)
     await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
 
     await file.write(new TextEncoder().encode(stringify(source, format)))
