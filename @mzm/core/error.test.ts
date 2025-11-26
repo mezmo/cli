@@ -230,7 +230,7 @@ Deno.test('CommunicationError.from() - with communication reason', () => {
   assertEquals(error.message, 'There was a problem communicating with the Mezmo Platform')
   assertEquals(error.status_code, 503)
   // @ts-ignore - accessing cause for testing
-  assertEquals(error.cause.code, 'ECOMM')
+  assertEquals(error.cause.code, 'SERVICE_UNAVAILABLE')
   // @ts-ignore - accessing cause for testing
   assertEquals(error.cause.help, 'Try again later')
   // @ts-ignore - accessing cause for testing
@@ -242,6 +242,7 @@ Deno.test('CommunicationError.from() - with communication reason', () => {
 Deno.test('CommunicationError.from() - reason without detail', () => {
   const reason = {
     status: 400
+  , detail: {code: 'ECOMM'}
   } as any
   const error = CommunicationError.from('Bad request', reason)
   assertEquals(error.status_code, 400)
@@ -261,7 +262,7 @@ Deno.test('CommunicationError.toString()', () => {
   const error = CommunicationError.from('Check server status', reason)
   const result = error.toString()
   const expected = [
-    `${colors.red("✴︎")} [${colors.bold('ECOMM')}] ${colors.red('There was a problem communicating with the Mezmo Platform')}`,
+    `${colors.red("✴︎")} [${colors.bold('INTERNAL_ERROR')}] ${colors.red('There was a problem communicating with the Mezmo Platform')}`,
     `  Check server status`
   ].join(EOL)
   assertEquals(result, expected)
