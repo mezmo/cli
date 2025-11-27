@@ -1,13 +1,12 @@
 import {EOL} from '@std/fs'
-import {MZMCommand} from '@mzm/core'
-import {OutputFormat} from './lib/enum.ts'
-import * as remote from './lib/remote.ts'
+import * as remote from '@mzm/core/remote'
+import {MZMCommand, EditFormat} from '@mzm/core'
 import ViewCommand from './view/command.ts'
 import CategoryCommand from './category/command.ts'
 
 export default new MZMCommand()
   .name('edit')
-  .type('editformat', OutputFormat)
+  .type('editformat', EditFormat)
   .description([
     'The edit command allows you to edit api resources via the command line.'
   , 'It will open the resource in a text editor as specified by the EDITOR'

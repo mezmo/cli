@@ -1,11 +1,11 @@
-import {OutputFormat} from '../lib/enum.ts'
-import * as remote from '../lib/remote.ts'
 import {EOL} from '@std/fs'
-import {MZMCommand} from '@mzm/core'
+import {MZMCommand, EditFormat} from '@mzm/core'
+import type {View} from '@mzm/core/resource'
+import * as remote from '@mzm/core/remote'
 
 export default new MZMCommand()
   .name('view')
-  .type('editformat', OutputFormat)
+  .type('editformat', EditFormat)
   .description([
     'The view subcommand allows you to edit a single view resource by its id.'
   , 'It will open the resource in a text editor as specified by the EDITOR'
@@ -36,8 +36,8 @@ export default new MZMCommand()
     //@ts-ignore work around for command subclassing
     const resource_id: string | undefined = view_id ? view_id : (await this.promptView())?.pk
     if (!resource_id) return
-    
+
     const content = await remote.load('v1', 'view', resource_id, options.output)
-    await remote.apply('v1', 'view', content)
-    console.log(view_id)
+    const view: View = await remote.applyTemplate<View>(content)
+    console.log(view.pk)
   })
