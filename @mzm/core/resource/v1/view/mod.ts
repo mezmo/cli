@@ -1,10 +1,13 @@
-import type {RequestError} from '@anitrend/request-client'
-import type {View, IViewListResponse, IViewResponse, JoiResponse} from './types.ts'
+import {join, dirname, fromFileUrl} from '@std/path'
 import {colors} from '@cliffy/ansi/colors'
 import {default as client} from '../../client.ts'
 import {AuthorizationError, CommunicationError, InputError, GenericError} from '../../../error.ts'
-export default {get, list, create, getBySpec, remove, removeBySpec, update}
+import type {RequestError} from '@anitrend/request-client'
+import type {View, IViewListResponse, IViewResponse, JoiResponse} from './types.ts'
+import ViewSpec from './spec.ts'
 
+export default {get, list, create, getBySpec, remove, removeBySpec, update}
+export {ViewSpec as Spec}
 export type {View}
 
 export async function get(view_id: string, params?: Record<string, string>): Promise<View | null> {
@@ -82,16 +85,16 @@ export async function list(params?: Record<string, string>): Promise<IViewListRe
       default: {
         throw CommunicationError.from(
           'Try again in a few minutes. If the problem persists, please contact customer support.'
-        , cast?.response?.data
+        , {status: status, detail: cast?.response?.data}
         )
       }
     }
   }
 }
 
-export async function create(params?: View): Promise<View> {
+export async function create(spec: ViewSpec): Promise<View> {
   try {
-    const res: IViewResponse = await client.post('/v1/config/view', params)
+    const res: IViewResponse = await client.post('/v1/config/view', spec.toUpdate())
     res.data.pk = res.data.viewid
     return res.data as View
   } catch (err) {
@@ -124,7 +127,7 @@ export async function create(params?: View): Promise<View> {
       default: {
         throw CommunicationError.from(
           'Try again in a few minutes. If the problem persists, please contact customer support.'
-        , cast?.response?.data
+        , {status: status, detail: cast?.response?.data}
         )
       }
     }
@@ -163,21 +166,22 @@ export async function remove(view_id: string): Promise<void> {
       default: {
         throw CommunicationError.from(
           'Try again in a few minutes. If the problem persists, please contact customer support.'
-        , cast?.response?.data
+        , {status: status, detail: cast?.response?.data}
         )
       }
     }
   }
 }
 
-export async function update(view: View): Promise<View> {
-  const {pk: _pk, account: _account, viewid: _viewid, orgs: _orgs, presetids = [], ...update} = view
+export async function update(spec: ViewSpec): Promise<View> {
 
-  if (presetids.length) update.presetid = presetids[0]
+  const update = spec.toUpdate()
 
   try {
-    const res = await client.put(`v1/config/view/${view.viewid}`, update)
-    return res.data as View
+    const res = await client.put(`v1/config/view/${spec.pk}`, update)
+    const view = res.data as View
+    view.pk = view.viewid
+    return view
   } catch (err) {
     if (err instanceof GenericError) throw err
     const cast: RequestError = err as RequestError
@@ -208,11 +212,17 @@ export async function update(view: View): Promise<View> {
       default: {
         throw CommunicationError.from(
           'Try again in a few minutes. If the problem persists, please contact customer support.'
-        , cast?.response?.data
+        , {status: status, detail: cast?.response?.data}
         )
       }
     }
   }
+}
+
+export function template(): Promise<string> {
+  const current_directory = dirname(fromFileUrl(import.meta.url))
+  const template_location = join(current_directory, 'template.yaml')
+  return Deno.readTextFile(template_location)
 }
 
 export async function removeBySpec(view: View): Promise<void> {

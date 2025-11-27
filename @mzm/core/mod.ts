@@ -1,3 +1,5 @@
+import {EnumType} from '@cliffy/command'
+
 export {Command, EnumType, ValidationError} from '@cliffy/command'
 export {colors} from '@cliffy/ansi/colors'
 export type {ArgumentValue} from '@cliffy/command'
@@ -12,3 +14,7 @@ export * as prompts from '@cliffy/prompt'
 export {prompt} from '@cliffy/prompt'
 export {toTitleCase} from '@std/text/unstable-to-title-case'
 export type {RequestError} from '@anitrend/request-client'
+
+const OutputFormat = new EnumType(['table', 'json', 'yaml'])
+const EditFormat = new EnumType(['json', 'yaml'])
+export {OutputFormat, EditFormat}

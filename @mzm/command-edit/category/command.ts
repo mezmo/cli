@@ -1,12 +1,11 @@
-import {OutputFormat} from '../lib/enum.ts'
-import * as remote from '../lib/remote.ts'
 import {EOL} from '@std/fs'
-import {MZMCommand} from '@mzm/core'
+import {MZMCommand, EditFormat} from '@mzm/core'
 import resource from '@mzm/core/resource'
+import * as remote from '@mzm/core/remote'
 
 export default new MZMCommand()
   .name('category')
-  .type('editformat', OutputFormat)
+  .type('editformat', EditFormat)
   .description([
     'The category subcommand allows you to edit a single category resource by its id.'
   , 'It will open the resource in a text editor as specified by the EDITOR'
