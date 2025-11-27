@@ -7,6 +7,8 @@ export type View = {
 , query: string
 , hosts?: Array<string>
 , apps?: Array<string>
+, tags?: Array<string>
+, levels?: Array<string>
 , presetids?: Array<string>
 , presetid?: string
 , description?: string

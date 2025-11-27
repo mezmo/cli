@@ -74,6 +74,7 @@ export class GenericError extends Error {
     super(message, options)
     Error.captureStackTrace(this, GenericError)
     this.name = this.constructor.name
+    if (options?.cause?.code) this.error_code = options.cause.code
   }
 
   /**
@@ -97,6 +98,8 @@ export class GenericError extends Error {
     cause.code = this.error_code
     if (help) cause.help = help
     if (reason) cause.reason = reason
+    if (reason?.code) cause.code = reason.code
+
     const err = new this(message, {cause})
     return err
   }
