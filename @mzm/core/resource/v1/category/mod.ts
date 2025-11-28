@@ -307,6 +307,6 @@ export async function update(category: Category): Promise<Category> {
 
 export function template(): Promise<string> {
   const current_directory = dirname(fromFileUrl(import.meta.url))
-  const template_location = join(current_directory, 'template.yaml')
+  const template_location = join(current_directory, '..', 'templates', 'category.yaml')
   return Deno.readTextFile(template_location)
 }
