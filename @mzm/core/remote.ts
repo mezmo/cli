@@ -43,7 +43,7 @@ export async function load(version: string, type: string, identifier: string, fo
     return content
 }
 
-export async function fromString(content: string, format: StringifyFormat): Promise<string> {
+export async function fromString(content: string, format?: StringifyFormat): Promise<string> {
   const editor = Deno.env.get('EDITOR') ?? DEFAULT_EDITOR
 
   //@ts-ignore work around for array index typing
@@ -51,8 +51,8 @@ export async function fromString(content: string, format: StringifyFormat): Prom
   const tmpfile = join(dirname,`from-string.${ulid()}.${format}`)
 
   await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
-  await file.write(new TextEncoder().encode(content))
-
+  const transformed: string = format === 'json' ? stringify(parse(content), format) : content
+  await file.write(new TextEncoder().encode(transformed))
   file[Symbol.dispose]()
 
   const cmd = new Deno.Command(editor, {
