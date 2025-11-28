@@ -1,0 +1,10 @@
+---
+version: v1
+resource: category
+metadata: {}
+spec:
+  # START required fields
+  name: string  # The name of the category - Production
+  # Categorys cannot be used beteween types
+  type: string  # the type of category - one of: boards | views | screens
+  # END required fields
