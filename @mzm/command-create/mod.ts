@@ -5,6 +5,7 @@ import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
 
 import ViewCommand from './view/mod.ts'
+import CategoryCommand from './category/mod.ts'
 
 export default new MZMCommand()
   .name('create')
@@ -50,4 +51,5 @@ export default new MZMCommand()
     const result = await (resource)[version][kind].create(definition.spec)
     console.log(result.pk)
   })
+  .command('category', CategoryCommand)
   .command('view', ViewCommand)

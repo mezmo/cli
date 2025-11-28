@@ -1,4 +1,5 @@
 import {debuglog} from 'node:util'
+import {join, dirname, fromFileUrl} from '@std/path'
 import {colors} from '@mzm/core'
 import {toArray} from '@mzm/core/lang'
 import {toTitleCase} from '@std/text/unstable-to-title-case'
@@ -7,6 +8,9 @@ import {default as client} from '../../client.ts'
 import {AuthorizationError, CommunicationError, InputError, GenericError} from '../../../error.ts'
 import {type Category , CATEGORY, type JoiResponse, type ICategoryDetailResponse} from './types.ts'
 import type {RequestError} from '@anitrend/request-client'
+import CategorySpec from './spec.ts'
+
+export {CategorySpec as Spec}
 
 const debug = debuglog('core:resource:category')
 
@@ -298,4 +302,10 @@ export async function update(category: Category): Promise<Category> {
       }
     }
   }
+}
+
+export function template(): Promise<string> {
+  const current_directory = dirname(fromFileUrl(import.meta.url))
+  const template_location = join(current_directory, 'template.yaml')
+  return Deno.readTextFile(template_location)
 }
