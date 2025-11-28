@@ -221,7 +221,7 @@ export async function update(spec: ViewSpec): Promise<View> {
 
 export function template(): Promise<string> {
   const current_directory = dirname(fromFileUrl(import.meta.url))
-  const template_location = join(current_directory, 'template.yaml')
+  const template_location = join(current_directory, '..', 'templates', 'view.yaml')
   return Deno.readTextFile(template_location)
 }
 
