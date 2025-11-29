@@ -76,6 +76,7 @@ export function parse(datetime: string|number): Date | null {
 
       result = new Date(value as string)
       if (!Number.isNaN(result.getTime())) return result
+      return null
     }
 
     default: {

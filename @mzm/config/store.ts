@@ -20,6 +20,7 @@ export default class Store {
           let index: number = 0
           const data = [record]
           return {
+            // deno-lint-ignore require-await
             next: async () => {
               if (index >= data.length) return {done: true}
               return {value: data[index++], done: false}

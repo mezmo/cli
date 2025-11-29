@@ -29,7 +29,7 @@ export default new ResourceCommand('version')
   .example('print version information', 'mzm version')
   .example('print version information in json format', 'mzm version -o json')
   .example('print version information in yaml format', 'mzm version -o json')
-  .action(async function(options: any) {
+  .action(function(options: any) {
     const version_info = info()
     if (options.quiet) return console.log(version_info.version)
 

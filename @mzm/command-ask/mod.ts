@@ -23,7 +23,8 @@ export default new MZMCommand()
       , type: Input
       , message: 'How can I help you today?'
       , prefix: ''
-      , before: async (inputs: any, next: Function) => {
+        // deno-lint-ignore ban-types
+      , before: async (_inputs: any, next: Function) => {
           let session: Conversation | undefined = undefined
 
           if (options.continue) {
@@ -49,6 +50,7 @@ export default new MZMCommand()
           debug('No question input - prompting for initial question')
           await next()
         }
+        // deno-lint-ignore ban-types
       , after: async (inputs: any, next: Function) => {
           const output: ChatResponse = await resource.v1.conversation.create(inputs.hello)
           const chat_session_id: string = `chat.history.${output?.metadata?.chat_session_id}`
@@ -61,6 +63,7 @@ export default new MZMCommand()
       , type: Input
       , message: ''
       , prefix: ''
+        // deno-lint-ignore ban-types
       , after: async (input: Record<string, string>, next: Function) => {
           if (!input.collect) return await next('collect')
           const conversation = await resource.v1.conversation.active()

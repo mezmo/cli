@@ -36,6 +36,7 @@ const sql = SQL(db)
 // primary configuration settings interace
 const store = new Store(kvdb)
 const migrator = new Migrate({
+  // deno-lint-ignore require-await
   getActiveVersion: async function getActiveVersion(context: Record<string, unknown>) {
     const database: DatabaseSync = context.db as DatabaseSync
     const result = database.prepare('PRAGMA user_version').get() as {user_version: number | undefined}
@@ -44,6 +45,7 @@ const migrator = new Migrate({
     log('current active version: %d', major)
     return `${major}.0.0`
   }
+  // deno-lint-ignore require-await
 , setActiveVersion: async function setActiveVersion(version: string | undefined, context: Record<string, unknown>) {
     if (!version) return
     const parsed:SemVer = parse(version)

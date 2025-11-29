@@ -1,8 +1,8 @@
- //@ts-nocheck
+ //@ts-nocheck fix command subclassing later
 import {MZMCommand} from './command.ts'
 import {obj as object} from '@mzm/core/lang'
 import resource from './resource/mod.ts'
-import {Table, Cell, Row} from '@cliffy/table'
+import {Table, Cell} from '@cliffy/table'
 import {toTitleCase} from '@std/text/unstable-to-title-case'
 import {EnumType} from '@cliffy/command'
 import * as yaml from '@std/yaml'
@@ -46,7 +46,7 @@ export default class ResourceCommand extends MZMCommand {
     return data as Type[]
   }
 
-  async get<Type>(identifer: string, params?: Record<string, string>): Promise<Type> {
+  async get<Type>(identifer: string, _params?: Record<string, string>): Promise<Type> {
     const result = await (resource as unknown)[this.#resource_version][this.#resource].get(identifer)
     return result as Type
   }
@@ -96,7 +96,7 @@ export default class ResourceCommand extends MZMCommand {
 
     if (this.#group_by) {
       for (const item of items) {
-        let grouper: string | undefined = Array.isArray(item[this.#group_by])
+        const grouper: string | undefined = Array.isArray(item[this.#group_by])
           ? item[this.#group_by][0]
           : item[this.#group_by]
 
