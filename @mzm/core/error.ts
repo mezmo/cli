@@ -239,7 +239,7 @@ export class CommunicationError extends GenericError {
     , 'There was a problem communicating with the Mezmo Platform'
     , {
         cause: {
-          code: cast.detail.code || this.error_code
+          code: cast.detail?.code || this.error_code
         , help: help
         , reason: cast
         , status_code: cast.status
@@ -248,7 +248,7 @@ export class CommunicationError extends GenericError {
     )
 
     err.status_code = cast.status || err.status_code
-    err.error_code = cast.detail.code || err.error_code
+    err.error_code = cast.detail?.code || err.error_code
 
     return err
   }

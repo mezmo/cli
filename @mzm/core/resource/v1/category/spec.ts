@@ -48,7 +48,7 @@ export default class CategorySpec implements IResourceSpec<Category> {
   static from(spec: {metadata: {pk: string, type: string}, spec: Partial<Category>}) {
     return new this({
       id: spec.metadata.pk
-    , type: spec.metadata.type as CATEGORY
+    , type: (spec.metadata.type || spec.spec.type) as CATEGORY
     , name: spec.spec.name as string
     })
   }

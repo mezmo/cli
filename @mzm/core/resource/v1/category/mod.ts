@@ -22,12 +22,13 @@ type ErrorResponse = {
 , status: string
 }
 
-export async function create(params: Record<string, string>): Promise<Category> {
-  const type = params.type
+export async function create(spec: CategorySpec): Promise<Category> {
+
+  const params = spec.toCreate()
   try {
-    const uri = `v1/config/categories/${type}`
+    const uri = `v1/config/categories/${spec.type}`
     debug('POST %s', uri)
-    const res: ICategoryDetailResponse = await client.post(uri, {name: params.name})
+    const res: ICategoryDetailResponse = await client.post(uri, params)
     const category = res.data as Category
     category.pk = category.id
     debug('%o', res.data)
@@ -264,7 +265,7 @@ export async function update(spec: CategorySpec): Promise<Category> {
   const update = spec.toUpdate()
   try {
     const uri = `v1/config/categories/${spec.type}/${spec.pk}`
-    debug('DELETE %s', uri)
+    debug('PUT %s', uri)
     const res = await client.put(uri, update)
     return res.data as Category
   } catch (err) {
