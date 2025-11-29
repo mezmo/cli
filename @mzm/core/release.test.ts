@@ -1,4 +1,4 @@
-import {assertEquals, assertRejects, assertThrows} from '@std/assert'
+import {assertEquals} from '@std/assert'
 import {stub, restore} from '@std/testing/mock'
 import {parse as parseSemver} from '@std/semver'
 import {info} from './release.ts'
@@ -27,13 +27,14 @@ function isValidDate(dateString: string): boolean {
   return !isNaN(date.getTime())
 }
 
-Deno.test('info - successfully reads and parses release info', async () => {
+Deno.test('info - successfully reads and parses release info', () => {
   const mockData = createMockReleaseData()
 
   // Stub Deno.readTextFile
   stub(
     Deno,
     'readTextFile',
+    // deno-lint-ignore require-await
     async (path: string | URL) => {
       // Verify it's trying to read the correct file
       if (typeof path === 'string' && path.endsWith('release.json')) {

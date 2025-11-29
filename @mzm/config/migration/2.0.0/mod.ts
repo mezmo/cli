@@ -1,6 +1,7 @@
 // deno-coverage-ignore-file
 import {DatabaseSync} from 'node:sqlite'
 
+// deno-lint-ignore require-await
 export async function up(context: any) {
   const db: DatabaseSync = context.db as DatabaseSync
   db.exec(`
@@ -27,6 +28,7 @@ export async function up(context: any) {
   `)
 }
 
+// deno-lint-ignore require-await
 export async function down(context: any) {
   const db: DatabaseSync = context.db as DatabaseSync
   db.exec(`

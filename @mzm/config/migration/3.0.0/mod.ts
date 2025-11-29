@@ -11,4 +11,4 @@ export async function up(context: any) {
   await store.set('core.upgrade.timeout', 1000 * 60 * 5)
 }
 
-export async function down(context: any) {}
+export async function down(_: any) {}
