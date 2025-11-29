@@ -37,18 +37,22 @@ export async function load(version: string, type: string, identifier: string, fo
 
     const process = cmd.spawn()
     const status = await process.status
-    if (status.code !== 0) throw GenericError.from('unable to save fild')
+    if (status.code !== 0) throw GenericError.from(
+      'Unable to save resource file'
+    , `Make sure the directory ${dirname} accessible and can be written to`
+    , {code: 'ENOIO'}
+    )
     const content = await Deno.readTextFile(tmpfile)
     await Deno.remove(tmpfile)
     return content
 }
 
-export async function fromString(content: string, format?: StringifyFormat): Promise<string> {
+export async function fromString(content: string, format?: StringifyFormat, file_name: string = 'from-string'): Promise<string> {
   const editor = Deno.env.get('EDITOR') ?? DEFAULT_EDITOR
 
   //@ts-ignore work around for array index typing
   const dirname = await Deno.makeTempDir({prefix: 'mzm-staging'})
-  const tmpfile = join(dirname,`from-string.${ulid()}.${format}`)
+  const tmpfile = join(dirname,`${file_name}.${ulid()}.${format}`)
 
   await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
   const transformed: string = format === 'json' ? stringify(parse(content), format) : content
@@ -64,7 +68,11 @@ export async function fromString(content: string, format?: StringifyFormat): Pro
 
   const process = cmd.spawn()
   const status = await process.status
-  if (status.code !== 0) throw new Error('Unable to save resource file')
+  if (status.code !== 0) throw GenericError.from(
+    'Unable to save resource file'
+  , `Make sure the directory ${dirname} accessible and can be written to`
+  , {code: 'ENOIO'}
+  )
   const output = await Deno.readTextFile(tmpfile)
   await Deno.remove(tmpfile)
   return output
