@@ -51,7 +51,7 @@ export function SQL(db: DatabaseSync): StringTemplate {
         }
       }
     } catch (err) {
-      console.dir(sql)
+      console.dir({sql, err})
       throw new Error('unable to compile sql statement')
     }
   }

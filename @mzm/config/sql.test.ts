@@ -24,14 +24,14 @@ Deno.test.afterEach(() => {
 
 Deno.test({
   name: 'sql.get - anonymous parameters'
-, fn: async function() {
+, fn: function() {
     const sql = SQL(db)
     sql`
       INSERT INTO sql_test (name)
       VALUES ('hello'), ('world')
     `.run()
 
-    let name = 'hello'
+    const name = 'hello'
     const query = sql`SELECT name from sql_test where name = ${name}`
 
     {
@@ -41,7 +41,7 @@ Deno.test({
     }
 
     {
-      let override = 'world'
+      const override = 'world'
       const record = query.get(override) // positional parameters
       assertExists(record, '1record returned')
       assertObjectMatch(record, {name: override})
@@ -52,7 +52,7 @@ Deno.test({
 
 Deno.test({
   name: 'sql.all - named parameters'
-,fn: async function() {
+,fn: function() {
     const sql = SQL(db)
     sql`
       INSERT INTO sql_test (name)
@@ -83,14 +83,14 @@ Deno.test({
 
 Deno.test({
   name: 'sql.all - anonymous parameters'
-, fn: async function() {
+, fn: function() {
     const sql = SQL(db)
     sql`
       INSERT INTO sql_test (name, category)
       VALUES ('hello', 'one'), ('world', 'one'), ('unknown', 'foobar')
     `.run()
 
-    let category = 'one'
+    const category = 'one'
     const query = sql`SELECT name from sql_test where category = ${category}`
 
     {
@@ -111,7 +111,7 @@ Deno.test({
 
 Deno.test({
   name: 'sql.all - named parameters'
-,fn: async function() {
+,fn: function() {
     const sql = SQL(db)
     sql`
       INSERT INTO sql_test (name, category)

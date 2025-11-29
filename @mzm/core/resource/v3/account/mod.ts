@@ -1,5 +1,5 @@
-import type {RequestError, RequestResponse} from '@anitrend/request-client'
-import {AuthorizationError, CommunicationError, InputError, GenericError} from '../../../error.ts'
+import type {RequestError} from '@anitrend/request-client'
+import {AuthorizationError, CommunicationError, GenericError} from '../../../error.ts'
 import client from '../../client.ts'
 import {type Account} from './types.ts'
 import {type IV3ListResponse, type IV3DetailResponse} from '../types.ts'
