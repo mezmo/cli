@@ -43,12 +43,12 @@ export async function load(version: string, type: string, identifier: string, fo
     return content
 }
 
-export async function fromString(content: string, format?: StringifyFormat): Promise<string> {
+export async function fromString(content: string, format?: StringifyFormat, file_name: string = 'from-string'): Promise<string> {
   const editor = Deno.env.get('EDITOR') ?? DEFAULT_EDITOR
 
   //@ts-ignore work around for array index typing
   const dirname = await Deno.makeTempDir({prefix: 'mzm-staging'})
-  const tmpfile = join(dirname,`from-string.${ulid()}.${format}`)
+  const tmpfile = join(dirname,`${file_name}.${ulid()}.${format}`)
 
   await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
   const transformed: string = format === 'json' ? stringify(parse(content), format) : content

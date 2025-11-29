@@ -17,7 +17,7 @@ export default new MZMCommand()
     //@ts-ignore work around for command subclassing
   .action(async function(options: any) {
     //@ts-ignore work around for command subclassing
-    const content = await remote.fromString(resource.v1.category.template(), options.output)
+    const content = await remote.fromString(resource.v1.category.template(), options.output, 'category')
     const category: Category = await remote.applyTemplate<Category>(content)
     console.log(category.pk)
   })
