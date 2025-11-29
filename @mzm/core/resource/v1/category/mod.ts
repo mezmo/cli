@@ -261,6 +261,7 @@ export async function removeBySpec(category: Category): Promise<string | void> {
 }
 
 export async function update(category: Category): Promise<Category> {
+  console.dir(category)
   const update = {name: category.name}
   try {
     const uri = `v1/config/categories/${category.type}/${category.pk}`

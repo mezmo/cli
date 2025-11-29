@@ -1,6 +1,6 @@
 import {EOL} from '@std/fs'
 import {MZMCommand, EditFormat} from '@mzm/core'
-import resource from '@mzm/core/resource'
+import resource, {type Category} from '@mzm/core/resource'
 import * as remote from '@mzm/core/remote'
 
 export default new MZMCommand()
@@ -45,6 +45,6 @@ export default new MZMCommand()
     if (!resource_id) return
 
     const content = await remote.load('v1', 'category', resource_id, options.output)
-    await remote.apply('v1', 'category', content)
-    console.log(category_id)
+    const category: Category = await remote.applyTemplate<Category>(content)
+    console.log(category.pk)
   })
