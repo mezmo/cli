@@ -1,10 +1,11 @@
-import {join, dirname, fromFileUrl} from '@std/path'
 import {colors} from '@cliffy/ansi/colors'
 import {default as client} from '../../client.ts'
 import {AuthorizationError, CommunicationError, InputError, GenericError} from '../../../error.ts'
 import type {RequestError} from '@anitrend/request-client'
 import type {View, IViewListResponse, IViewResponse, JoiResponse} from './types.ts'
 import ViewSpec from './spec.ts'
+
+import view_template from './template.yaml' with {type: 'text'}
 
 export default {get, list, create, getBySpec, remove, removeBySpec, update}
 export {ViewSpec as Spec}
@@ -219,10 +220,8 @@ export async function update(spec: ViewSpec): Promise<View> {
   }
 }
 
-export function template(): Promise<string> {
-  const current_directory = dirname(fromFileUrl(import.meta.url))
-  const template_location = join(current_directory, '..', 'templates', 'view.yaml')
-  return Deno.readTextFile(template_location)
+export function template(): string {
+  return view_template
 }
 
 export async function removeBySpec(view: View): Promise<void> {

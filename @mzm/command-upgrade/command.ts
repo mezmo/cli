@@ -1,5 +1,5 @@
 import {UpgradeCommand} from '@mzm/core/update'
-import {infoSync} from '@mzm/core/release'
+import {info} from '@mzm/core/release'
 import {GithubReleaseProvider} from '@mzm/core/update/providers'
 
 interface GithubReleasesUpgradeOptions {
@@ -19,7 +19,7 @@ export default class GithubReleasesUpgradeCommand extends UpgradeCommand {
   }
 
   override getVersion(): string | undefined {
-    const release = infoSync()
+    const release = info()
     return release.version
   }
 }

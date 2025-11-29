@@ -1,5 +1,5 @@
 import type {IResourceTemplate, IResourceSpec} from '../../types.ts'
-import type {Category} from './types.ts'
+import type {Category, CATEGORY} from './types.ts'
 
 export default class CategorySpec implements IResourceSpec<Category> {
   resource: Category
@@ -14,6 +14,10 @@ export default class CategorySpec implements IResourceSpec<Category> {
     return this.resource.id
   }
 
+  get type(): string {
+    return this.resource.type
+  }
+
   toJSON() {
     return this.resource
   }
@@ -25,7 +29,6 @@ export default class CategorySpec implements IResourceSpec<Category> {
   toUpdate(): Partial<Category> {
     return {
       name: this.resource.name
-    , type: this.resource.type
     }
   }
 
@@ -42,11 +45,11 @@ export default class CategorySpec implements IResourceSpec<Category> {
       }
     }
   }
-  static from(spec: {metadata: {pk: string, type?: string}, spec: Partial<Category>}) {
-    return {
+  static from(spec: {metadata: {pk: string, type: string}, spec: Partial<Category>}) {
+    return new this({
       id: spec.metadata.pk
-    , type: spec.metadata.type
-    , name: spec.spec.name
-    }
+    , type: spec.metadata.type as CATEGORY
+    , name: spec.spec.name as string
+    })
   }
 }

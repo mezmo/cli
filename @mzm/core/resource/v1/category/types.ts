@@ -7,7 +7,7 @@ export enum CATEGORY {
 
 export type Category = {
   name: string
-, type: CATEGORY
+, 'type': CATEGORY
 , id: string
 , pk?: string
 }
