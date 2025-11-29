@@ -1,14 +1,14 @@
 import {debuglog} from 'node:util'
-import {join, dirname, fromFileUrl} from '@std/path'
 import {colors} from '@mzm/core'
 import {toArray} from '@mzm/core/lang'
 import {toTitleCase} from '@std/text/unstable-to-title-case'
 import {Select} from '@cliffy/prompt/select'
 import {default as client} from '../../client.ts'
-import {AuthorizationError, CommunicationError, InputError, GenericError} from '../../../error.ts'
+import {AuthorizationError, CommunicationError, InputError, GenericError, ClientError} from '../../../error.ts'
 import {type Category , CATEGORY, type JoiResponse, type ICategoryDetailResponse} from './types.ts'
 import type {RequestError} from '@anitrend/request-client'
 import CategorySpec from './spec.ts'
+import category_template from './template.yaml' with {type: 'text'}
 
 export {CategorySpec as Spec}
 
@@ -61,16 +61,16 @@ export async function create(params: Record<string, string>): Promise<Category> 
       }
 
       case 409: {
-        throw AuthorizationError.from(
-          `Make sure you have the appropriate permissions to create a ${colors.yellow("category")} in the appropriate account`
-        , cast?.response?.data
+        throw CommunicationError.from(
+          `A ${colors.yellow("category")} with the same name already exists`
+        , {status, detail: cast?.response?.data}
         )
       }
 
       default: {
         throw CommunicationError.from(
           'Try again in a few minutes. If the problem persists, please contact customer support.'
-        , cast?.response?.data
+        , {status, detail: cast?.response?.data}
         )
       }
     }
@@ -260,11 +260,10 @@ export async function removeBySpec(category: Category): Promise<string | void> {
   return await remove(category.pk)
 }
 
-export async function update(category: Category): Promise<Category> {
-  console.dir(category)
-  const update = {name: category.name}
+export async function update(spec: CategorySpec): Promise<Category> {
+  const update = spec.toUpdate()
   try {
-    const uri = `v1/config/categories/${category.type}/${category.pk}`
+    const uri = `v1/config/categories/${spec.type}/${spec.pk}`
     debug('DELETE %s', uri)
     const res = await client.put(uri, update)
     return res.data as Category
@@ -295,18 +294,23 @@ export async function update(category: Category): Promise<Category> {
         )
       }
 
+      case 409: {
+        throw ClientError.from(
+          `A ${colors.yellow("category")} with the same name already exists`
+        , cast?.response?.data
+        )
+      }
+
       default: {
         throw CommunicationError.from(
           'Try again in a few minutes. If the problem persists, please contact customer support.'
-        , {status, detail: cast?.response?.data}
+        , cast?.response?.data
         )
       }
     }
   }
 }
 
-export function template(): Promise<string> {
-  const current_directory = dirname(fromFileUrl(import.meta.url))
-  const template_location = join(current_directory, '..', 'templates', 'category.yaml')
-  return Deno.readTextFile(template_location)
+export function template(): string {
+  return category_template
 }

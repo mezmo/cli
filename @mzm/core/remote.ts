@@ -109,8 +109,6 @@ export async function applyTemplate<T>(content: string): Promise<T> {
   const Spec = module.Spec
 
   const spec = Spec.from(template)
-  console.dir(spec)
-  console.dir(spec.pk)
   const pk = spec.pk
   const result = pk
     ? await module.update(spec)
