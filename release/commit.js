@@ -31,8 +31,12 @@ function transform(commit) {
   output.type = typeOf(commit.type)
   output.shortHash = commit.hash.substring(0, 7)
 
-  for (const note of output.notes) {
-    note.title = '**BREAKING CHANGES**'
-  }
+  output.notes = output.notes.map((note) => {
+    const remaped = {
+      ...note
+    , title: '**BREAKING CHANGES**'
+    }
+    return remaped
+  })
   return output
 }
