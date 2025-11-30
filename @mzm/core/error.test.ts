@@ -43,6 +43,7 @@ Deno.test('GenericError - constructor with options', () => {
   assertInstanceOf(error, GenericError)
   assertEquals(error.message, 'Test error')
   assertEquals(error.cause, options.cause)
+  assertEquals(error.error_code, 'TEST_CODE')
 })
 
 Deno.test('GenericError - constructor with partial cause', () => {

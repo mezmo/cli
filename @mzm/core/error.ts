@@ -74,6 +74,7 @@ export class GenericError extends Error {
     super(message, options)
     Error.captureStackTrace(this, GenericError)
     this.name = this.constructor.name
+    if (options?.cause?.code) this.error_code = options.cause.code
   }
 
   /**
@@ -97,6 +98,8 @@ export class GenericError extends Error {
     cause.code = this.error_code
     if (help) cause.help = help
     if (reason) cause.reason = reason
+    if (reason?.code) cause.code = reason.code
+
     const err = new this(message, {cause})
     return err
   }
@@ -236,7 +239,7 @@ export class CommunicationError extends GenericError {
     , 'There was a problem communicating with the Mezmo Platform'
     , {
         cause: {
-          code: cast.detail.code || this.error_code
+          code: cast.detail?.code || this.error_code
         , help: help
         , reason: cast
         , status_code: cast.status
@@ -245,7 +248,7 @@ export class CommunicationError extends GenericError {
     )
 
     err.status_code = cast.status || err.status_code
-    err.error_code = cast.detail.code || err.error_code
+    err.error_code = cast.detail?.code || err.error_code
 
     return err
   }
@@ -319,6 +322,44 @@ export class InputError extends GenericError {
     }
     return msg.join(EOL)
   }
+
+  /**
+   * Factory method to create an input validation error with a standard message.
+   *
+   * @static
+   * @override
+   * @param {string} help - Help text for resolving the validation issue
+   * @param {any} [reason] - Optional validation error details (typically an array of validation errors)
+   * @returns {InputError} A new input error instance
+   *
+   * @example
+   * throw InputError.from(
+   *   'Review the validation errors above',
+   *   validationErrors
+   * );
+   */
+  static override from(help: string, reason?: any) {
+    return super.from(
+      'Something about the provided input is invalid'
+    , help
+    , reason
+    )
+  }
+}
+
+export class ClientError extends GenericError {
+
+  /** Error code for input validation errors */
+  static override error_code: string = 'EINVAL'
+
+  /** Exit code for input validation errors */
+  static override exit_code: number = 5
+
+  /** Instance error code for input validation errors */
+  override error_code: string = 'EINVAL'
+
+  /** Instance exit code for input validation errors */
+  override exit_code: number = 5
 
   /**
    * Factory method to create an input validation error with a standard message.

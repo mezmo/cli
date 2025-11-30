@@ -6,6 +6,19 @@ export enum StringifyFormat {
 
 export interface IResourceDefinition {
   type: string
-  spec: object
+  spec: Record<string, unknown>
 }
 
+export interface IResourceTemplate {
+  version: 'v1' | 'v2' | 'v3'
+, resource: 'view' | 'category'
+, metadata: Record<string, string>
+, spec: Record<string, unknown>
+}
+
+export interface IResourceSpec<T> {
+  toJSON(): T
+, toTemplate(): IResourceTemplate
+, toUpdate(): unknown
+, toCreate(): unknown
+}

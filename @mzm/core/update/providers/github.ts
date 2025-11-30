@@ -1,13 +1,11 @@
-import {homedir} from 'node:os'
 import {debuglog} from 'node:util'
-import {dirname} from '@std/path'
 import {storage} from '@mzm/config'
 import {date} from '@mzm/core/lang'
 import {colors} from '@mzm/core'
 import {equals as semverEqual, parse, compare, tryParse, format} from '@std/semver'
 import {Table, Cell, type RowType} from '@cliffy/table'
 import {ValidationError} from '@cliffy/command'
-import {Provider, type UpgradeCommandOptions} from "@cliffy/command/upgrade"
+import {Provider} from "@cliffy/command/upgrade"
 import type {GithubProviderOptions} from "@cliffy/command/upgrade/provider/github"
 import {GenericError} from '../../error.ts'
 import {

@@ -1,7 +1,7 @@
 import * as object from './object.ts'
 import {assertEquals, assertThrows} from '@std/assert'
 
-Deno.test('Exports as expected', async (t) => {
+Deno.test('Exports as expected', () => {
   const entries = Object.entries(object)
   assertEquals(entries.length, 1, 'function count')
   assertEquals(typeof object.get, 'function', 'get function exported')

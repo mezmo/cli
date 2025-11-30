@@ -1,11 +1,12 @@
 import {EOL} from 'node:os'
 import {join, isAbsolute} from '@std/path'
 import {MZMCommand, ValidationError} from '@mzm/core'
-import {getLogger} from '@mzm/log'
 import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
 
-const log = getLogger('default')
+import ViewCommand from './view/mod.ts'
+import CategoryCommand from './category/mod.ts'
+
 export default new MZMCommand()
   .name('create')
   .usage('<options>')
@@ -50,3 +51,5 @@ export default new MZMCommand()
     const result = await (resource)[version][kind].create(definition.spec)
     console.log(result.pk)
   })
+  .command('category', CategoryCommand)
+  .command('view', ViewCommand)

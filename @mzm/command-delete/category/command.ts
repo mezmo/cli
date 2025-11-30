@@ -3,7 +3,7 @@ import resource from '@mzm/core/resource'
 
 export default new MZMCommand()
   .name('category')
-  .description('Delete one or more categorys')
+  .description('Delete one or more categories')
   .arguments('[identifiers...:string]')
   .example('Delete a single category:', 'mzm delete category a3d194')
   .example('Delete many category:', 'mzm delete category a3d194 fab3134')
