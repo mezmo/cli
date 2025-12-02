@@ -1,5 +1,43 @@
 ## Changelog
 
+# [2.0.0](https://github.com/mezmo/cli/compare/v1.3.0...v2.0.0) (2025-12-02)
+
+
+### Bug Fixes
+
+* **ci**: fix commit transform function in release [eb16c36](https://github.com/mezmo/cli/commit/eb16c366c567bacff30f626a90d80a6733ee4b46) - Eric Satterwhite
+* **remote**: make sure to transform string input into requested format [13e29a1](https://github.com/mezmo/cli/commit/13e29a1e0a3244b17e736b2bc20b31ff1816d5c0) - Eric Satterwhite
+
+
+### Chores
+
+* **core**: move resource templates into a single directory [3df2620](https://github.com/mezmo/cli/commit/3df26207f000d6167ec7245fbf05706d62a34359) - Eric Satterwhite
+* **core**: update the category resource module to utilize spec files [f02f020](https://github.com/mezmo/cli/commit/f02f020620e0a16ec9cbc6b2eaab79ffa7020e28) - Eric Satterwhite
+* **lint**: update files to pass basic lint [ee93451](https://github.com/mezmo/cli/commit/ee9345195db9fe6d73ee29646cfc5b45a29da624) - Eric Satterwhite
+
+
+### Documentation
+
+* **wiki**: include recording for using create + edit together [864a5a5](https://github.com/mezmo/cli/commit/864a5a529884e3b08cf601df467bfb294e06f747) - Eric Satterwhite
+
+
+### Features
+
+* **command-create**: category sub command to create a category [ad437e5](https://github.com/mezmo/cli/commit/ad437e591f488d41191c8641c5addb6f11a0411a) - Eric Satterwhite
+* **core**: adds ability to create from a resource spec template [a33818d](https://github.com/mezmo/cli/commit/a33818d139152e61c97a0afd1e8bf4308bbee18a) - Eric Satterwhite
+* **core**: replace file embending [b6a8ac6](https://github.com/mezmo/cli/commit/b6a8ac6eda29e1d6f80b33d2198efefdca9f5934) - Eric Satterwhite
+
+
+### Miscellaneous
+
+* fix(resource) Fix the create logic for categories [affce4f](https://github.com/mezmo/cli/commit/affce4f7861ca501ee3c6c89308ec65347e37a48) - Eric Satterwhite
+
+
+### **BREAKING CHANGES**
+
+* **core:** the release file is renamed to release.json
+* **core:** Format of resource spec changed from previous format
+
 # [1.3.0](https://github.com/mezmo/cli/compare/v1.2.0...v1.3.0) (2025-11-26)
 
 
