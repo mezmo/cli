@@ -1,5 +1,12 @@
 ## Changelog
 
+## [2.0.1](https://github.com/mezmo/cli/compare/v2.0.0...v2.0.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* **command-log**: fix windows signal handling [ad22ded](https://github.com/mezmo/cli/commit/ad22ded00d5c943c580435ccdbcb3e5e415952db) - Eric Satterwhite, closes: [#28](https://github.com/mezmo/cli/issues/28)
+
 # [2.0.0](https://github.com/mezmo/cli/compare/v1.3.0...v2.0.0) (2025-12-02)
 
 
