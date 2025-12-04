@@ -39,6 +39,15 @@
         "review",
         "ideas"
       ]
+    },
+    {
+      "login": "seeruyy",
+      "name": "Sergey Opria",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5346824?v=4",
+      "profile": "https://github.com/seeruyy",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
