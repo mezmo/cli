@@ -1,6 +1,7 @@
-import {MZMCommand, EnumType} from '@mzm/core'
+import {MZMCommand, EnumType, colors} from '@mzm/core'
 import type {RequestError} from '@mzm/core'
 import {WebsocketProtocol as PROTOCOL, Socket} from './web-socket.ts'
+import {AuthorizationError} from '@mzm/core/error'
 import type {SocketOptions} from './web-socket.ts'
 import {storage} from '@mzm/config'
 import {pprint} from '@mzm/log'
@@ -9,7 +10,7 @@ import {getLogger} from '@mzm/log'
 
 const log = getLogger('default')
 const OutputFormat = new EnumType(['json', 'pretty'])
-
+const WINDOWS = Deno.build.os === 'windows'
 function messageCallback(event: CustomEvent) {
   const payload = JSON.parse(event.detail.data)
   // ignore meta message
@@ -48,6 +49,10 @@ const tail = new MZMCommand()
   .group('Formatting options')
   .option('-o, --output [format:format]', 'Output raw JSON', {default: 'pretty'})
   .action(async function(options: any, query?: string) {
+    const ACCESS_KEY: string | undefined = options.accessKey ?? ''
+    if (!ACCESS_KEY) throw AuthorizationError.from(
+      `Make sure the environment variable ${colors.magenta('MZM_ACCESS_KEY')} is set`
+    )
     const STREAM_HOST = await storage.getOne('core.host.stream')
     const headers = new Headers()
     log.debug(`stream host: ${STREAM_HOST}`)
@@ -84,7 +89,7 @@ const tail = new MZMCommand()
     tail_params.levels = toArray(options.level).join(',')
     tail_params.apps = toArray(options.app).join(',')
 
-    if (options.accessKey) headers.append('Authorization', `Token ${options.accessKey}`)
+    headers.append('Authorization', `Token ${ACCESS_KEY}`)
 
     const ws = new Socket(
       `${STREAM_HOST}/ws/tail`
@@ -105,12 +110,18 @@ const tail = new MZMCommand()
       log.error('error encountered')
     })
 
-    Deno.addSignalListener('SIGTERM', () => {
+    if (!WINDOWS) Deno.addSignalListener('SIGTERM', () => {
       ws.close()
     })
+
     Deno.addSignalListener('SIGINT', () => {
       ws.close()
     })
+
+    Deno.addSignalListener('SIGHUP', () => {
+      ws.close()
+    })
+
     ws.open()
   })
 

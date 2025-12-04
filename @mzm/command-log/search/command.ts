@@ -8,6 +8,7 @@ import {client} from '@mzm/core/resource'
 import {pprint, getLogger} from '@mzm/log';
 import {storage} from '@mzm/config'
 
+const WINDOWS = Deno.build.os === 'windows'
 const log = getLogger('default')
 const debug = debuglog('core:command:log:search')
 const StartPrefernce = new EnumType(['head', 'tail'])
@@ -130,11 +131,15 @@ const search = new MZMCommand()
 
     const controller = new AbortController()
 
-    Deno.addSignalListener('SIGTERM', () => {
+    if (!WINDOWS) Deno.addSignalListener('SIGTERM', () => {
       controller.abort()
     })
 
     Deno.addSignalListener('SIGINT', () => {
+      controller.abort()
+    })
+
+    Deno.addSignalListener('SIGHUP', () => {
       controller.abort()
     })
 
