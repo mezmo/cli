@@ -1,5 +1,20 @@
 ## Changelog
 
+## [2.0.2](https://github.com/mezmo/cli/compare/v2.0.1...v2.0.2) (2025-12-05)
+
+
+### Bug Fixes
+
+* **core**: make sure version object can be translated to a string [0b1c131](https://github.com/mezmo/cli/commit/0b1c13125497c481fede62cf5c79ad38efb85b4b) - Eric Satterwhite, closes: [#32](https://github.com/mezmo/cli/issues/32)
+
+
+### Miscellaneous
+
+* update .all-contributorsrc [skip ci] [924f40e](https://github.com/mezmo/cli/commit/924f40ed7f694f77e0c7ad7ea8d80bf525c93f4a) - Eric Satterwhite
+* update .all-contributorsrc [skip ci] [ff78724](https://github.com/mezmo/cli/commit/ff787248e00142378e92a7ed9a6bdd94f66a106e) - Eric Satterwhite
+* update README.md [skip ci] [d54d5cb](https://github.com/mezmo/cli/commit/d54d5cb76245170cb5b551368da7ed1728f81fb4) - Eric Satterwhite
+* update README.md [skip ci] [607c2aa](https://github.com/mezmo/cli/commit/607c2aaccc766d2135a5e11fb12e0e118256e9c7) - Eric Satterwhite
+
 ## [2.0.1](https://github.com/mezmo/cli/compare/v2.0.0...v2.0.1) (2025-12-04)
 
 
