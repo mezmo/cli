@@ -274,7 +274,13 @@ export default class GithubReleaseProvider extends Provider {
         return true
       })
       .map((value) => {
-        return {created_at: value.created_at, tag: value.tag_name}
+        return {
+          created_at: value.created_at
+        , tag: value.tag_name
+        , toString(): string {
+            return value.tag_name.replace('v', '')
+          }
+        }
       })
       .sort(sortVersions)
 
