@@ -1,6 +1,6 @@
 # Mezmo CLI
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 > [!CAUTION]
@@ -459,6 +459,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/e
       <td align="center" valign="top" width="14.28%"><a href="http://mdel.io"><img src="https://avatars.githubusercontent.com/u/69520?v=4?s=100" width="100px;" alt="Mike Del Tito"/><br /><sub><b>Mike Del Tito</b></sub></a><br /><a href="https://github.com/mezmo/cli/pulls?q=is%3Apr+reviewed-by%3Amdeltito" title="Reviewed Pull Requests">👀</a> <a href="#ideas-mdeltito" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://biblicalph.github.io"><img src="https://avatars.githubusercontent.com/u/3032519?v=4?s=100" width="100px;" alt="kwabena"/><br /><sub><b>kwabena</b></sub></a><br /><a href="https://github.com/mezmo/cli/pulls?q=is%3Apr+reviewed-by%3Abiblicalph" title="Reviewed Pull Requests">👀</a> <a href="#ideas-biblicalph" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/seeruyy"><img src="https://avatars.githubusercontent.com/u/5346824?v=4?s=100" width="100px;" alt="Sergey Opria"/><br /><sub><b>Sergey Opria</b></sub></a><br /><a href="https://github.com/mezmo/cli/pulls?q=is%3Apr+reviewed-by%3Aseeruyy" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/NickDiMucci"><img src="https://avatars.githubusercontent.com/u/1623178?v=4?s=100" width="100px;" alt="Nicholas DiMucci"/><br /><sub><b>Nicholas DiMucci</b></sub></a><br /><a href="https://github.com/mezmo/cli/issues?q=author%3ANickDiMucci" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
