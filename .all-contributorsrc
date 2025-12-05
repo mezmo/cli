@@ -48,6 +48,15 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "NickDiMucci",
+      "name": "Nicholas DiMucci",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1623178?v=4",
+      "profile": "https://github.com/NickDiMucci",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
