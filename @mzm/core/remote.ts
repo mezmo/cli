@@ -55,7 +55,8 @@ export async function fromString(content: string, format?: StringifyFormat, file
   const tmpfile = join(dirname,`${file_name}.${ulid()}.${format}`)
 
   await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
-  const transformed: string = format === 'json' ? stringify(parse(content), format) : content
+  //TODO(esatterwhite): this should throw if we can't parse it
+  const transformed: string = format === 'json' ? stringify(parse(content) ?? {}, format) : content
   await file.write(new TextEncoder().encode(transformed))
   file[Symbol.dispose]()
 

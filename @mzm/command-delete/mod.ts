@@ -25,10 +25,11 @@ export default new MZMCommand()
 
     if (!definition) return
 
-    const [version, kind] = definition.type?.split('/')
+    const version = definition.version
+    const kind = definition.resource
 
     if (!kind) {
-      throw new ValidationError(`Resource definiton missing type declaration.`)
+      throw new ValidationError(`Resource definiton missing resource declaration.`)
     }
 
     if (!Object.hasOwnProperty.call(resource, version)) {
@@ -49,6 +50,7 @@ export default new MZMCommand()
       //@ts-ignore workaround for module indexing
       const spec = await resource[version][kind].getBySpec(definition.spec)
 
+      if (!spec) return
       //@ts-ignore workaround for module indexing
       await (resource)[version][kind].removeBySpec(spec)
       if (spec.pk) console.log(spec.pk)
