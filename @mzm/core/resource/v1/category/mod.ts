@@ -315,3 +315,8 @@ export async function update(spec: CategorySpec): Promise<Category> {
 export function template(): string {
   return category_template
 }
+
+
+export async function getBySpec(spec: Category):Promise<Category | null> {
+  return await get(spec.name, {type: spec.type})
+}

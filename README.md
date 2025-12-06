@@ -31,21 +31,39 @@ Manage logs, views, configurations, and leverage AI-powered assistance directly 
 | `mzm edit` | Edit existing resources |
 | `mzm get` | Retrieve and display resources |
 | `mzm log` | Interact with log data |
+| `mzm upgrade` | Upgrade the CLI to the latest version |
+| `mzm version` | Display version information |
 
 ### Subcommands
 
 #### Log Commands
-- `mzm log search` - Search through historical logs
+- `mzm log search` - Search through historical logs with pagination
 - `mzm log tail` - Stream logs in real-time
 
 #### Get Commands
 - `mzm get account` - Display account information
-- `mzm get conversation` - List AI conversations
-- `mzm get view` - List or get specific views
+- `mzm get category [id | name]` - List or get specific categories
+- `mzm get conversation [id]` - List AI conversations or get a specific one
+- `mzm get view [id | name]` - List or get specific views
 
 #### Config Commands
 - `mzm config get <key>` - Display configuration values
-- `mzm config set <key>` - Set configuration values
+- `mzm config set <key> <value>` - Set configuration values
+
+#### Create Commands
+- `mzm create -f <file>` - Create resources from a file
+- `mzm create category` - Create a category from a template
+- `mzm create view` - Create a view from a template
+
+#### Edit Commands
+- `mzm edit category [id | name]` - Edit a category resource
+- `mzm edit view [id | name]` - Edit a view resource
+
+#### Delete Commands
+- `mzm delete -f <file>` - Delete resources from a file
+- `mzm delete category <id...>` - Delete one or more categories
+- `mzm delete conversation <id...>` - Delete one or more conversations
+- `mzm delete view <id...>` - Delete one or more views
 
 ## Prerequisites
 
@@ -265,13 +283,16 @@ mzm get view --output json
 ```bash
 # Create from YAML file
 cat > view.yaml << EOF
-type: v1/view
+---
+version: v1
+resource: view
+metadata: {}
 spec:
-    name: production-errors
-    query: level:error AND app:production
-    categories:
-      - production
-      - errors
+  name: production-errors
+  query: level:error AND app:production
+  category:
+    - production
+    - errors
 EOF
 
 mzm create -f view.yaml
@@ -332,12 +353,14 @@ mzm delete view "my view name"
 Example resource definition:
 ```yaml
 ---
-type: v1/view
+version: v1
+resource: view
+metadata: {}
 spec:
-    name: application-logs
-    query: app:myapp
-    categories:
-      - application
+  name: application-logs
+  query: app:myapp
+  category:
+    - application
 ---
 ```
 
