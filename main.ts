@@ -1,5 +1,6 @@
-import {debuglog} from 'node:util'
-import {CompletionsCommand, MZMCommand} from '@mzm/core'
+import {debuglog, format} from 'node:util'
+import {CompletionsCommand, MZMCommand, Table, Cell, colors} from '@mzm/core'
+import {info} from '@mzm/core/release'
 import {LogCommand} from '@mzm/command-log'
 import {ConfigCommand} from '@mzm/command-config'
 import GetCommand from '@mzm/command-get'
@@ -10,6 +11,7 @@ import AskCommand from '@mzm/command-ask'
 import VersionCommand from '@mzm/command-version'
 import {GithubReleasesUpgradeCommand} from '@mzm/command-upgrade'
 import {providers} from '@mzm/core/update'
+import {logo} from '@mzm/core/assets'
 
 const debug = debuglog('core:command:entry')
 
@@ -38,6 +40,18 @@ const upgrade = new GithubReleasesUpgradeCommand({
 if (import.meta.main) {
   const cmd = new MZMCommand()
     .action(function () {
+      const output = new Table().padding(8)
+
+      const body = []
+      body.push(['', new Cell(logo())])
+      body.push([])
+      body.push([
+        new Cell(
+          format('%s %s @ %s', colors.yellow('mezmo'), 'cli', colors.bold(info().version))
+        ).colSpan(2).align('center')
+      , ''
+      ])
+      console.log(output.body(body).toString())
       this.showHelp()
     })
     .command('ask', AskCommand)

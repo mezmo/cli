@@ -5,6 +5,7 @@
   },
   "exports": {
     ".": "./mod.ts",
+    "./assets": "./assets.ts",
     "./release": "./release.ts",
     "./lang": "./lang/mod.ts",
     "./resource": "./resource/mod.ts",
