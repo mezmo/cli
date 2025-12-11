@@ -1,5 +1,24 @@
 ## Changelog
 
+## [2.0.3](https://github.com/mezmo/cli/compare/v2.0.2...v2.0.3) (2025-12-11)
+
+
+### Bug Fixes
+
+* **command-create**: update create command to handle new spec format [8bc753e](https://github.com/mezmo/cli/commit/8bc753ece42a1c5f339557ae4148628b93826b23) - Eric Satterwhite
+
+
+### Documentation
+
+* **wiki**: Include a security policy [3c6587d](https://github.com/mezmo/cli/commit/3c6587db991b82959bf112bcafd60468dbb5b457) - GitHub
+* **wiki**: Update issue templates [42faaba](https://github.com/mezmo/cli/commit/42faaba85f179860ed50c987fb848d24fc799319) - GitHub
+
+
+### Miscellaneous
+
+* update .all-contributorsrc [skip ci] [3573545](https://github.com/mezmo/cli/commit/357354597e50850dcca08352bc2ed181637d5f60) - Eric Satterwhite
+* update README.md [skip ci] [876c8da](https://github.com/mezmo/cli/commit/876c8da5a067b9c14dc792659601b68208e9c080) - Eric Satterwhite
+
 ## [2.0.2](https://github.com/mezmo/cli/compare/v2.0.1...v2.0.2) (2025-12-05)
 
 
