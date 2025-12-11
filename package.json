@@ -1,6 +1,6 @@
 {
   "name": "@mezmo/cli",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "scripts": {
     "prerelease": "rm -rf dist && mkdir dist",
     "release": "semantic-release",

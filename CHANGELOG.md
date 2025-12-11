@@ -1,5 +1,12 @@
 ## Changelog
 
+## [2.0.4](https://github.com/mezmo/cli/compare/v2.0.3...v2.0.4) (2025-12-11)
+
+
+### Chores
+
+* **pkg**: include logo for command entrypoint [98364e3](https://github.com/mezmo/cli/commit/98364e319c3ac04a95e5a715eaf379aa42325abd) - Eric Satterwhite
+
 ## [2.0.3](https://github.com/mezmo/cli/compare/v2.0.2...v2.0.3) (2025-12-11)
 
 
