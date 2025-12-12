@@ -12,6 +12,7 @@ import VersionCommand from '@mzm/command-version'
 import {GithubReleasesUpgradeCommand} from '@mzm/command-upgrade'
 import {providers} from '@mzm/core/update'
 import {logo} from '@mzm/core/assets'
+import {storage} from '@mzm/config'
 
 const debug = debuglog('core:command:entry')
 
@@ -29,15 +30,28 @@ const upgrade = new GithubReleasesUpgradeCommand({
       , ['aarch64']: 'mzm-darwin-aarch64'
       }
     , windows: {
-        ['x86_64']: 'mzm-windows-x86_64'
+        ['x86_64']: 'mzm-windows-x86_64.exe'
       , ['aarch64']: null
       }
     }
   })
 })
-
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
+  const previous_version: string | null = await storage.getOne('upgrade.cleanup.file') as string | null
+  if (previous_version) {
+    debug('previous version cleanup: %s', previous_version)
+    Deno
+      .remove(previous_version)
+      .catch((error) => {
+        debug('unable to remove previous version', error)
+      })
+      .finally(() => {
+        return storage.unset('upgrade.cleanup.file')
+        debug('previous version cleanup complete')
+      })
+  }
+
   const cmd = new MZMCommand()
     .action(function () {
       const output = new Table().padding(8)
