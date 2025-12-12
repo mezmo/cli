@@ -7,7 +7,7 @@ import {Table, Cell, type RowType} from '@cliffy/table'
 import {ValidationError} from '@cliffy/command'
 import {Provider} from "@cliffy/command/upgrade"
 import type {GithubProviderOptions} from "@cliffy/command/upgrade/provider/github"
-import {GenericError} from '../../error.ts'
+import {GenericError, NotFoundError} from '../../error.ts'
 import {
   createClient
 , RequestClient
@@ -245,10 +245,28 @@ export default class GithubReleaseProvider extends Provider {
     try {
       const timeout = parseInt(await storage.getOne('core.upgrade.timeout') as string)
       const tmp_file = await Deno.makeTempFile({prefix: 'mzm-'})
-      const response = await fetch(`https://github.com/${this.owner}/${this.repo}/releases/download/${to}/${asset_name}`, {
+      const normalized_to: string = to.startsWith('v') ? to : `v${to}`
+      const response = await fetch(`https://github.com/${this.owner}/${this.repo}/releases/download/${normalized_to}/${asset_name}`, {
         signal: AbortSignal.timeout(isNaN(timeout) ? DEFAULT_DOWNLOAD_TIMEOUT : timeout)
       })
 
+      debug('upgrade status %s', response.status)
+
+      switch (response.status) {
+        case 200: {
+          break
+        }
+
+        case 404: {
+          const error = NotFoundError.from(
+            `No matching version for: ${to}`
+          , `Use ${colors.yellow('mzm')} upgrade --list-versions for acceptable upgrade targets`
+          )
+
+          error.message = `Version ${to} Not Found`
+          throw error
+        }
+      }
       await using file_handle: Deno.FsFile = await Deno.open(tmp_file, {create: true, write: true})
       if (response.body) await response.body.pipeTo(file_handle.writable)
 
@@ -264,6 +282,8 @@ export default class GithubReleaseProvider extends Provider {
         + 'Looks like it just took too long. Make sure your internet connection is reasonably fast\n'
         + `Additionally, verify there are no current problems reported on ${colors.yellow('https://status.github.com')}`
       )
+
+      if (err instanceof GenericError) throw err
 
       throw GenericError.from(
         `There was a problem downloading the ${to} release`
