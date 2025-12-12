@@ -88,9 +88,44 @@ export class GHError extends Error {
   }
 }
 
-function noopComplete(_meta: OnCompleteMetadata, _cb: OnCompleteFinalCallback) {}
-function noopError(_error: Error) {}
+function noopComplete(_meta: OnCompleteMetadata, _cb: OnCompleteFinalCallback): void {}
+function noopError(_error: Error): void {}
 
+async function swap(old_file: string, new_file: string, version: string): Promise<void> {
+
+  // On windows you cannot remove a file while it is running
+  // We can rename, and remove later
+  if (Deno.build.os === 'windows') {
+    const target_file = `${old_file}.${version}`
+    debug('windows file swap', {old_file, new_file})
+    await Deno.rename(old_file, target_file)
+    debug('file renamed %s', target_file)
+
+    // attempt to make the file hidden
+    const command = new Deno.Command('cmd', {
+      args: ['/c', 'attrib', '+h', target_file]
+    })
+
+    // its ok if this fails
+    await Promise.allSettled([command.output()])
+
+    // the command entry point attempts to remove this file on the next run
+    await storage.set('upgrade.cleanup.file', target_file)
+    debug('store previous file location %s', target_file)
+    debug('windows executable swap complete')
+  } else {
+    await Deno.remove(old_file)
+  }
+
+  // copy tmp file to <file>
+  // moving / and $HOME likely spans devices, which makes simple rename not possible
+  // poor mans mv (copy + remove)
+  debug(`copy %s to %s`, new_file, old_file)
+  await Deno.copyFile(new_file, old_file)
+
+  // its not terribly important that the temp file is removed
+  await Promise.allSettled([Deno.remove(new_file)])
+}
 export default class GithubReleaseProvider extends Provider {
   name: string = "GithubReleaseProvider"
   spinner: boolean = true
@@ -221,16 +256,7 @@ export default class GithubReleaseProvider extends Provider {
 
       // remove the current one
       debug('removing %s', running_bin)
-      await Deno.remove(running_bin)
-
-      // copy tmp file to <file>
-      // moving / and $HOME likely spans devices, which makes simple rename not possible
-      // poor mans mv (copy + remove)
-      debug(`copy %s to %s`, tmp_file, running_bin)
-      await Deno.copyFile(tmp_file, running_bin)
-
-      // its not terribly important that the temp file is removed
-      await Promise.allSettled([Deno.remove(tmp_file)])
+      await swap(running_bin, tmp_file, from)
     } catch (err: any) {
       const repository_url = colors.brightBlue(this.getRepositoryUrl('mzm'))
       if (err.name === 'TimeoutError') throw GenericError.from(
