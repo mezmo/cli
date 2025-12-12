@@ -384,3 +384,17 @@ export class ClientError extends GenericError {
     )
   }
 }
+
+export class NotFoundError extends GenericError {
+  static override error_code: string = 'ENOENT'
+  static override exit_code: number = 6
+  override error_code: string = 'ENOENT'
+  override exit_code: number = 6
+  static override from(help: string, reason?: any) {
+    return super.from(
+      'Not Found'
+    , help
+    , reason
+    )
+  }
+}
