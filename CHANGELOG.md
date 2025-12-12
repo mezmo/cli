@@ -1,5 +1,13 @@
 ## Changelog
 
+## [2.0.5](https://github.com/mezmo/cli/compare/v2.0.4...v2.0.5) (2025-12-12)
+
+
+### Bug Fixes
+
+* **upgrade**: account for versions strings sans v [a64f1c7](https://github.com/mezmo/cli/commit/a64f1c782b299b20f4fa1754fc6b4ee19de762a9) - Eric Satterwhite
+* **upgrade**: correctly handle removal of running program on windows [d168be3](https://github.com/mezmo/cli/commit/d168be3f13e95359fc01a051433af41852d3b38b) - Eric Satterwhite, closes: [#36](https://github.com/mezmo/cli/issues/36)
+
 ## [2.0.4](https://github.com/mezmo/cli/compare/v2.0.3...v2.0.4) (2025-12-11)
 
 
