@@ -64,9 +64,7 @@ func Store() (*KV, error) {
 		os.MkdirAll(configDir, 0755)
 		pool, err := sqlitex.NewPool(filepath.Join(configDir, "mzmg.cfgx"), sqlitex.PoolOptions{})
 		if err != nil {
-			initErr = err
-			log.Fatal("unable to initialize database storage database")
-			return
+			log.Fatalf("unable to initialize database storage database: %s", err)
 		}
 		// Create the Sqlite instance using the constructor
 		sqliteDB := sqlitekv.NewSqlite(pool)
