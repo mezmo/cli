@@ -1,16 +1,19 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package commands
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"mzm/commands/log"
+	"mzm/core/logging"
+
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"mzm/commands/log"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -26,6 +29,23 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		debug, err := cmd.Flags().GetBool("debug")
+		if err != nil {
+			return err
+		}
+
+		if debug {
+			logging.SetLogLevel(zerolog.DebugLevel)
+			// Test that debug logging is now working
+			logging.Default.Debug("Debug logging has been enabled")
+			logging.Default.Info("Info logging is also enabled")
+		}
+
+		ctx := context.WithValue(cmd.Context(), "log", logging.Default)
+		cmd.SetContext(ctx)
+		return nil
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -51,6 +71,7 @@ func init() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().Bool("debug", false, "enable debug logging")
 
 	viper.BindEnv("access-key")
 	rootCmd.AddCommand(log.Command)

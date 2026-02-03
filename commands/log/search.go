@@ -100,16 +100,13 @@ func init() {
 	searchCmd.Flags().VarP(&prefer, "prefer", "p", "Get lines from the beginning of the interval rather than the end")
 }
 
-var searchExamples core.ExampleRender = core.ExampleRender{}
-
-// log/tailCmd represents the log/tail command
 var searchCmd = &cobra.Command{
 	Use:   "search 'hello OR bye'",
 	Short: "execute search queries over your data",
 	Long: `Perform paginated search queries over indexed historical data.
 If the --to and --from flags are omitted the last 2 hours will be searched.
 `,
-	Example: searchExamples.
+	Example: core.NewExampleRenderer().
 		Example(
 			"Start new paginated search query using unix timestamps",
 			"mzm log search --from=1762198107863 --to=1762198113902 podwidget-server",
@@ -151,15 +148,32 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 		var pagination_id string = ""
 		var params = SearchParams{}
 		db, err := storage.Store()
-		flags := cmd.Flags()
-		if to == "" {
-			params.To = int(time.Now().UnixMilli())
+
+		if err != nil {
+			return err
 		}
 
-		nlp_time := en.ParseDate(from, time.Now(), nil)
+		flags := cmd.Flags()
 
-		if nlp_time != nil {
-			params.From = int(nlp_time.UnixMilli())
+		if to == "" {
+			params.To = int(time.Now().UnixMilli())
+		} else {
+			nlpTo := en.ParseDate(to, time.Now(), nil)
+			if nlpTo != nil {
+				params.From = int(nlpTo.UnixMilli())
+			} else {
+				parsed, err := strconv.Atoi(from)
+				if err != nil {
+					return err
+				}
+				params.From = parsed
+			}
+		}
+
+		nlpFrom := en.ParseDate(from, time.Now(), nil)
+
+		if nlpFrom != nil {
+			params.From = int(nlpFrom.UnixMilli())
 		} else {
 			parsed, err := strconv.Atoi(from)
 			if err != nil {
@@ -222,19 +236,19 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 				return fmt.Errorf("failed to unmarshal search params: %w", err)
 			}
 
-			pagination_id, err := db.Get("search.page.next")
+			previous_pagination_id, err := db.Get("search.page.next")
 			if err != nil {
 				return err
 			}
 
-			if pagination_id != "" {
-				params.PaginationID = pagination_id
+			if previous_pagination_id != "" {
+				params.PaginationID = previous_pagination_id
 			}
 		}
 
 		controller := make(chan os.Signal, 1)
 
-		signal.Notify(controller, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+		signal.Notify(controller, syscall.SIGTERM, os.Interrupt)
 
 		if err != nil {
 			return err
@@ -255,6 +269,12 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 					return err
 				}
 
+				// the error response from this endpoint is just plain text :|
+				if !res.IsSuccess() {
+					fmt.Println(res.String())
+					return nil
+				}
+
 				result := res.Result().(*SearchResult)
 				pagination_id = result.PaginationID
 				if pagination_id != "" {
@@ -273,11 +293,9 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 
 				if len(result.Lines) == 0 {
 					fmt.Println("Nothing to display")
-					controller <- os.Interrupt
 					return nil
 				}
 
-				fmt.Println("output: ", format)
 				for _, line := range result.Lines {
 					fmt.Println(pprint(line, format == json))
 				}
