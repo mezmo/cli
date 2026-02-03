@@ -18,8 +18,8 @@ func (pattern *HolidayParser) Extract(context *chrono.ParsingContext, match []st
 	component := chrono.NewParsingComponents(context.Reference, nil)
 
 	fmt.Println(match)
-	component.Assign(chrono.ComponentDay, 24)
-	component.Assign(chrono.ComponentMonth, 11)
+	component.Assign(chrono.ComponentDay, 25)
+	component.Assign(chrono.ComponentMonth, 12)
 	component.AddTag("parser/HolidayParser")
 	return component
 }
