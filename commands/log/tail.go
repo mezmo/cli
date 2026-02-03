@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"mzm/core"
+	"mzm/core/logging"
 	"net/http"
 	"net/url"
 	"os"
@@ -46,7 +47,11 @@ to quickly create a Cobra application.`,
 		).
 		Render(),
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println(args)
+		logger, ok := cmd.Context().Value("log").(logging.Logger)
+		if ok {
+			logger = logger.Child("log.tail")
+		}
+
 		interrupt := make(chan os.Signal, 1)
 		signal.Notify(interrupt, os.Interrupt)
 
@@ -68,7 +73,6 @@ to quickly create a Cobra application.`,
 		}
 
 		levels, err := cmd.Flags().GetStringArray("level")
-		log.Println(err)
 		if err == nil {
 			params.Set("levels", strings.Join(levels, ","))
 		}
@@ -79,13 +83,14 @@ to quickly create a Cobra application.`,
 		}
 
 		u.RawQuery = params.Encode()
-		log.Printf("Connecting to %s", u.String())
+		logger.Print("Connecting to %s", u.String())
 
 		headers := make(http.Header)
 		headers.Add("Authorization", "Token "+viper.GetString("access-key"))
 		conn, _, err := websocket.DefaultDialer.Dial(u.String(), headers)
+
 		if err != nil {
-			log.Fatal("dail", err)
+			log.Fatal("dial ", err)
 		}
 
 		defer conn.Close()
@@ -97,7 +102,7 @@ to quickly create a Cobra application.`,
 			for {
 				err := conn.ReadJSON(&msg)
 				if err != nil {
-					log.Printf("error reading json: %v", err)
+					logger.Error("error reading json: %v", err)
 					return
 				}
 				if msg.Event == "meta" {
@@ -112,10 +117,10 @@ to quickly create a Cobra application.`,
 		for {
 			select {
 			case <-done:
-				log.Println("channel closed")
+				logger.Debug("channel closed")
 				return
 			case sig := <-interrupt:
-				log.Println(sig)
+				logger.Trace("Signal recieved %s", sig)
 				return
 			}
 		}

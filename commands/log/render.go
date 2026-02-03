@@ -2,7 +2,7 @@ package log
 
 import (
 	JSON "encoding/json"
-	"fmt"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -74,7 +74,7 @@ func pprint(line Message, plain bool) string {
 	if plain {
 		output, err := JSON.Marshal(line)
 		if err != nil {
-			fmt.Println("Broken json")
+			log.Fatalf("Unable to format log data for display: %s", err)
 		}
 
 		return string(output)
