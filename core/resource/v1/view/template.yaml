@@ -1,0 +1,28 @@
+---
+version: v1
+resource: view
+metadata: {}
+spec:
+  # START required fields
+  name: string  # name of the view - My New View
+  # END required fields
+
+  # One of query, hosts, apps, level or tags is required
+  query: string  # search query to apply to log lines - (foobar AND widgets) OR namespace:secret
+
+  hosts:
+    - string  # additional hosts to filter the results by, in addtion to `query`
+  apps:
+    - string  # additional applications to filter the results by, in addtion to `query`
+  levels:
+    - string  # additional log levels to filter the results by, in addtion to `query`
+  tags:
+    - string  # additional tags to filter the results by, in addtion to `query`
+
+  presetid: string  # identifiers of an existing preset alert
+
+  # Use mzm create, get and edit to manage categories
+  category:
+    - string  # Name of categries to to group the view in. These must already exist
+
+  channels: []  # alert configurations
