@@ -17,6 +17,7 @@ func NewExampleRenderer() *ExampleRender {
 	render := ExampleRender{}
 	return &render
 }
+
 func (example *ExampleRender) Example(desc string, detail string) *ExampleRender {
 	example.examples = append(example.examples, Example{
 		Description: desc,
