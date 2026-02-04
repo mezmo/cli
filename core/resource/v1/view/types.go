@@ -204,5 +204,3 @@ func CreateViewFromTemplate(content string) (*View, error) {
 
 	return ViewFromTemplate(template)
 }
-
-// Note: ViewFromTemplateOld removed - migration to generic approach complete!

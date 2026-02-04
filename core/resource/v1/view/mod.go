@@ -62,7 +62,6 @@ func (r *ViewResource) Get(pk string, params map[string]string) (*View, error) {
 	}
 
 	for _, instance := range views {
-		fmt.Println(instance.PK(), pk)
 		if instance.PK() == pk {
 			return &instance, nil
 		}
@@ -100,8 +99,6 @@ func (r *ViewResource) GetBySpec(spec *View) (*View, error) {
 func (r *ViewResource) Create(template resource.IResourceTemplate[View]) (*View, error) {
 	// Create view from strongly typed template - NO TYPE CASTING!
 	view, err := ViewFromTemplate(&template)
-	fmt.Println("templates :", template)
-	fmt.Println("view :", view)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create view from template: %w", err)
 	}
