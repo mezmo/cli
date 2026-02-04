@@ -7,7 +7,7 @@ import (
 var format formatEnum = pretty
 var Command = &cobra.Command{
 	Use:   "log",
-	Short: "A brief description of your command",
+	Short: "Stream and Search log data",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

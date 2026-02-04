@@ -17,14 +17,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/phoenix-tui/phoenix/layout"
 	"github.com/spf13/cobra"
 )
 
-var left = layout.NewBox("left")
-var right = layout.NewBox("right")
-var help = layout.NewBox(layout.Row().Gap(1).Add(left).Add(right).Render(80, 1))
-var examples = layout.Column().Add(help)
 var prefer searchDirection = tail // defined in enum.go
 
 var (
@@ -100,6 +95,7 @@ func init() {
 	searchCmd.Flags().VarP(&prefer, "prefer", "p", "Get lines from the beginning of the interval rather than the end")
 }
 
+// log/tailCmd represents the log/tail command
 var searchCmd = &cobra.Command{
 	Use:   "search 'hello OR bye'",
 	Short: "execute search queries over your data",
