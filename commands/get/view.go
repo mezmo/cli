@@ -1,15 +1,16 @@
 package get
 
 import (
-	JSON "encoding/json"
+	"cmp"
 	"fmt"
 	"mzm/core"
 	"mzm/core/logging"
-	resource "mzm/core/resource/v1/view"
+	coreResource "mzm/core/resource"
+	api "mzm/core/resource/v1/view"
 	"os"
+	"slices"
 	"strings"
 
-	yaml "github.com/elioetibr/golang-yaml/pkg/encoder"
 	"github.com/olekukonko/tablewriter"
 	"github.com/olekukonko/tablewriter/renderer"
 	"github.com/olekukonko/tablewriter/tw"
@@ -38,7 +39,7 @@ var getViewCommand = &cobra.Command{
 		).
 		Render(),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var views *[]resource.View
+		var views []api.View
 		var viewid string = ""
 		var err error = nil
 
@@ -48,18 +49,19 @@ var getViewCommand = &cobra.Command{
 			log = log.Child("get.view")
 		}
 
-		// Handle the case when args is not empty
 		if len(args) > 0 {
 			viewid = args[0]
 		}
 
+		viewRes := api.NewViewResource()
+
 		if viewid == "" {
-			views, err = resource.List(defaultViewParams)
+			views, err = viewRes.List(defaultViewParams)
 			if err != nil {
 				return fmt.Errorf("Unable to get views: %s", err)
 			}
 		} else {
-			view, err := resource.Get(viewid, nil)
+			view, err := viewRes.Get(viewid, nil)
 			if err != nil {
 				return err
 			}
@@ -67,32 +69,27 @@ var getViewCommand = &cobra.Command{
 			if view == nil {
 				return nil
 			}
-			// Simply create a new slice with the single view
-			views = &[]resource.View{*view}
+			views = []api.View{*view}
 		}
 
 		switch outputFormat.String() {
-		case "json":
-			encoder := JSON.NewEncoder(os.Stdout)
-			encoder.SetIndent("", " ")
+		case "json", "yaml":
+			format := core.InputFormatEnum(outputFormat.String())
 			if viewid != "" {
 				// Single view - encode just the view object
-				encoder.Encode((*views)[0])
+				content, err := coreResource.Stringify(views[0], format)
+				if err != nil {
+					return err
+				}
+				os.Stdout.Write(content)
 			} else {
 				// Multiple views - encode the entire slice
-				encoder.Encode(*views)
+				content, err := coreResource.Stringify(views, format)
+				if err != nil {
+					return err
+				}
+				os.Stdout.Write(content)
 			}
-		case "yaml":
-			var out []byte
-			if viewid != "" {
-				out, err = yaml.Marshal((*views)[0])
-			} else {
-				out, err = yaml.Marshal(views)
-			}
-			if err != nil {
-				return fmt.Errorf("Unable to convert views you yaml")
-			}
-			fmt.Println(string(out))
 		case "table":
 			table := tablewriter.NewTable(
 				os.Stdout,
@@ -131,7 +128,16 @@ var getViewCommand = &cobra.Command{
 
 			table.Header("CATEGORY", "ID", "NAME", "APPS", "HOSTS", "QUERY")
 
-			for _, view := range *views {
+			slices.SortFunc(views, func(a, b api.View) int {
+				if a.GetCategory() == "Uncategorized" {
+					return -1
+				}
+				if b.GetCategory() == "Uncategorized" {
+					return 1
+				}
+				return cmp.Compare(a.GetCategory(), b.GetCategory())
+			})
+			for _, view := range views {
 				categories := "Uncategorized" // Default if it doesn't have any
 
 				if len(view.Category) > 0 {

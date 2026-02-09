@@ -1,11 +1,30 @@
 package core
 
 var FORMAT = struct {
-	JSON  OutputFormatEnum
-	YAML  OutputFormatEnum
-	TABLE OutputFormatEnum
+	OUTPUT struct {
+		JSON  OutputFormatEnum
+		YAML  OutputFormatEnum
+		TABLE OutputFormatEnum
+	}
+	CRUD struct {
+		JSON InputFormatEnum
+		YAML InputFormatEnum
+	}
 }{
-	JSON:  json,
-	YAML:  yaml,
-	TABLE: table,
+	OUTPUT: struct {
+		JSON  OutputFormatEnum
+		YAML  OutputFormatEnum
+		TABLE OutputFormatEnum
+	}{
+		JSON:  jsonOutput,
+		YAML:  yamlOutput,
+		TABLE: tableOutput,
+	},
+	CRUD: struct {
+		JSON InputFormatEnum
+		YAML InputFormatEnum
+	}{
+		JSON: jsonInput,
+		YAML: yamlInput,
+	},
 }

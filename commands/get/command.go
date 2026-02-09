@@ -5,7 +5,7 @@ import (
 	"mzm/core"
 )
 
-var outputFormat core.OutputFormatEnum = core.FORMAT.TABLE
+var outputFormat core.OutputFormatEnum = core.FORMAT.OUTPUT.TABLE
 
 var Command = &cobra.Command{
 	Use:   "get",
