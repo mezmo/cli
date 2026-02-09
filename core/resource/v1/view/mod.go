@@ -1,16 +1,38 @@
 package view
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
 	"mzm/core/resource"
 	"strings"
+
+	resty "resty.dev/v3"
 )
 
-func Get(pk string, params map[string]string) (*View, error) {
-	client := resource.Client()
+//go:embed template.yaml
+var viewTemplate []byte
+
+// ViewResource implements IResource[View] for type-safe view operations
+type ViewResource struct {
+	client *resty.Client
+}
+
+// Ensure ViewResource implements IResource[View, View] with new generic interface
+var _ resource.IResource[View, View] = (*ViewResource)(nil)
+
+// NewViewResource creates a new ViewResource instance
+func NewViewResource() *ViewResource {
+	return &ViewResource{
+		client: resource.Client(),
+	}
+}
+
+// ViewResource methods implementing IResource[View]
+
+func (r *ViewResource) Get(pk string, params map[string]string) (*View, error) {
 	response := View{}
-	res, err := client.
+	res, err := r.client.
 		R().
 		SetResult(response).
 		SetPathParam("pk", pk).
@@ -33,13 +55,13 @@ func Get(pk string, params map[string]string) (*View, error) {
 		return nil, errors.New("unexpected error")
 	}
 
-	views, err := List(params)
+	views, err := r.List(params)
 
 	if err != nil {
 		return nil, err
 	}
 
-	for _, instance := range *views {
+	for _, instance := range views {
 		fmt.Println(instance.PK(), pk)
 		if instance.PK() == pk {
 			return &instance, nil
@@ -52,11 +74,10 @@ func Get(pk string, params map[string]string) (*View, error) {
 	return nil, nil
 }
 
-func List(params map[string]string) (*[]View, error) {
-	client := resource.Client()
+func (r *ViewResource) List(params map[string]string) ([]View, error) {
 	var response []View
 
-	res, err := client.
+	res, err := r.client.
 		R().
 		SetResult(response).
 		Get("/v1/config/view")
@@ -65,25 +86,98 @@ func List(params map[string]string) (*[]View, error) {
 		return nil, err
 	}
 
-	return res.Result().(*[]View), nil
+	result := res.Result().(*[]View)
+	if result == nil {
+		return []View{}, nil
+	}
+	return *result, nil
 }
 
-func GetBySpec(spec *View) (*View, error) {
+func (r *ViewResource) GetBySpec(spec *View) (*View, error) {
 	return nil, errors.New("GetBySpec() Not Implemented")
 }
 
-func Create(spec resource.IResourceTemplate) (*View, error) {
-	return nil, errors.New("Create() Not Implemented")
+func (r *ViewResource) Create(template resource.IResourceTemplate[View]) (*View, error) {
+	// Create view from strongly typed template - NO TYPE CASTING!
+	view, err := ViewFromTemplate(&template)
+	fmt.Println("templates :", template)
+	fmt.Println("view :", view)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create view from template: %w", err)
+	}
+
+	fmt.Println(template)
+	apiView := view.ToCreate()
+
+	// Use the original view object for the API response - Resty will populate it directly
+	res, err := r.client.
+		R().
+		SetResult(view).
+		SetBody(apiView).
+		Post("/v1/config/view")
+
+	if err != nil {
+		return nil, err
+	}
+
+	switch res.StatusCode() {
+	case 200, 201:
+		// The view object is already populated by Resty's SetResult
+		return view, nil
+	case 400:
+		fmt.Printf("Bad request - API response:\n%s\n", res.String())
+		return nil, errors.New("bad request: check your view specification")
+	case 401:
+		return nil, errors.New("unauthorized: check your access key")
+	case 403:
+		return nil, errors.New("forbidden: insufficient permissions to create views")
+	default:
+		return nil, fmt.Errorf("unexpected error: status %d", res.StatusCode())
+	}
 }
 
-func Remove(pk string) error {
-	return errors.New("Remove() Not Implemented")
+func (r *ViewResource) Remove(pk string) error {
+	res, err := r.client.
+		R().
+		SetPathParam("pk", pk).
+		Delete("/v1/config/view/{pk}")
+
+	if err != nil {
+		return err
+	}
+
+	switch res.StatusCode() {
+	case 200, 201, 204, 404:
+		return nil
+	case 400:
+		fmt.Printf("Bad request - API response:\n%s\n", res.String())
+		return errors.New("bad request: check your view specification")
+	case 401:
+		return errors.New(
+			"There was a problem authenticating the previous operation. Make sure your access key is still valid",
+		)
+	case 403:
+		return errors.New(
+			"Make sure you have the appropriate permissions to read views in the appropriate account",
+		)
+	default:
+		return fmt.Errorf("unexpected error: status %d", res.StatusCode())
+	}
 }
 
-func RemoveBySpec(view *View) error {
+func (r *ViewResource) RemoveBySpec(view *View) error {
 	return errors.New("RemoveBySpec() Not Implemented")
 }
 
-func Update(spec resource.IResourceTemplate) (*View, error) {
+func (r *ViewResource) Update(template resource.IResourceTemplate[View]) (*View, error) {
 	return nil, errors.New("Update() Not Implemented")
+}
+
+func (r *ViewResource) GetTemplate() []byte {
+	return viewTemplate
+}
+
+// Register this resource with the main resource package
+func init() {
+	resource.Register("v1", "view", NewViewResource())
 }
