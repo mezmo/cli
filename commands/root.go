@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"mzm/commands/create"
+	"mzm/commands/delete"
 	"mzm/commands/get"
 	"mzm/commands/log"
 	"mzm/core/logging"
@@ -79,4 +80,5 @@ func init() {
 	rootCmd.AddCommand(log.Command)
 	rootCmd.AddCommand(get.Command)
 	rootCmd.AddCommand(create.Command)
+	rootCmd.AddCommand(delete.Command)
 }
