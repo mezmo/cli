@@ -21,7 +21,6 @@ import (
 )
 
 var prefer searchDirection = tail // defined in enum.go
-
 var (
 	to   string
 	from string
@@ -93,6 +92,7 @@ func init() {
 	searchCmd.Flags().Bool("all", false, "Automatically scroll through all pages until search results are exhausted")
 	searchCmd.Flags().Bool("next", false, "Get next chunk of lines (after last search). This is a convenience wrapper around the --from and --to parameters.")
 	searchCmd.Flags().VarP(&prefer, "prefer", "p", "Get lines from the beginning of the interval rather than the end")
+	searchCmd.Flags().Bool("with-view", false, "Search with a predefined view")
 }
 
 // log/tailCmd represents the log/tail command
@@ -150,6 +150,27 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 		}
 
 		flags := cmd.Flags()
+		withView, err := flags.GetBool("with-view")
+
+		if err != nil {
+			return err
+		}
+
+		if withView == true {
+			view, err := promptView()
+
+			if err != nil {
+				return fmt.Errorf("Unable retrieve views:%s", err)
+			}
+
+			if view != nil {
+				params.Query = view.Query
+				params.Hosts = view.Hosts
+				params.Tags = view.Tags
+				params.Levels = view.Levels
+				params.Apps = view.Apps
+			}
+		}
 
 		if to == "" {
 			params.To = int(time.Now().UnixMilli())

@@ -44,7 +44,12 @@ func (view *View) PK() string {
 	return view.Viewid
 }
 
-func (view *View) GetCategory() string {
+// GetName implements the CategorizedResource interface
+func (view View) GetName() string {
+	return view.Name
+}
+
+func (view View) GetCategory() string {
 	if len(view.Category) == 0 {
 		return "Uncategorized"
 	}
