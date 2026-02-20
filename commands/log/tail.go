@@ -23,6 +23,10 @@ type WebsocketEvent struct {
 
 var tailExamples core.ExampleRender = core.ExampleRender{}
 
+func init() {
+	tailCmd.Flags().Bool("with-view", false, "Search with a predefined view")
+}
+
 // log/tailCmd represents the log/tail command
 var tailCmd = &cobra.Command{
 	Use:   "tail",
@@ -43,7 +47,7 @@ to quickly create a Cobra application.`,
 			`mzm log tail -a <app> "level:-(debug OR trace) missing cred"`,
 		).
 		Render(),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		logger, ok := cmd.Context().Value("log").(logging.Logger)
 		if ok {
 			logger = logger.Child("log.tail")
@@ -59,23 +63,43 @@ to quickly create a Cobra application.`,
 			params.Set("q", args[0])
 		}
 
-		hosts, err := cmd.Flags().GetStringArray("host")
-		if err == nil {
+		flags := cmd.Flags()
+		withView, err := flags.GetBool("with-view")
+		if err != nil {
+			return err
+		}
+		if withView == true {
+			view, err := promptView()
+
+			if err != nil {
+				return fmt.Errorf("Unable retrieve views:%s", err)
+			}
+
+			if view != nil {
+				params.Set("q", view.Query)
+				params.Set("hosts", strings.Join(view.Hosts, ","))
+				params.Set("tags", strings.Join(view.Tags, ","))
+				params.Set("levels", strings.Join(view.Levels, ","))
+				params.Set("apps", strings.Join(view.Apps, ","))
+			}
+		}
+		hosts, err := flags.GetStringArray("host")
+		if err == nil && len(hosts) > 0 {
 			params.Set("hosts", strings.Join(hosts, ","))
 		}
 
-		tags, err := cmd.Flags().GetStringArray("tag")
-		if err == nil {
+		tags, err := flags.GetStringArray("tag")
+		if err == nil && len(tags) > 0 {
 			params.Set("tags", strings.Join(tags, ","))
 		}
 
-		levels, err := cmd.Flags().GetStringArray("level")
-		if err == nil {
+		levels, err := flags.GetStringArray("level")
+		if err == nil && len(levels) > 0 {
 			params.Set("levels", strings.Join(levels, ","))
 		}
 
-		apps, err := cmd.Flags().GetStringArray("app")
-		if err == nil {
+		apps, err := flags.GetStringArray("app")
+		if err == nil && len(apps) > 0 {
 			params.Set("apps", strings.Join(apps, ","))
 		}
 
@@ -115,10 +139,10 @@ to quickly create a Cobra application.`,
 			select {
 			case <-done:
 				logger.Debug("channel closed")
-				return
+				return nil
 			case sig := <-interrupt:
 				logger.Trace("Signal recieved %s", sig)
-				return
+				return nil
 			}
 		}
 	},

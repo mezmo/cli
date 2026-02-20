@@ -17,7 +17,7 @@ var (
 func Client() *resty.Client {
 	once.Do(func() {
 		client = resty.New()
-		client.SetBaseURL("https://api.use.dev.mezmo.it")
+		client.SetBaseURL("https://api.use.int.mezmo.it")
 		client.SetTimeout(10 * time.Second)
 		client.AddRequestMiddleware(authMiddleware)
 	})
