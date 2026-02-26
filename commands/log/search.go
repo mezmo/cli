@@ -177,13 +177,13 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 		} else {
 			nlpTo := en.ParseDate(to, time.Now(), nil)
 			if nlpTo != nil {
-				params.From = int(nlpTo.UnixMilli())
+				params.To = int(nlpTo.UnixMilli())
 			} else {
 				parsed, err := strconv.Atoi(from)
 				if err != nil {
 					return err
 				}
-				params.From = parsed
+				params.To = parsed
 			}
 		}
 
