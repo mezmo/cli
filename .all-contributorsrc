@@ -66,6 +66,16 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "tylerthehaas",
+      "name": "Tyler Haas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11150235?v=4",
+      "profile": "https://github.com/tylerthehaas",
+      "contributions": [
+        "doc",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
