@@ -1,5 +1,12 @@
 ## Changelog
 
+## [2.0.6](https://github.com/mezmo/cli/compare/v2.0.5...v2.0.6) (2026-04-14)
+
+
+### Documentation
+
+* Add skills.sh skill for cli workflows [82ba981](https://github.com/mezmo/cli/commit/82ba981e90585a8da90fcf061dd37cf3c146cc52) - GitHub
+
 ## [2.0.5](https://github.com/mezmo/cli/compare/v2.0.4...v2.0.5) (2025-12-12)
 
 
