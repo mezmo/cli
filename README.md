@@ -1,6 +1,6 @@
 # Mezmo CLI
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 > [!CAUTION]
@@ -484,6 +484,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/e
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/seeruyy"><img src="https://avatars.githubusercontent.com/u/5346824?v=4?s=100" width="100px;" alt="Sergey Opria"/><br /><sub><b>Sergey Opria</b></sub></a><br /><a href="https://github.com/mezmo/cli/pulls?q=is%3Apr+reviewed-by%3Aseeruyy" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/NickDiMucci"><img src="https://avatars.githubusercontent.com/u/1623178?v=4?s=100" width="100px;" alt="Nicholas DiMucci"/><br /><sub><b>Nicholas DiMucci</b></sub></a><br /><a href="https://github.com/mezmo/cli/issues?q=author%3ANickDiMucci" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/matt-march"><img src="https://avatars.githubusercontent.com/u/60368220?v=4?s=100" width="100px;" alt="Matt March"/><br /><sub><b>Matt March</b></sub></a><br /><a href="https://github.com/mezmo/cli/pulls?q=is%3Apr+reviewed-by%3Amatt-march" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tylerthehaas"><img src="https://avatars.githubusercontent.com/u/11150235?v=4?s=100" width="100px;" alt="Tyler Haas"/><br /><sub><b>Tyler Haas</b></sub></a><br /><a href="https://github.com/mezmo/cli/commits?author=tylerthehaas" title="Documentation">📖</a> <a href="https://github.com/mezmo/cli/commits?author=tylerthehaas" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
