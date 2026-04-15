@@ -65,7 +65,14 @@ module.exports = {
       "prepareCmd": "release/shasum.sh"
     }]
   , ['@semantic-release/git', {
-      assets: ['package.json', 'package-lock.json', 'CHANGELOG.md', '!**/node_modules/**', 'release.json']
+      assets: [
+        'package.json'
+      , 'package-lock.json'
+      , 'CHANGELOG.md'
+      , 'release.json'
+      , 'core/meta/release.json'
+      , '!**/node_modules/**'
+      ]
     , message: `release: ${year}-${month}-${day}, `
         + 'Version <%= nextRelease.version %> [skip ci]'
     }]

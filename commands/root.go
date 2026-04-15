@@ -1,10 +1,11 @@
-/*
-Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-*/
+/**
+* Copyright © 2026 Mezmo <support@mezmo.com>
+**/
 package commands
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -12,8 +13,14 @@ import (
 	"mzm/commands/delete"
 	"mzm/commands/get"
 	"mzm/commands/log"
+	"mzm/core/assets"
 	"mzm/core/logging"
+	"mzm/core/meta"
 
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/renderer"
+	"github.com/olekukonko/tablewriter/tw"
+	style "github.com/phoenix-tui/phoenix/style"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -23,15 +30,65 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "mzm",
 	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Run: func(cmd *cobra.Command, args []string) {
+		// Create a borderless table for layout
+		table := tablewriter.NewTable(
+			os.Stdout,
+			tablewriter.WithRenderer(
+				renderer.NewBlueprint(
+					tw.Rendition{
+						Borders: tw.BorderNone,
+						Settings: tw.Settings{
+							Separators: tw.Separators{
+								ShowHeader:     tw.Off,
+								ShowFooter:     tw.Off,
+								BetweenRows:    tw.Off,
+								BetweenColumns: tw.Off,
+							},
+							Lines: tw.Lines{
+								ShowTop:        tw.Off,
+								ShowBottom:     tw.Off,
+								ShowHeaderLine: tw.Off,
+								ShowFooterLine: tw.Off,
+							},
+						},
+					},
+				),
+			),
+			tablewriter.WithConfig(
+				tablewriter.Config{
+					Row: tw.CellConfig{
+						Alignment: tw.CellAlignment{Global: tw.AlignCenter},
+					},
+				},
+			),
+		)
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+		// Get release info
+		info := meta.GetRelease()
+		yellow := style.RGB(255, 215, 0)
+		yellowStyle := style.New().Foreground(yellow)
+		bold := style.New().Bold(true)
+
+		// Format: "mezmo cli @ 2.0.6" with mezmo in yellow, version in bold
+		versionText := fmt.Sprintf("%s cli @ %s",
+			style.Render(yellowStyle, "mezmo"),
+			style.Render(bold, info.Version),
+		)
+
+		// Add logo
+		table.Append(assets.Logo())
+		// Add empty row for spacing
+		table.Append("")
+		// Add version info centered
+		table.Append(versionText)
+
+		table.Render()
+		fmt.Println()
+
+		// Show help
+		cmd.Help()
+	},
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		debug, err := cmd.Flags().GetBool("debug")
 		if err != nil {
