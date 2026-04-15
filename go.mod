@@ -6,10 +6,12 @@ require (
 	github.com/a-h/sqlitekv v0.0.0-20250411170825-1020591797e9
 	github.com/elioetibr/golang-yaml v0.1.3
 	github.com/gorilla/websocket v1.5.3
+	github.com/hbollon/go-edlib v1.7.0
 	github.com/olekukonko/tablewriter v1.1.3
 	github.com/phoenix-tui/phoenix/layout v0.2.2
 	github.com/phoenix-tui/phoenix/style v0.2.4
 	github.com/phoenix-tui/phoenix/tea v0.2.4
+	github.com/phoenix-tui/phoenix/terminal v0.2.4
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
@@ -37,7 +39,6 @@ require (
 	github.com/olekukonko/ll v0.1.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/phoenix-tui/phoenix/core v0.2.4 // indirect
-	github.com/phoenix-tui/phoenix/terminal v0.2.4 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rqlite/rqlite-go-http v0.0.0-20251215132209-f8a9279b0df0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
