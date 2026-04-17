@@ -5,6 +5,7 @@ import (
 	"log"
 	"mzm/core"
 	"mzm/core/logging"
+	viewlib "mzm/core/resource/v1/view"
 	"net/http"
 	"net/url"
 	"os"
@@ -21,10 +22,11 @@ type WebsocketEvent struct {
 	Payload []Message `json:"p"`
 }
 
-var tailExamples core.ExampleRender = core.ExampleRender{}
+var tailViewSelection = &ViewSelection{}
 
 func init() {
-	tailCmd.Flags().Bool("with-view", false, "Search with a predefined view")
+	tailCmd.Flags().Var(searchViewSelection, "with-view", "Filter the log stream with a predefined view")
+	tailCmd.Flags().Lookup("with-view").NoOptDefVal = PROMPT_TRIGGER
 }
 
 // log/tailCmd represents the log/tail command
@@ -37,14 +39,26 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Example: tailExamples.
+	Example: core.NewExampleRenderer().
 		Example(
 			`Tail error logs for a specific application`,
 			`mzm log tail -a <app> -l error`,
 		).
 		Example(
-			`Tail for a specific application with a query filter`,
+			`Tail logs for a specific application with a query filter`,
 			`mzm log tail -a <app> "level:-(debug OR trace) missing cred"`,
+		).
+		Example(
+			"Tail logs using a predefined view from a list",
+			`mzm log tail --with-view`,
+		).
+		Example(
+			"Tail logs using a specific predefined view by its id",
+			`mzm log tail --with-view=a2dfe012b`,
+		).
+		Example(
+			"Tail logs using a specific predefined view by its id",
+			`mzm log tail --with-view=$(mzm log get view "only errors" -q)`,
 		).
 		Render(),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -64,15 +78,22 @@ to quickly create a Cobra application.`,
 		}
 
 		flags := cmd.Flags()
-		withView, err := flags.GetBool("with-view")
-		if err != nil {
-			return err
-		}
-		if withView == true {
-			view, err := promptView()
 
-			if err != nil {
-				return fmt.Errorf("Unable retrieve views:%s", err)
+		var view *viewlib.View
+		var err error
+		emptyViews := make([]viewlib.View, 0)
+
+		if tailViewSelection.IsSet {
+			if tailViewSelection.Prompt {
+				view, err = promptView(emptyViews)
+				if err != nil {
+					return fmt.Errorf("Unable retrieve views:%s", err)
+				}
+			} else {
+				view, err = findView(tailViewSelection.ID)
+				if err != nil {
+					return fmt.Errorf("Unable retrieve views:%s", err)
+				}
 			}
 
 			if view != nil {

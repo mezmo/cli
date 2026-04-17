@@ -14,8 +14,7 @@ type ExampleRender struct {
 }
 
 func NewExampleRenderer() *ExampleRender {
-	render := ExampleRender{}
-	return &render
+	return &ExampleRender{}
 }
 
 func (example *ExampleRender) Example(desc string, detail string) *ExampleRender {

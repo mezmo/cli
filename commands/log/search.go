@@ -9,6 +9,7 @@ import (
 	"mzm/core"
 	en "mzm/core/chrono/en" // TODO(esatterwhite): handle more locales
 	resource "mzm/core/resource"
+	viewlib "mzm/core/resource/v1/view"
 	"mzm/core/storage"
 	"os"
 	"os/signal"
@@ -21,6 +22,7 @@ import (
 )
 
 var prefer searchDirection = tail // defined in enum.go
+var searchViewSelection = &ViewSelection{}
 var (
 	to   string
 	from string
@@ -92,7 +94,9 @@ func init() {
 	searchCmd.Flags().Bool("all", false, "Automatically scroll through all pages until search results are exhausted")
 	searchCmd.Flags().Bool("next", false, "Get next chunk of lines (after last search). This is a convenience wrapper around the --from and --to parameters.")
 	searchCmd.Flags().VarP(&prefer, "prefer", "p", "Get lines from the beginning of the interval rather than the end")
-	searchCmd.Flags().Bool("with-view", false, "Search with a predefined view")
+	searchCmd.Flags().Var(searchViewSelection, "with-view", "Search with a predefined view")
+
+	searchCmd.Flags().Lookup("with-view").NoOptDefVal = PROMPT_TRIGGER
 }
 
 // log/tailCmd represents the log/tail command
@@ -117,15 +121,15 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 		).
 		Example(
 			"Start new paginated with a subset of views",
-			"mzm log search --from 1762198107863 --to 1762198113902 --with-view proxy",
+			"mzm log search --from 1762198107863 --to 1762198113902 --with-view=proxy",
 		).
 		Example(
 			"Start new paginated with a specific view",
-			`mzm log search --from "yesterday at 3pm" --to "now" --with-view a2dfe012b`,
+			`mzm log search --from "yesterday at 3pm" --to "now" --with-view=a2dfe012b`,
 		).
 		Example(
 			"Start new paginated using a sub command to find a view by name",
-			`mzm log search --from "yesterday at 3pm" --to "now" --with-view $(mzm get view "only errors" -q)`,
+			`mzm log search --from "yesterday at 3pm" --to "now" --with-view=$(mzm get view "only errors" -q)`,
 		).
 		Example(
 			"Start search query and page throuh all results",
@@ -150,14 +154,19 @@ If the --to and --from flags are omitted the last 2 hours will be searched.
 		}
 
 		flags := cmd.Flags()
-		withView, err := flags.GetBool("with-view")
 
 		if err != nil {
 			return err
 		}
 
-		if withView == true {
-			view, err := promptView()
+		var view *viewlib.View
+		emptyViews := make([]viewlib.View, 0)
+		if searchViewSelection.IsSet {
+			if searchViewSelection.Prompt {
+				view, err = promptView(emptyViews)
+			} else {
+				view, err = findView(searchViewSelection.ID)
+			}
 
 			if err != nil {
 				return fmt.Errorf("Unable retrieve views:%s", err)

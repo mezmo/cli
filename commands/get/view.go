@@ -72,6 +72,24 @@ var getViewCommand = &cobra.Command{
 			views = []api.View{*view}
 		}
 
+		flags := cmd.Flags()
+
+		quiet, err := flags.GetBool("quiet")
+
+		if err != nil {
+			return err
+		}
+
+		if quiet {
+			output := make([]string, len(views))
+			for idx, item := range views {
+				output[idx] = item.PK()
+			}
+
+			fmt.Println(strings.Join(output, " "))
+			return nil
+		}
+
 		switch outputFormat.String() {
 		case "json", "yaml":
 			format := core.InputFormatEnum(outputFormat.String())

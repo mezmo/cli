@@ -1,8 +1,9 @@
 package get
 
 import (
-	"github.com/spf13/cobra"
 	"mzm/core"
+
+	"github.com/spf13/cobra"
 )
 
 var outputFormat core.OutputFormatEnum = core.FORMAT.OUTPUT.TABLE
@@ -33,4 +34,5 @@ var Command = &cobra.Command{
 func init() {
 	Command.AddCommand(getViewCommand)
 	Command.PersistentFlags().VarP(&outputFormat, "output", "o", `output logs in specific format [json, pretty]`)
+	Command.PersistentFlags().BoolP("quiet", "q", false, "output only the resource identifiers")
 }

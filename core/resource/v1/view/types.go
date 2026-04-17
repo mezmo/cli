@@ -2,13 +2,15 @@ package view
 
 import (
 	"fmt"
+
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
 	JSON "encoding/json"
+	"mzm/core/resource"
+
 	yamlDecoder "github.com/elioetibr/golang-yaml/pkg/decoder"
 	yamlEncoder "github.com/elioetibr/golang-yaml/pkg/encoder"
-	"mzm/core/resource"
 )
 
 // Validator interface for template validation

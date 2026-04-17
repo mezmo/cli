@@ -2,7 +2,6 @@ package resource
 
 import (
 	JSON "encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"mzm/core"
@@ -44,11 +43,15 @@ func FromString(content []byte, format core.InputFormatEnum, file_name string) (
 	}
 
 	logger.Debug("Temp dir created %s", dirName)
-
+	file_path := strings.Join([]string{file_name, "*", format.String()}, ".")
 	file, err := os.CreateTemp(
 		dirName,
-		strings.Join([]string{file_name, "*", format.String()}, "."),
+		file_path,
 	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println(file.Name())
 	defer os.Remove(file.Name())
@@ -65,7 +68,7 @@ func FromString(content []byte, format core.InputFormatEnum, file_name string) (
 	err = cmd.Run()
 
 	if err != nil {
-		return "", errors.New("unable to save resource file")
+		log.Fatal(err)
 	}
 	output, err := os.ReadFile(file.Name())
 	return string(output), err
@@ -92,6 +95,7 @@ func Stringify(content any, format core.InputFormatEnum) ([]byte, error) {
 	case core.FORMAT.CRUD.JSON:
 		return JSON.MarshalIndent(content, "", " ")
 	case core.FORMAT.CRUD.YAML:
+		fmt.Println(content)
 		return yamlEncoder.Marshal(content)
 	default:
 		return []byte{}, fmt.Errorf("unknown stringify format %s", string(format))
