@@ -12,6 +12,13 @@ type IResourceTemplate[T any] struct {
 // This allows different resource types to be stored in the same registry
 type IResourceBase interface {
 	GetTemplate() []byte
+	// ToTemplate fetches a resource from the API and returns it as a template structure
+	// with only editable fields (no API-only fields like IDs, account info, etc.)
+	// Returns IResourceTemplate structure (not serialized) for use with Stringify
+	ToTemplate(id string, params map[string]string) (any, error)
+	// ParseAndApply parses template content and applies it (create or update based on metadata.pk)
+	// Returns the created or updated resource as any (caller should type assert)
+	ParseAndApply(content string) (any, error)
 }
 
 // IResource is a common generic interface that all resources implement

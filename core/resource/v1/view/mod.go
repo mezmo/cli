@@ -18,6 +18,11 @@ type ViewResource struct {
 	client *resty.Client
 }
 
+// Register this resource with the main resource package
+func init() {
+	resource.Register("v1", "view", NewViewResource())
+}
+
 // Ensure ViewResource implements IResource[View, View] with new generic interface
 var _ resource.IResource[View, View] = (*ViewResource)(nil)
 
@@ -217,14 +222,137 @@ func (r *ViewResource) removeByName(name string) error {
 }
 
 func (r *ViewResource) Update(template resource.IResourceTemplate[View]) (*View, error) {
-	return nil, errors.New("Update() Not Implemented")
+	// Get the pk from metadata
+	pk, hasPk := template.Metadata["pk"]
+	if !hasPk || pk == "" {
+		return nil, errors.New("update requires metadata.pk to be set")
+	}
+
+	// Create view from template
+	view, err := ViewFromTemplate(&template)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create view from template: %w", err)
+	}
+
+	// Prepare for update
+	apiView := view.ToUpdate()
+
+	// Make API call
+	res, err := r.client.
+		R().
+		SetResult(view).
+		SetBody(apiView).
+		SetPathParam("pk", pk).
+		Put("/v1/config/view/{pk}")
+
+	if err != nil {
+		return nil, err
+	}
+
+	switch res.StatusCode() {
+	case 200, 201:
+		return res.Result().(*View), nil
+	case 400:
+		fmt.Printf("Bad request - API response:\n%s\n", res.String())
+		return nil, errors.New("bad request: check your view specification")
+	case 401:
+		return nil, errors.New("unauthorized: check your access key")
+	case 403:
+		return nil, errors.New("forbidden: insufficient permissions to update views")
+	case 404:
+		return nil, fmt.Errorf("view with ID '%s' not found", pk)
+	default:
+		return nil, fmt.Errorf("unexpected error: status %d", res.StatusCode())
+	}
+}
+
+// ParseAndApply parses template content and applies it (create or update based on metadata.pk)
+func (r *ViewResource) ParseAndApply(content string) (any, error) {
+	// Parse content into IResourceTemplate[View]
+	template, err := resource.Parse[View](content)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse template: %w", err)
+	}
+
+	// Validate the template
+	if err := template.Spec.Validate(); err != nil {
+		return nil, fmt.Errorf("template validation failed: %w", err)
+	}
+
+	// Check metadata for pk (primary key)
+	pk, hasPk := template.Metadata["pk"]
+
+	var result *View
+
+	if hasPk && pk != "" {
+		// Update existing resource
+		result, err = r.Update(*template)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update view: %w", err)
+		}
+	} else {
+		// Create new resource
+		result, err = r.Create(*template)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create view: %w", err)
+		}
+	}
+
+	return result, nil
 }
 
 func (r *ViewResource) GetTemplate() []byte {
 	return viewTemplate
 }
 
-// Register this resource with the main resource package
-func init() {
-	resource.Register("v1", "view", NewViewResource())
+// ToTemplate fetches a view from the API and returns it as a template structure
+// with only editable fields (strips API-only fields like viewid, account, orgs, etc.)
+func (r *ViewResource) ToTemplate(id string, params map[string]string) (any, error) {
+	// Fetch from API (includes all fields)
+	view, err := r.Get(id, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch view: %w", err)
+	}
+
+	// Handle 404 case - view not found (could be a typo)
+	if view == nil {
+		return nil, fmt.Errorf("view '%s' not found", id)
+	}
+
+	// Create clean spec with ONLY editable fields
+	spec := View{
+		Name:     view.Name,
+		Query:    view.Query,
+		Category: view.Category,
+		Hosts:    view.Hosts,
+		Apps:     view.Apps,
+		Tags:     view.Tags,
+		Levels:   view.Levels,
+		Channels: view.Channels,
+	}
+
+	// Handle preset field conversion (API uses array, template uses string)
+	if len(view.Presetid) > 0 {
+		spec.PresetID = view.Presetid[0]
+	} else if len(view.Presetids) > 0 {
+		spec.PresetID = view.Presetids[0]
+	}
+
+	// Ensure Category is never nil - use empty array instead
+	if spec.Category == nil {
+		spec.Category = []string{}
+	}
+
+	// Return template with clean spec
+	template := resource.IResourceTemplate[View]{
+		Version:  "v1",
+		Resource: "view",
+		Metadata: map[string]string{
+			"account": view.Account,
+			"pk":      view.Viewid,
+		},
+		Spec: spec,
+	}
+
+	return template, nil
 }

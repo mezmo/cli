@@ -18,8 +18,8 @@ func (r ResourceRegistry) Register(version, resourceType string, resource IResou
 }
 
 // GetResource returns a resource by version and type
-// The caller must type assert to the specific IResource[T] they need
-func (r ResourceRegistry) GetResource(version, resourceType string) (interface{}, error) {
+// Returns IResourceBase which can be used for common operations like ToTemplateStruct
+func (r ResourceRegistry) GetResource(version, resourceType string) (IResourceBase, error) {
 	key := version + ":" + resourceType
 	if resource, ok := r[key]; ok {
 		return resource, nil

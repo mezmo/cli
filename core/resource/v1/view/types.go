@@ -79,15 +79,15 @@ func (v View) Validate() error {
 func (v *View) ToYAML() ([]byte, error) {
 	// Create a copy with only template-relevant fields
 	templateView := struct {
-		Name     string                   `yaml:"name"`
-		Query    string                   `yaml:"query,omitempty"`
-		Category []string                 `yaml:"category"`
-		Hosts    []string                 `yaml:"hosts,omitempty"`
-		Apps     []string                 `yaml:"apps,omitempty"`
-		Tags     []string                 `yaml:"tags,omitempty"`
-		Levels   []string                 `yaml:"levels,omitempty"`
-		PresetID string                   `yaml:"presetid,omitempty"`
-		Channels []map[string]interface{} `yaml:"channels,omitempty"`
+		Name     string                   `yaml:"name,flow"`
+		Query    string                   `yaml:"query,omitempty,flow"`
+		Category []string                 `yaml:"category,flow"`
+		Hosts    []string                 `yaml:"hosts,omitempty,flow"`
+		Apps     []string                 `yaml:"apps,omitempty,flow"`
+		Tags     []string                 `yaml:"tags,omitempty,flow"`
+		Levels   []string                 `yaml:"levels,omitempty,flow"`
+		PresetID string                   `yaml:"presetid,omitempty,flow"`
+		Channels []map[string]interface{} `yaml:"channels,omitempty,flow"`
 	}{
 		Name:     v.Name,
 		Query:    v.Query,

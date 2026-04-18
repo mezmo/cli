@@ -11,6 +11,7 @@ import (
 
 	"mzm/commands/create"
 	"mzm/commands/delete"
+	"mzm/commands/edit"
 	"mzm/commands/get"
 	"mzm/commands/log"
 	"mzm/core/assets"
@@ -138,4 +139,5 @@ func init() {
 	rootCmd.AddCommand(get.Command)
 	rootCmd.AddCommand(create.Command)
 	rootCmd.AddCommand(delete.Command)
+	rootCmd.AddCommand(edit.Command)
 }

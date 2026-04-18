@@ -2,10 +2,11 @@ package create
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"mzm/core"
 	"mzm/core/resource"
 	resourceView "mzm/core/resource/v1/view"
+
+	"github.com/spf13/cobra"
 )
 
 var viewCommand = &cobra.Command{
