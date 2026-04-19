@@ -33,6 +33,7 @@ var Command = &cobra.Command{
 
 func init() {
 	Command.AddCommand(getViewCommand)
+	Command.AddCommand(getCategoryCommand)
 	Command.PersistentFlags().VarP(&outputFormat, "output", "o", `output logs in specific format [json, pretty]`)
 	Command.PersistentFlags().BoolP("quiet", "q", false, "output only the resource identifiers")
 }
