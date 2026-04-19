@@ -8,6 +8,7 @@ import (
 
 func init() {
 	Command.AddCommand(viewCommand)
+	Command.AddCommand(categoryCommand)
 }
 
 var Command = &cobra.Command{

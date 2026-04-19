@@ -201,7 +201,62 @@ func (r *CategoryResource) RemoveBySpec(category *Category) error {
 
 // Update updates an existing category
 func (r *CategoryResource) Update(template resource.IResourceTemplate[Category]) (*Category, error) {
-	return nil, errors.New("Update() Not Implemented")
+	// Get the pk from metadata
+	pk, hasPk := template.Metadata["pk"]
+	if !hasPk || pk == "" {
+		return nil, errors.New("update requires metadata.pk to be set")
+	}
+
+	// Create category from template
+	category, err := CategoryFromTemplate(&template)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create category from template: %w", err)
+	}
+
+	// Prepare for update
+	apiCategory := category.ToUpdate()
+
+	// We need to determine the category type to construct the correct API endpoint
+	// First, try to get the existing category to determine its type
+	existingCategory, err := r.Get(pk, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch existing category: %w", err)
+	}
+	if existingCategory == nil {
+		return nil, fmt.Errorf("category with ID '%s' not found", pk)
+	}
+
+	// Use the existing category's type for the update
+	categoryType := existingCategory.Type
+
+	// Make API call
+	res, err := r.client.
+		R().
+		SetResult(category).
+		SetBody(apiCategory).
+		SetPathParam("type", string(categoryType)).
+		SetPathParam("pk", pk).
+		Put("/v1/config/categories/{type}/{pk}")
+
+	if err != nil {
+		return nil, err
+	}
+
+	switch res.StatusCode() {
+	case 200, 201:
+		return res.Result().(*Category), nil
+	case 400:
+		fmt.Printf("Bad request - API response:\n%s\n", res.String())
+		return nil, errors.New("bad request: check your category specification")
+	case 401:
+		return nil, errors.New("unauthorized: check your access key")
+	case 403:
+		return nil, errors.New("forbidden: insufficient permissions to update categories")
+	case 404:
+		return nil, fmt.Errorf("category with ID '%s' not found", pk)
+	default:
+		return nil, fmt.Errorf("unexpected error: status %d", res.StatusCode())
+	}
 }
 
 // ParseAndApply parses template content and applies it (create or update based on metadata.pk)
@@ -258,12 +313,15 @@ func (r *CategoryResource) ToTemplate(id string, params map[string]string) (any,
 		Type: category.Type,
 	}
 
-	// Return template with clean spec
+	// Return template with clean spec and populated metadata
 	template := resource.IResourceTemplate[Category]{
 		Version:  "v1",
 		Resource: "category",
-		Metadata: map[string]string{},
-		Spec:     spec,
+		Metadata: map[string]string{
+			"account": category.Account,
+			"pk":      category.Id,
+		},
+		Spec: spec,
 	}
 
 	return template, nil
