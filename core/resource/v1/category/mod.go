@@ -2,9 +2,11 @@ package category
 
 import (
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"mzm/core/resource"
+	"regexp"
 	"sync"
 
 	"resty.dev/v3"
@@ -60,10 +62,9 @@ func (r *CategoryResource) Get(pk string, params map[string]string) (*Category, 
 
 			switch res.StatusCode() {
 			case 200:
-				result := res.Result().(*Category)
 				// Verify the ID matches what we're looking for
-				if result.Id == pk {
-					responses <- result
+				if cat.Id == pk {
+					responses <- &cat
 				}
 			case 404:
 				// Category not found in this type, this is expected
@@ -136,8 +137,7 @@ func (r *CategoryResource) List(params map[string]string) ([]Category, error) {
 
 			switch res.StatusCode() {
 			case 200:
-				result := res.Result().(*[]Category)
-				responses <- *result
+				responses <- cats
 			case 401:
 				errChan <- fmt.Errorf("unauthorized to fetch %s categories", catType)
 			case 403:
@@ -181,12 +181,73 @@ func (r *CategoryResource) List(params map[string]string) ([]Category, error) {
 
 // GetBySpec fetches a category by spec
 func (r *CategoryResource) GetBySpec(spec *Category) (*Category, error) {
+
 	return nil, errors.New("GetBySpec() Not Implemented")
 }
 
 // Create creates a new category
 func (r *CategoryResource) Create(template resource.IResourceTemplate[Category]) (*Category, error) {
-	return nil, errors.New("Create() Not Implemented")
+	// Create category from strongly typed template
+	category, err := CategoryFromTemplate(&template)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create category from template: %w", err)
+	}
+
+	// Validate the category before sending to API
+	if err := category.Validate(); err != nil {
+		return nil, fmt.Errorf("validation failed: %w", err)
+	}
+
+	// Prepare for creation
+	apiCategory := category.ToCreate()
+
+	fmt.Println(apiCategory)
+	// Make API call - use the category type from the template to construct the endpoint
+	res, err := r.client.
+		R().
+		SetResult(category).
+		SetBody(apiCategory).
+		SetPathParam("type", string(category.Type)).
+		Post("/v1/config/categories/{type}")
+
+	if err != nil {
+		return nil, err
+	}
+
+	switch res.StatusCode() {
+	case 200, 201:
+		// The category object is already populated by Resty's SetResult
+		return category, nil
+	case 400:
+		// Parse the response to check for Joi validation errors or authorization errors
+		var joiResp JoiResponse
+		if err := json.Unmarshal(res.Bytes(), &joiResp); err == nil {
+			// Check for authorization errors hidden in 400 responses
+			// The API sometimes returns 400 with "notauthorized" code for auth errors
+			if matched, _ := regexp.MatchString(`(?i)notauthorized`, joiResp.Code); matched {
+				return nil, errors.New("unauthorized: there was a problem authenticating the previous operation. Make sure your access key is still valid")
+			}
+
+			// Format Joi validation errors for better user experience
+			if len(joiResp.Details) > 0 {
+				return nil, fmt.Errorf("validation failed: %s", joiResp.FormatJoiError())
+			}
+
+			// Fallback to generic error message if no details
+			if joiResp.Error != "" {
+				return nil, fmt.Errorf("bad request: %s", joiResp.Error)
+			}
+		}
+
+		// If we can't parse as Joi response, return generic error
+		return nil, errors.New("bad request: make sure your category specification includes all required fields and they are in the correct format")
+	case 401:
+		return nil, errors.New("unauthorized: check your access key")
+	case 403:
+		return nil, errors.New("forbidden: insufficient permissions to create categories")
+	default:
+		return nil, fmt.Errorf("unexpected error: status %d", res.StatusCode())
+	}
 }
 
 // Remove deletes a category by ID
@@ -246,8 +307,28 @@ func (r *CategoryResource) Update(template resource.IResourceTemplate[Category])
 	case 200, 201:
 		return res.Result().(*Category), nil
 	case 400:
-		fmt.Printf("Bad request - API response:\n%s\n", res.String())
-		return nil, errors.New("bad request: check your category specification")
+		// Parse the response to check for Joi validation errors or authorization errors
+		var joiResp JoiResponse
+		if err := json.Unmarshal(res.Bytes(), &joiResp); err == nil {
+			// Check for authorization errors hidden in 400 responses
+			// The API sometimes returns 400 with "notauthorized" code for auth errors
+			if matched, _ := regexp.MatchString(`(?i)notauthorized`, joiResp.Code); matched {
+				return nil, errors.New("unauthorized: there was a problem authenticating the previous operation. Make sure your access key is still valid")
+			}
+
+			// Format Joi validation errors for better user experience
+			if len(joiResp.Details) > 0 {
+				return nil, fmt.Errorf("validation failed: %s", joiResp.FormatJoiError())
+			}
+
+			// Fallback to generic error message if no details
+			if joiResp.Error != "" {
+				return nil, fmt.Errorf("bad request: %s", joiResp.Error)
+			}
+		}
+
+		// If we can't parse as Joi response, return generic error
+		return nil, errors.New("bad request: make sure your category specification includes all required fields and they are in the correct format")
 	case 401:
 		return nil, errors.New("unauthorized: check your access key")
 	case 403:
@@ -314,12 +395,13 @@ func (r *CategoryResource) ToTemplate(id string, params map[string]string) (any,
 	}
 
 	// Return template with clean spec and populated metadata
+	// Note: Category metadata includes pk and type, not account (unlike View resource)
 	template := resource.IResourceTemplate[Category]{
 		Version:  "v1",
 		Resource: "category",
 		Metadata: map[string]string{
-			"account": category.Account,
-			"pk":      category.Id,
+			"pk":   category.Id,
+			"type": string(category.Type),
 		},
 		Spec: spec,
 	}

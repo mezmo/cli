@@ -108,7 +108,6 @@ func (r *ViewResource) Create(template resource.IResourceTemplate[View]) (*View,
 		return nil, fmt.Errorf("failed to create view from template: %w", err)
 	}
 
-	fmt.Println(template)
 	apiView := view.ToCreate()
 
 	// Use the original view object for the API response - Resty will populate it directly

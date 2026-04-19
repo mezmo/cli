@@ -1,6 +1,7 @@
 package get
 
 import (
+	"fmt"
 	"mzm/core"
 	coreResource "mzm/core/resource"
 	api "mzm/core/resource/v1/category"
@@ -35,6 +36,10 @@ var getCategoryCommand = &cobra.Command{
 			category, err := resource.Get(pk, make(map[string]string))
 			if err != nil {
 				return err
+			}
+
+			if category == nil {
+				return fmt.Errorf("category '%s' not found", pk)
 			}
 
 			categories = append(categories, *category)

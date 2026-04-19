@@ -25,4 +25,5 @@ var Command = &cobra.Command{
 func init() {
 	Command.PersistentFlags().VarP(&inputFormat, "output", "o", "The data format used to interact (edit | create) with remote resources [yaml, json]")
 	Command.AddCommand(viewCommand)
+	Command.AddCommand(categoryCommand)
 }
