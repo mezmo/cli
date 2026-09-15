@@ -15,7 +15,7 @@ const OutputFormat = new EnumType(['table', 'json', 'yaml'])
 type ColumnDefinition = {
   name: string
   property: string
-  render?: (value?: any) => string
+  render?: (value?: any) => string | Cell
 }
 
 function noop(value?: unknown): string {

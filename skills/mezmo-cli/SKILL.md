@@ -12,6 +12,7 @@ Use `mzm` for Mezmo platform workflows from the terminal.
 - Confirm `mzm` is installed before attempting Mezmo work: `mzm version`
 - Confirm `MZM_ACCESS_KEY` is set before any API call: `printenv MZM_ACCESS_KEY`
 - If either prerequisite is missing, tell the user what is missing and stop. Do not invent an unsupported fallback transport.
+- If `MZM_ACCESS_KEY` starts with `ste_` it is an enterprise access key. Commands run as the active account, so pick one first (see [references/setup.md](references/setup.md#enterprise-access-keys)).
 
 ## Quick Start
 

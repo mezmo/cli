@@ -3,8 +3,7 @@ import type {RequestConfig} from '@anitrend/request-client'
 import {storage} from '@mzm/config'
 import {AuthorizationError} from '../error.ts'
 import {colors} from '@cliffy/ansi/colors'
-
-const ACCESS_KEY: string | undefined = Deno.env.get('MZM_ACCESS_KEY') as string ?? ''
+import {ACCESS_KEY, DELEGATE_HEADER, delegateAccount} from './auth.ts'
 
 interface ApiRequest extends RequestConfig {
   url?: string
@@ -22,15 +21,26 @@ const client = createClient({
 
 // add auth key just before request as to not
 // print it when introspecting objects inline
-client.interceptors.request.use((config: ApiRequest): RequestConfig => {
+client.interceptors.request.use(async (config: ApiRequest): Promise<RequestConfig> => {
   if (!ACCESS_KEY) throw AuthorizationError.from(
     `Make sure the environment variable ${colors.magenta('MZM_ACCESS_KEY')} is set`
   )
   const {headers = {}} = config
-  config.headers = {
+  const defaults: Record<string, string> = {
     'Content-Type': 'application/json'
   , 'Authorization': `Token ${ACCESS_KEY}`
-  ,  ...headers
+  }
+
+  // enterprise keys act on child accounts through delegation.
+  // The enterprise api itself is never delegated
+  if (!config.url?.replace(/^\/+/, '').startsWith('v3/enterprise')) {
+    const account_id = await delegateAccount()
+    if (account_id) defaults[DELEGATE_HEADER] = account_id
+  }
+
+  config.headers = {
+    ...defaults
+  , ...headers
   }
   return config as RequestConfig
 })

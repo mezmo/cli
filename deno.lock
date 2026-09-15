@@ -2034,6 +2034,11 @@
           "jsr:@std/assert@1"
         ]
       },
+      "@mzm/command-set": {
+        "dependencies": [
+          "jsr:@std/assert@1"
+        ]
+      },
       "@mzm/command-upgrade": {
         "dependencies": [
           "jsr:@std/assert@1",

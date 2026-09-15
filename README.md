@@ -15,7 +15,7 @@ Manage logs, views, configurations, and leverage AI-powered assistance directly 
 - **View Management**: Create, edit, delete, and manage log views
 - **AI-Powered Assistant**: Ask questions and get intelligent assistance
 - **Resource Management**: Manage various Mezmo platform resources via YAML/JSON definitions
-- **Account Management**: View and manage account information
+- **Account Management**: View and manage account information, including enterprise child accounts
 - **Configuration Management**: Customize CLI behavior and settings
 - **Shell Completions**: Auto-completion support for enhanced productivity
 
@@ -31,6 +31,7 @@ Manage logs, views, configurations, and leverage AI-powered assistance directly 
 | `mzm edit` | Edit existing resources |
 | `mzm get` | Retrieve and display resources |
 | `mzm log` | Interact with log data |
+| `mzm set` | Set the active value of a resource, such as the active account |
 | `mzm upgrade` | Upgrade the CLI to the latest version |
 | `mzm version` | Display version information |
 
@@ -41,10 +42,15 @@ Manage logs, views, configurations, and leverage AI-powered assistance directly 
 - `mzm log tail` - Stream logs in real-time
 
 #### Get Commands
-- `mzm get account` - Display account information
+- `mzm get account [id]` - Display account information. The active account is marked in the `ACTIVE` column
+  - For enterprise access keys, the active account is the selected account
+  - For all other access keys, the active account is the account the access key belongs to
 - `mzm get category [id | name]` - List or get specific categories
 - `mzm get conversation [id]` - List AI conversations or get a specific one
 - `mzm get view [id | name]` - List or get specific views
+
+#### Set Commands
+- `mzm set account [id | name]` - Select the active account of an enterprise by id or company name. Names do not need to be exact, and you choose when more than one account matches. Without an argument, choose from all of the accounts of the enterprise. Enterprise access keys only
 
 #### Config Commands
 - `mzm config get <key>` - Display configuration values
@@ -76,6 +82,7 @@ The Mezmo CLI uses the following environment variables:
 | Variable | Required | Description | Default |
 |----------|----------|-------------|---------|
 | `MZM_ACCESS_KEY` | **Yes** | Authentication key for accessing the Mezmo platform API. This is required for all API operations. | None |
+| `MZM_ACCOUNT_ID` | No | Account to run commands as. Enterprise access keys only. Overrides the account selected with `mzm set account`, and is overridden by `--account` | None |
 | `EDITOR` | No | Specifies the text editor to use when editing resources with `mzm edit` command | `vi` (Unix/Linux/macOS) or `notepad.exe` (Windows) |
 
 **Note**: The CLI also respects standard system environment variables like `HOME` for determining configuration file locations.
@@ -193,6 +200,51 @@ export MZM_ACCESS_KEY="your-access-key-here"
 - It is recommended to use a Personal Access Key for better security and control
 - Visit the [Mezmo documentation on IAM Service Keys](https://docs.mezmo.com/docs/ingestion-key#iam-service-keys) for detailed instructions on creating and managing access keys
 - Personal Access Keys can be created and managed through your Mezmo User Preferences
+
+### Enterprise Access Keys
+
+Enterprise service access keys (prefixed with `ste_`) are not bound to a single account.
+They provide access to every account under an enterprise. When one is used, commands are run on behalf
+of the **active account**, sent to the API with the `x-delegate-account-id` header.
+
+```bash
+export MZM_ACCESS_KEY="ste_your-enterprise-key"
+
+# list the child accounts of the enterprise
+mzm get account
+
+# select the active account by id
+mzm set account b35eda6673
+
+# or by company name. Names do not need to be exact, and when more than one
+# account matches you will be prompted to choose
+mzm set account "Acme Inc."
+mzm set account "acme icn"
+
+# or choose from all of the accounts of the enterprise
+mzm set account
+
+# all other commands now run as the active account
+mzm get view
+
+# run a single command as a different account
+mzm get view --account 1234567890
+mzm get view --account $(mzm get account "Acme Inc." -q)
+MZM_ACCOUNT_ID=1234567890 mzm log search "level:error"
+```
+
+The active account is resolved in this order. The first one set is used:
+
+1. `--account <id>`: the current command only
+2. `MZM_ACCOUNT_ID`: every command run with it set
+3. `mzm set account`: saved, used when neither of the above is set
+
+`--account` and `MZM_ACCOUNT_ID` never change the account saved with `mzm set account`.
+If there is no active account, commands fail and suggest how to choose one.
+In scripts and CI, set `MZM_ACCOUNT_ID` or pass `--account`.
+
+Switching accounts is reserved for enterprise access keys. With any other access key, the active account is the account
+the key belongs to. `mzm set account`, `--account`, and `MZM_ACCOUNT_ID` are rejected.
 
 ### Shell Completions
 
