@@ -1,5 +1,23 @@
 ## Changelog
 
+# [2.1.0](https://github.com/mezmo/cli/compare/v2.0.6...v2.1.0) (2026-09-15)
+
+
+### Chores
+
+* **assets**: include a recording of enterprise account usage [652c053](https://github.com/mezmo/cli/commit/652c053fae29a4338f903ead25e760433c36b742) - Eric Satterwhite
+
+
+### Features
+
+* **enterprise**: add support for enterprise service keys [50b9291](https://github.com/mezmo/cli/commit/50b9291e9a30f43ae0ae66fa95972877d2f1eb26) - Eric Satterwhite, closes: [#45](https://github.com/mezmo/cli/issues/45)
+
+
+### Miscellaneous
+
+* update .all-contributorsrc [skip ci] [9eb06e3](https://github.com/mezmo/cli/commit/9eb06e3275310084de6861e2c9698fc780ebd5a5) - Eric Satterwhite
+* update README.md [skip ci] [ec1dea9](https://github.com/mezmo/cli/commit/ec1dea951bded71930aa68efebd745196f16aa26) - Eric Satterwhite
+
 ## [2.0.6](https://github.com/mezmo/cli/compare/v2.0.5...v2.0.6) (2026-04-14)
 
 
