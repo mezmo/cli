@@ -7,6 +7,7 @@ import GetCommand from '@mzm/command-get'
 import CreateCommand from '@mzm/command-create'
 import DeleteCommand from '@mzm/command-delete'
 import EditCommand from '@mzm/command-edit'
+import SetCommand from '@mzm/command-set'
 import AskCommand from '@mzm/command-ask'
 import VersionCommand from '@mzm/command-version'
 import {GithubReleasesUpgradeCommand} from '@mzm/command-upgrade'
@@ -53,6 +54,16 @@ if (import.meta.main) {
   }
 
   const cmd = new MZMCommand()
+    .globalOption('--account <account:string>', 'Run the command as a specific account (enterprise access keys)')
+    .globalEnv(
+      'MZM_ACCOUNT_ID=<value:string>'
+    , 'Account to run commands as when using an enterprise access key'
+    , {prefix: 'MZM_'}
+    )
+    .globalAction(function (options: {account?: string}) {
+      // the flag takes precedence over the environment variable
+      if (options.account) Deno.env.set('MZM_ACCOUNT_ID', options.account)
+    })
     .action(function () {
       const output = new Table().padding(8)
 
@@ -76,6 +87,7 @@ if (import.meta.main) {
     .command('edit', EditCommand)
     .command('get', GetCommand)
     .command('log', LogCommand)
+    .command('set', SetCommand)
     .command('upgrade', upgrade)
     .command('version', VersionCommand)
 

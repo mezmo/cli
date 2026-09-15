@@ -10,6 +10,7 @@ Inspect current resources before mutating them.
 # accounts
 mzm get account
 mzm get account <account-id>
+mzm set account <account-id-or-name>
 
 # categories
 mzm get category

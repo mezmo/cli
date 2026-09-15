@@ -6,6 +6,7 @@ import type {SocketOptions} from './web-socket.ts'
 import {storage} from '@mzm/config'
 import {pprint} from '@mzm/log'
 import {toArray} from '@mzm/core/lang'
+import {DELEGATE_HEADER, delegateAccount} from '@mzm/core/resource/auth'
 import {getLogger} from '@mzm/log'
 
 const log = getLogger('default')
@@ -90,6 +91,9 @@ const tail = new MZMCommand()
     tail_params.apps = toArray(options.app).join(',')
 
     headers.append('Authorization', `Token ${ACCESS_KEY}`)
+
+    const account_id = await delegateAccount()
+    if (account_id) headers.append(DELEGATE_HEADER, account_id)
 
     const ws = new Socket(
       `${STREAM_HOST}/ws/tail`

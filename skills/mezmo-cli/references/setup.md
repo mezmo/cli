@@ -16,6 +16,29 @@ printenv EDITOR
 
 If `mzm` or `MZM_ACCESS_KEY` is missing, surface the missing prerequisite and stop. This skill does not assume a hidden fallback.
 
+## Enterprise Access Keys
+
+Keys prefixed with `ste_` belong to an enterprise, not a single account. Every non-enterprise command runs as the
+active account. Without one, API commands fail with `EAUTH`.
+
+```bash
+# list child accounts; the active account is marked with * in the ACTIVE column
+mzm get account
+
+# select the active account by id or company name.
+# Prefer ids: an ambiguous name, or no argument, prompts and fails when there is no terminal
+mzm set account <account-id-or-name>
+
+# or target an account for a single command without changing the saved selection
+mzm get view --account <account-id>
+MZM_ACCOUNT_ID=<account-id> mzm log search "level:error"
+```
+
+Prefer `--account` or `MZM_ACCOUNT_ID` when working across several accounts so the user's saved selection is not changed.
+These are enterprise-only: with any other key, `mzm set account`, `--account`, and `MZM_ACCOUNT_ID` fail with `EINVAL`.
+The active account is the key's own account, marked with `*` in `mzm get account`.
+Confirm with the user before running `mzm set account`, since it changes the account later commands run as.
+
 ## Installation Expectations
 
 - This skill is installable from the repository with `npx skills add <repo> --skill mezmo-cli`.

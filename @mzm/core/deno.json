@@ -9,6 +9,7 @@
     "./release": "./release.ts",
     "./lang": "./lang/mod.ts",
     "./resource": "./resource/mod.ts",
+    "./resource/auth": "./resource/auth.ts",
     "./resource/types": "./resource/types.ts",
     "./chrono": "./chrono.vnd.mjs",
     "./error": "./error.ts",

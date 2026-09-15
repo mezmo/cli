@@ -8,6 +8,7 @@ export type {IResourceDefinition, IResourceSpec, IResourceTemplate} from './type
 export type {View} from './v1/view/types.ts'
 export type {ChatHistory, ChatResponse, ChatResponseMessage, Conversation, UserMessage} from './v1/conversation/types.ts'
 export type {Account} from './v3/account/types.ts'
+export type {Enterprise} from './v3/enterprise/types.ts'
 export type {Category} from './v1/category/types.ts'
 export {StringifyFormat} from './types.ts'
 export {client, parse, stringify, ChatRole}
