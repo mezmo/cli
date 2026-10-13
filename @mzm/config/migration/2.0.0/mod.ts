@@ -1,9 +1,9 @@
 // deno-coverage-ignore-file
-import {DatabaseSync} from 'node:sqlite'
+import type {Database} from 'bun:sqlite'
 
 // deno-lint-ignore require-await
 export async function up(context: any) {
-  const db: DatabaseSync = context.db as DatabaseSync
+  const db: Database = context.db as Database
   db.exec(`
     CREATE TABLE IF NOT EXISTS conversation(
       conversation_session_id TEXT PRIMARY KEY
@@ -30,7 +30,7 @@ export async function up(context: any) {
 
 // deno-lint-ignore require-await
 export async function down(context: any) {
-  const db: DatabaseSync = context.db as DatabaseSync
+  const db: Database = context.db as Database
   db.exec(`
     DROP TABLE IF EXISTS conversation_history;
     DROP TABLE IF EXISTS conversation;

@@ -48,8 +48,8 @@ if (import.meta.main) {
         debug('unable to remove previous version', error)
       })
       .finally(() => {
-        return storage.unset('upgrade.cleanup.file')
         debug('previous version cleanup complete')
+        return storage.unset('upgrade.cleanup.file')
       })
   }
 

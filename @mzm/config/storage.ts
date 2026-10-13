@@ -1,67 +1,40 @@
 import {debuglog} from 'node:util'
-import {DatabaseSync} from 'node:sqlite'
+import {Database} from 'bun:sqlite'
 import * as os from 'node:os'
-import * as path from '@std/path'
-import {exists} from '@std/fs/exists'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import Store from './store.ts'
 import {SQL} from './sql.ts'
-import {Migrate} from '@marianmeres/migrate'
-import {parse, SemVer} from '@std/semver'
-import * as migrations from './migration/mod.ts'
+import {migrate} from './migrate.ts'
 
 const log = debuglog('config:storage')
 
 const home = os.homedir()
 const config_dir = path.join(home, '.config', 'mezmo')
 const config_file = path.join(config_dir, 'mzm.cfg')
-const config_exists = await exists(config_file, {isFile: true})
 
-if (!config_exists) {
+if (!fs.existsSync(config_file)) {
   log('initializing config dir: %s', config_dir)
-  Deno.mkdirSync(config_dir, {recursive: true})
+  fs.mkdirSync(config_dir, {recursive: true})
 }
 
 log('opening configuration store: %s', config_file)
 
 // low level sqlite interface
-const db: DatabaseSync = new DatabaseSync(config_file)
-
-// deno high level Key/Value interface for sqlite 
-const kvdb = await Deno.openKv(config_file)
-
+// strict allows named parameters to be passed with out a prefix - {name: 'value'}
+const db: Database = new Database(config_file, {strict: true})
 
 // sql tag wrapper + query interace for easier prepared statements
 const sql = SQL(db)
 
 // primary configuration settings interace
-const store = new Store(kvdb)
-const migrator = new Migrate({
-  // deno-lint-ignore require-await
-  getActiveVersion: async function getActiveVersion(context: Record<string, unknown>) {
-    const database: DatabaseSync = context.db as DatabaseSync
-    const result = database.prepare('PRAGMA user_version').get() as {user_version: number | undefined}
-    const major = result.user_version
-    if (!major) return
-    log('current active version: %d', major)
-    return `${major}.0.0`
-  }
-  // deno-lint-ignore require-await
-, setActiveVersion: async function setActiveVersion(version: string | undefined, context: Record<string, unknown>) {
-    if (!version) return
-    const parsed:SemVer = parse(version)
-    const database: DatabaseSync = context.db as DatabaseSync
-    log('setting active version %d', parsed.major)
-    database.exec(`PRAGMA user_version = ${parsed.major}`)
-    return version
-  }
-}, {db, store})
+const store = new Store(db)
 
-for (const [version, migration] of Object.entries(migrations)) {
-  log('adding migration version: %s', version)
-  migrator.addVersion(version, migration.up, migration.down)
-}
+await migrate(db, store)
 
-await migrator.up('latest')
+process.on('exit', () => {
+  store.close()
+})
 
 export default store
-export {kvdb, sql, db as sqlite}
+export {sql, db as sqlite}
