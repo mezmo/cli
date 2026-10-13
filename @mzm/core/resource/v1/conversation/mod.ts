@@ -76,7 +76,7 @@ export async function activate(conversation_session_id:string): Promise<Conversa
     //@ts-ignore typescript is wrong
     return result as Conversation
   } catch(err) {
-    if (sqlite.isTransaction) sqlite.exec('ROLLBACK')
+    if (sqlite.inTransaction) sqlite.exec('ROLLBACK')
     throw err
   }
 }
@@ -209,5 +209,5 @@ export async function remove(identifiers: Array<string>): Promise<Array<Record<s
     return '?'
   })
   const query = `DELETE FROM conversation WHERE conversation_session_id IN (${placholders}) RETURNING conversation_session_id as pk`
-  return sqlite.prepare(query).all(...identifiers)
+  return sqlite.prepare(query).all(...identifiers) as Array<Record<string, unknown>>
 }

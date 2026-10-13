@@ -1,10 +1,10 @@
 import {debuglog} from 'node:util'
-import {Database} from 'bun:sqlite'
+import type {Database} from 'bun:sqlite'
 import * as os from 'node:os'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import Store from './store.ts'
-import {SQL} from './sql.ts'
+import {SQL, connect} from './sql.ts'
 import {migrate} from './migrate.ts'
 
 const log = debuglog('config:storage')
@@ -21,8 +21,7 @@ if (!fs.existsSync(config_file)) {
 log('opening configuration store: %s', config_file)
 
 // low level sqlite interface
-// strict allows named parameters to be passed with out a prefix - {name: 'value'}
-const db: Database = new Database(config_file, {strict: true})
+const db: Database = connect(config_file)
 
 // sql tag wrapper + query interace for easier prepared statements
 const sql = SQL(db)

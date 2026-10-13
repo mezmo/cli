@@ -24,7 +24,7 @@
     "@types/node": "^24.2.0",
     "@types/web": "^0.0.281",
     "semantic-release": "^25.0.2",
-    "typescript": "^5.9.2"
+    "typescript": "^6.0.3"
   },
   "type": "module",
   "workspaces": [
@@ -41,7 +41,6 @@
     "@mzm/command-upgrade": "workspace:*",
     "@mzm/command-version": "workspace:*",
     "@mzm/config": "workspace:*",
-    "@mzm/core": "workspace:*",
-    "@mzm/log": "workspace:*"
+    "@mzm/core": "workspace:*"
   }
 }

@@ -1,3 +1,4 @@
+import {test} from 'bun:test'
 import {
   assertEquals,
   assertInstanceOf,
@@ -14,7 +15,7 @@ import {
   type ErrorOptions
 } from './error.ts'
 
-Deno.test('GenericError - constructor with message', () => {
+test('GenericError - constructor with message', () => {
   const error = new GenericError('Test error message')
   assertInstanceOf(error, GenericError)
   assertInstanceOf(error, Error)
@@ -24,14 +25,14 @@ Deno.test('GenericError - constructor with message', () => {
   assertEquals(error.exit_code, 1)
 })
 
-Deno.test('GenericError - constructor without message', () => {
+test('GenericError - constructor without message', () => {
   const error = new GenericError()
   assertInstanceOf(error, GenericError)
   assertEquals(error.message, '')
   assertEquals(error.name, 'GenericError')
 })
 
-Deno.test('GenericError - constructor with options', () => {
+test('GenericError - constructor with options', () => {
   const options: ErrorOptions = {
     cause: {
       code: 'TEST_CODE',
@@ -46,7 +47,7 @@ Deno.test('GenericError - constructor with options', () => {
   assertEquals(error.error_code, 'TEST_CODE')
 })
 
-Deno.test('GenericError - constructor with partial cause', () => {
+test('GenericError - constructor with partial cause', () => {
   const options: ErrorOptions = {
     cause: {
       code: 'TEST_CODE'
@@ -56,12 +57,12 @@ Deno.test('GenericError - constructor with partial cause', () => {
   assertEquals(error.cause, options.cause)
 })
 
-Deno.test('GenericError - static properties', () => {
+test('GenericError - static properties', () => {
   assertEquals(GenericError.error_code, 'ENOOP')
   assertEquals(GenericError.exit_code, 1)
 })
 
-Deno.test('GenericError.from() - with message only', () => {
+test('GenericError.from() - with message only', () => {
   const error = GenericError.from('Test message')
   assertInstanceOf(error, GenericError)
   assertEquals(error.message, 'Test message')
@@ -73,7 +74,7 @@ Deno.test('GenericError.from() - with message only', () => {
   assertEquals(error.cause.reason, undefined)
 })
 
-Deno.test('GenericError.from() - with message and help', () => {
+test('GenericError.from() - with message and help', () => {
   const error = GenericError.from('Test message', 'Help text')
   assertEquals(error.message, 'Test message')
   // @ts-ignore - accessing cause for testing
@@ -84,7 +85,7 @@ Deno.test('GenericError.from() - with message and help', () => {
   assertEquals(error.cause.reason, undefined)
 })
 
-Deno.test('GenericError.from() - with message, help, and reason', () => {
+test('GenericError.from() - with message, help, and reason', () => {
   const originalError = new Error('Original')
   const error = GenericError.from('Test message', 'Help text', originalError)
   assertEquals(error.message, 'Test message')
@@ -96,7 +97,7 @@ Deno.test('GenericError.from() - with message, help, and reason', () => {
   assertStrictEquals(error.cause.reason, originalError)
 })
 
-Deno.test('GenericError.from() - with message and reason but no help', () => {
+test('GenericError.from() - with message and reason but no help', () => {
   const originalError = new Error('Original')
   const error = GenericError.from('Test message', undefined, originalError)
   assertEquals(error.message, 'Test message')
@@ -108,7 +109,7 @@ Deno.test('GenericError.from() - with message and reason but no help', () => {
   assertStrictEquals(error.cause.reason, originalError)
 })
 
-Deno.test('GenericError.toString() - with code, message and help', () => {
+test('GenericError.toString() - with code, message and help', () => {
   const error = GenericError.from('Test error message', 'This is help text')
   const result = error.toString()
   const expected = [
@@ -118,7 +119,7 @@ Deno.test('GenericError.toString() - with code, message and help', () => {
   assertEquals(result, expected)
 })
 
-Deno.test('GenericError.toString() - without help text', () => {
+test('GenericError.toString() - without help text', () => {
   const error = GenericError.from('Test error message')
   const result = error.toString()
   const expected = [
@@ -129,7 +130,7 @@ Deno.test('GenericError.toString() - without help text', () => {
 })
 
 // AuthorizationError Tests
-Deno.test('AuthorizationError - constructor', () => {
+test('AuthorizationError - constructor', () => {
   const error = new AuthorizationError('Auth failed')
   assertInstanceOf(error, AuthorizationError)
   assertInstanceOf(error, GenericError)
@@ -140,12 +141,12 @@ Deno.test('AuthorizationError - constructor', () => {
   assertEquals(error.exit_code, 2)
 })
 
-Deno.test('AuthorizationError - static properties', () => {
+test('AuthorizationError - static properties', () => {
   assertEquals(AuthorizationError.error_code, 'EAUTH')
   assertEquals(AuthorizationError.exit_code, 2)
 })
 
-Deno.test('AuthorizationError.from() - with help', () => {
+test('AuthorizationError.from() - with help', () => {
   const error = AuthorizationError.from('Please login')
   assertInstanceOf(error, AuthorizationError)
   assertEquals(error.message, 'Unable to authenticate operation')
@@ -157,7 +158,7 @@ Deno.test('AuthorizationError.from() - with help', () => {
   assertEquals(error.cause.reason, undefined)
 })
 
-Deno.test('AuthorizationError.from() - with help and reason', () => {
+test('AuthorizationError.from() - with help and reason', () => {
   const reason = {statusCode: 401}
   const error = AuthorizationError.from('Please login', reason)
   assertEquals(error.message, 'Unable to authenticate operation')
@@ -169,7 +170,7 @@ Deno.test('AuthorizationError.from() - with help and reason', () => {
   assertEquals(error.cause.reason, reason)
 })
 
-Deno.test('AuthorizationError.toString()', () => {
+test('AuthorizationError.toString()', () => {
   const error = AuthorizationError.from('Run "mzm auth login" to authenticate')
   const result = error.toString()
   const expected = [
@@ -180,7 +181,7 @@ Deno.test('AuthorizationError.toString()', () => {
 })
 
 // CommunicationError Tests
-Deno.test('CommunicationError - constructor with status and message', () => {
+test('CommunicationError - constructor with status and message', () => {
   const error = new CommunicationError(500, 'Server error')
   assertInstanceOf(error, CommunicationError)
   assertInstanceOf(error, GenericError)
@@ -192,13 +193,13 @@ Deno.test('CommunicationError - constructor with status and message', () => {
   assertEquals(error.status_code, 500)
 })
 
-Deno.test('CommunicationError - constructor with status only', () => {
+test('CommunicationError - constructor with status only', () => {
   const error = new CommunicationError(404)
   assertEquals(error.message, '')
   assertEquals(error.status_code, 404)
 })
 
-Deno.test('CommunicationError - constructor with status, message and options', () => {
+test('CommunicationError - constructor with status, message and options', () => {
   const options: ErrorOptions = {
     cause: {
       code: 'NETWORK_ERROR',
@@ -212,12 +213,12 @@ Deno.test('CommunicationError - constructor with status, message and options', (
   assertEquals(error.cause, options.cause)
 })
 
-Deno.test('CommunicationError - static properties', () => {
+test('CommunicationError - static properties', () => {
   assertEquals(CommunicationError.error_code, 'ECOMM')
   assertEquals(CommunicationError.exit_code, 3)
 })
 
-Deno.test('CommunicationError.from() - with communication reason', () => {
+test('CommunicationError.from() - with communication reason', () => {
   const reason = {
     status: 503,
     detail: {
@@ -240,7 +241,7 @@ Deno.test('CommunicationError.from() - with communication reason', () => {
   assertEquals(error.cause.status_code, 503)
 })
 
-Deno.test('CommunicationError.from() - reason without detail', () => {
+test('CommunicationError.from() - reason without detail', () => {
   const reason = {
     status: 400
   , detail: {code: 'ECOMM'}
@@ -251,7 +252,7 @@ Deno.test('CommunicationError.from() - reason without detail', () => {
   assertEquals(error.cause.reason, reason)
 })
 
-Deno.test('CommunicationError.toString()', () => {
+test('CommunicationError.toString()', () => {
   const reason = {
     status: 500,
     detail: {
@@ -270,7 +271,7 @@ Deno.test('CommunicationError.toString()', () => {
 })
 
 // InputError Tests
-Deno.test('InputError - constructor', () => {
+test('InputError - constructor', () => {
   const error = new InputError('Invalid input')
   assertInstanceOf(error, InputError)
   assertInstanceOf(error, GenericError)
@@ -281,12 +282,12 @@ Deno.test('InputError - constructor', () => {
   assertEquals(error.exit_code, 4)
 })
 
-Deno.test('InputError - static properties', () => {
+test('InputError - static properties', () => {
   assertEquals(InputError.error_code, 'EINVAL')
   assertEquals(InputError.exit_code, 4)
 })
 
-Deno.test('InputError.from() - with help only', () => {
+test('InputError.from() - with help only', () => {
   const error = InputError.from('Check your input')
   assertInstanceOf(error, InputError)
   assertEquals(error.message, 'Something about the provided input is invalid')
@@ -298,7 +299,7 @@ Deno.test('InputError.from() - with help only', () => {
   assertEquals(error.cause.reason, undefined)
 })
 
-Deno.test('InputError.from() - with validation details', () => {
+test('InputError.from() - with validation details', () => {
   const validationErrors = [
     { message: '"name" is required' },
     { message: '"email" must be a valid email address' }
@@ -311,7 +312,7 @@ Deno.test('InputError.from() - with validation details', () => {
   assertEquals(error.cause.reason, validationErrors)
 })
 
-Deno.test('InputError.toString() - without validation details', () => {
+test('InputError.toString() - without validation details', () => {
   const error = InputError.from('Please provide valid input')
   const result = error.toString()
   const expected = [
@@ -321,7 +322,7 @@ Deno.test('InputError.toString() - without validation details', () => {
   assertEquals(result, expected)
 })
 
-Deno.test('InputError.toString() - with validation details', () => {
+test('InputError.toString() - with validation details', () => {
   const validationErrors = [
     { message: '"name" is required' },
     { message: '"email" must be a valid email address' },
@@ -339,7 +340,7 @@ Deno.test('InputError.toString() - with validation details', () => {
   assertEquals(result, expected)
 })
 
-Deno.test('InputError.toString() - validation messages without quoted field names', () => {
+test('InputError.toString() - validation messages without quoted field names', () => {
   const validationErrors = [
     { message: 'Invalid format' },
     { message: 'Value out of range' }
@@ -355,7 +356,7 @@ Deno.test('InputError.toString() - validation messages without quoted field name
   assertEquals(result, expected)
 })
 
-Deno.test('InputError.toString() - empty validation errors array', () => {
+test('InputError.toString() - empty validation errors array', () => {
   const error = InputError.from('Check input', [])
   const result = error.toString()
   const expected = [
@@ -365,7 +366,7 @@ Deno.test('InputError.toString() - empty validation errors array', () => {
   assertEquals(result, expected)
 })
 
-Deno.test('InputError.toString() - null reason', () => {
+test('InputError.toString() - null reason', () => {
   const error = InputError.from('Check input', null)
   const result = error.toString()
   const expected = [
@@ -375,7 +376,7 @@ Deno.test('InputError.toString() - null reason', () => {
   assertEquals(result, expected)
 })
 
-Deno.test('InputError.toString() - undefined reason in cause', () => {
+test('InputError.toString() - undefined reason in cause', () => {
   const error = new InputError('Invalid input', {
     cause: {
       code: 'EINVAL',
@@ -390,7 +391,7 @@ Deno.test('InputError.toString() - undefined reason in cause', () => {
   assertEquals(result, expected)
 })
 
-Deno.test('InputError.toString() - multiple quoted field names in single message', () => {
+test('InputError.toString() - multiple quoted field names in single message', () => {
   const validationErrors = [
     { message: '"firstName" and "lastName" are required' }
   ]
@@ -406,7 +407,7 @@ Deno.test('InputError.toString() - multiple quoted field names in single message
 })
 
 // Inheritance chain tests
-Deno.test('Error inheritance - all error types inherit properly', () => {
+test('Error inheritance - all error types inherit properly', () => {
   const genericError = new GenericError('test')
   const authError = new AuthorizationError('test')
   const commError = new CommunicationError(500, 'test')
@@ -430,7 +431,7 @@ Deno.test('Error inheritance - all error types inherit properly', () => {
   assertInstanceOf(inputError, InputError)
 })
 
-Deno.test('Error inheritance - correct constructor names', () => {
+test('Error inheritance - correct constructor names', () => {
   assertEquals(new GenericError().name, 'GenericError')
   assertEquals(new AuthorizationError().name, 'AuthorizationError')
   assertEquals(new CommunicationError(500).name, 'CommunicationError')
@@ -438,12 +439,12 @@ Deno.test('Error inheritance - correct constructor names', () => {
 })
 
 // Edge cases for complete coverage
-Deno.test('GenericError - captureStackTrace is called', () => {
+test('GenericError - captureStackTrace is called', () => {
   const error = new GenericError('test')
   assertExists(error.stack)
 })
 
-Deno.test('CommunicationError - captureStackTrace is called', () => {
+test('CommunicationError - captureStackTrace is called', () => {
   const error = new CommunicationError(500, 'test')
   assertExists(error.stack)
 })

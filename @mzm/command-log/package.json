@@ -7,7 +7,6 @@
   "license": "MIT",
   "dependencies": {
     "@mzm/config": "workspace:*",
-    "@mzm/core": "workspace:*",
-    "@mzm/log": "workspace:*"
+    "@mzm/core": "workspace:*"
   }
 }

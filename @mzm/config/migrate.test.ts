@@ -1,11 +1,12 @@
 import {test, beforeEach, afterEach} from 'bun:test'
-import {Database} from 'bun:sqlite'
+import type {Database} from 'bun:sqlite'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import {assertEquals} from '@std/assert'
 import Store from './store.ts'
 import {migrate} from './migrate.ts'
+import {connect} from './sql.ts'
 
 // a config database written by deno 2.7.1. see fixture/denokv.gen.js
 const FIXTURE = path.join(import.meta.dir, 'fixture', 'denokv.cfg')
@@ -15,7 +16,7 @@ let config_file: string
 let db: Database | undefined
 
 function open(): {db: Database, store: Store} {
-  db = new Database(config_file, {strict: true})
+  db = connect(config_file)
   return {db, store: new Store(db)}
 }
 

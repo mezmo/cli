@@ -13,5 +13,5 @@
     "types": ["bun"]
   },
   "include": ["main.ts", "@mzm/**/*.ts"],
-  "exclude": ["node_modules", "dist", "coverage", "@mzm/core/chrono.vnd.mjs"]
+  "exclude": ["node_modules", "dist", "coverage"]
 }

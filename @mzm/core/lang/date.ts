@@ -1,5 +1,5 @@
 import {difference} from '@std/datetime'
-import * as chrono from '../chrono.vnd.mjs'
+import * as chrono from 'chrono-node'
 import {typecast} from './string.ts'
 import {typeOf} from './mod.ts'
 

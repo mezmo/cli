@@ -1,7 +1,7 @@
 import {test, beforeAll, afterEach} from 'bun:test'
-import {Database} from 'bun:sqlite'
-import {assertObjectMatch, assertExists, assertEquals, assertArrayIncludes} from '@std/assert'
-import {SQL} from './sql.ts'
+import type {Database} from 'bun:sqlite'
+import {assertObjectMatch, assertExists, assertEquals, assertArrayIncludes, assertThrows} from '@std/assert'
+import {SQL, connect} from './sql.ts'
 
 let db: Database
 
@@ -14,7 +14,7 @@ const TEST_TABLE_SQL = `
 `
 
 beforeAll(() => {
-  db = new Database(':memory:', {strict: true})
+  db = connect(':memory:')
   db.exec(TEST_TABLE_SQL)
 })
 
@@ -127,4 +127,36 @@ test('sql.all - named parameters', () => {
     assertEquals(records.length, 1, '1 record returned')
     assertArrayIncludes(records, [{name: 'whizbang'}])
   }
+})
+
+test('sql.connect - foreign keys are enforced', () => {
+  const connection = connect(':memory:')
+  const sql = SQL(connection)
+  connection.exec(`
+    CREATE TABLE parent(id TEXT PRIMARY KEY);
+    CREATE TABLE child(
+      id TEXT PRIMARY KEY
+    , parent_id TEXT NOT NULL
+    , FOREIGN KEY (parent_id) REFERENCES parent(id) ON DELETE CASCADE
+    );
+    INSERT INTO parent(id) VALUES ('a'), ('b');
+    INSERT INTO child(id, parent_id) VALUES ('a1', 'a'), ('a2', 'a'), ('b1', 'b');
+  `)
+
+  assertEquals(connection.prepare('PRAGMA foreign_keys').get(), {foreign_keys: 1}, 'enabled for the connection')
+
+  assertThrows(() => {
+    sql`INSERT INTO child(id, parent_id) VALUES ('c1', 'c')`.run()
+  }, Error, 'FOREIGN KEY constraint failed')
+
+  sql`DELETE FROM parent WHERE id = ${'a'}`.run()
+  assertEquals(sql`SELECT id FROM child`.all(), [{id: 'b1'}], 'rows that reference a removed row are removed with it')
+
+  assertEquals(sql`SELECT ${'named'} AS value`.get(), {value: 'named'}, 'statements are usable')
+  assertEquals(
+    connection.prepare('SELECT :name AS value').get({name: 'no prefix'})
+  , {value: 'no prefix'}
+  , 'named parameters do not need a prefix'
+  )
+  connection.close()
 })
