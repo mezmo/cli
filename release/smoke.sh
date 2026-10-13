@@ -6,12 +6,12 @@
 #
 # environment:
 #   SMOKE_OFFLINE=1            skip the steps that reach github
-#   SMOKE_UPGRADE_VERSION=x    release to upgrade a copy of the executable to (default 2.1.0)
+#   SMOKE_UPGRADE_VERSION=x    release to replace a copy of the executable with.
+#                              The newest release that is not its own version by default
 set -euo pipefail
 
 BIN="${1:-}"
 EXPECTED_VERSION="${2:-}"
-UPGRADE_VERSION="${SMOKE_UPGRADE_VERSION:-2.1.0}"
 
 if [ -z "$BIN" ] || [ ! -f "$BIN" ]; then
   echo "usage: release/smoke.sh <executable> [expected-version]" >&2
@@ -131,18 +131,36 @@ if [ "${SMOKE_OFFLINE:-}" = 1 ]; then
 fi
 
 step 'lists the releases it can upgrade to'
-"$MZM" upgrade --list-versions | grep -q "v$UPGRADE_VERSION" || fail "release v$UPGRADE_VERSION is not listed"
+RELEASES=$("$MZM" upgrade --list-versions | tr -d '\r' | awk '/^v[0-9]+\.[0-9]+\.[0-9]+/ {print substr($1, 2)}')
+[ -n "$RELEASES" ] || fail 'no releases were listed'
+echo "$RELEASES" | head -3
+
+# The executable under test is newer than anything published, so there is never a
+# release for it to move up to. What is being checked is that it can swap itself for
+# another executable on this system, which a move to any other release does.
+# Asking for the version it already is does nothing, and reports success
+UPGRADE_VERSION="${SMOKE_UPGRADE_VERSION:-}"
+if [ -z "$UPGRADE_VERSION" ]; then
+  UPGRADE_VERSION=$(echo "$RELEASES" | awk -v current="$VERSION" '$0 != current {print; exit}')
+fi
+[ -n "$UPGRADE_VERSION" ] || fail "no release other than $VERSION to swap with"
+[ "$UPGRADE_VERSION" != "$VERSION" ] || fail "the executable is already version $VERSION. Nothing would be swapped"
 
 step "replaces itself with release $UPGRADE_VERSION"
-# exercises the download, the swap of a running executable and the check that the new one starts
+BEFORE=$(cksum < "$MZM")
 # the progress spinner is kept out of the build log unless something goes wrong
 if ! "$MZM" upgrade --version "$UPGRADE_VERSION" > "$WORK/upgrade.log" 2>&1; then
   cat "$WORK/upgrade.log" >&2
   fail 'the upgrade command reported a failure'
 fi
+
 [ -f "$MZM" ] || fail 'the executable is gone after the upgrade'
-UPGRADED=$("$MZM" version 2>&1 | tr -d '\r')
-echo "$UPGRADED"
-echo "$UPGRADED" | grep -q "$UPGRADE_VERSION" || fail "the executable is not version $UPGRADE_VERSION after the upgrade"
+AFTER=$(cksum < "$MZM")
+[ "$BEFORE" != "$AFTER" ] || fail 'the upgrade command reported success, but the executable was not replaced'
+
+# the executable that was put in place has to run, and be the release that was asked for
+UPGRADED=$("$MZM" version --quiet 2>/dev/null | tr -d '\r')
+echo "$VERSION -> $UPGRADED"
+[ "$UPGRADED" = "$UPGRADE_VERSION" ] || fail "expected version $UPGRADE_VERSION after the upgrade"
 
 printf '\nsmoke test passed: %s\n' "$BIN"

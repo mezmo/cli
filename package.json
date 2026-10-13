@@ -47,6 +47,7 @@
     "@mzm/command-edit": "workspace:*",
     "@mzm/command-get": "workspace:*",
     "@mzm/command-log": "workspace:*",
+    "@mzm/command-set": "workspace:*",
     "@mzm/command-upgrade": "workspace:*",
     "@mzm/command-version": "workspace:*",
     "@mzm/config": "workspace:*",

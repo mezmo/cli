@@ -3,7 +3,7 @@
 import {EOL} from 'node:os'
 import {Cell, ResourceCommand, ValidationError, colors, prompts} from '@mzm/core'
 import {InputError, NotFoundError} from '@mzm/core/error'
-import {kvdb} from '@mzm/config'
+import {storage} from '@mzm/config'
 import {type Account, default as resource} from '@mzm/core/resource'
 import {ACCOUNT_KEY, isEnterpriseKey} from '@mzm/core/resource/auth'
 
@@ -47,7 +47,7 @@ export default new ResourceCommand('account')
 
     // account ids are lower case. names are matched regardless of case
     const value = input?.trim().toLowerCase()
-    const interactive = Deno.stdin.isTerminal() && Deno.stdout.isTerminal()
+    const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY)
 
     if (value === '') throw new ValidationError('An account id or name is required. Run "mzm set account" to choose one')
 
@@ -89,7 +89,7 @@ export default new ResourceCommand('account')
         })
 
     const account_id = selected.account ?? selected.account_id
-    await kvdb.set(ACCOUNT_KEY, account_id)
+    await storage.set(ACCOUNT_KEY, account_id)
 
     // short ids are saved before they are looked up so a problematic account can
     // always be replaced. The lookup only fills in the details that are displayed

@@ -12,6 +12,7 @@
         "@mzm/command-edit": "workspace:*",
         "@mzm/command-get": "workspace:*",
         "@mzm/command-log": "workspace:*",
+        "@mzm/command-set": "workspace:*",
         "@mzm/command-upgrade": "workspace:*",
         "@mzm/command-version": "workspace:*",
         "@mzm/config": "workspace:*",
@@ -80,6 +81,14 @@
     },
     "@mzm/command-log": {
       "name": "@mzm/command-log",
+      "version": "0.1.0",
+      "dependencies": {
+        "@mzm/config": "workspace:*",
+        "@mzm/core": "workspace:*",
+      },
+    },
+    "@mzm/command-set": {
+      "name": "@mzm/command-set",
       "version": "0.1.0",
       "dependencies": {
         "@mzm/config": "workspace:*",
@@ -242,6 +251,8 @@
     "@mzm/command-get": ["@mzm/command-get@workspace:@mzm/command-get"],
 
     "@mzm/command-log": ["@mzm/command-log@workspace:@mzm/command-log"],
+
+    "@mzm/command-set": ["@mzm/command-set@workspace:@mzm/command-set"],
 
     "@mzm/command-upgrade": ["@mzm/command-upgrade@workspace:@mzm/command-upgrade"],
 
