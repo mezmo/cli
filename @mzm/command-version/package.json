@@ -1,0 +1,14 @@
+{
+  "name": "@mzm/command-version",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@mzm/core": "workspace:*",
+    "@std/datetime": "npm:@jsr/std__datetime@^0.225.5",
+    "@std/fs": "npm:@jsr/std__fs@^1.0.20",
+    "@std/semver": "npm:@jsr/std__semver@^1.0.7"
+  }
+}

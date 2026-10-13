@@ -1,0 +1,12 @@
+{
+  "name": "@mzm/command-delete",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@mzm/core": "workspace:*",
+    "@std/path": "npm:@jsr/std__path@^1.1.3"
+  }
+}

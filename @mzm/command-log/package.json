@@ -1,0 +1,13 @@
+{
+  "name": "@mzm/command-log",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@mzm/config": "workspace:*",
+    "@mzm/core": "workspace:*",
+    "@mzm/log": "workspace:*"
+  }
+}

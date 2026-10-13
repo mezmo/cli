@@ -1,0 +1,13 @@
+{
+  "name": "@mzm/command-create",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@mzm/core": "workspace:*",
+    "@std/fs": "npm:@jsr/std__fs@^1.0.20",
+    "@std/path": "npm:@jsr/std__path@^1.1.3"
+  }
+}
