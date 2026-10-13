@@ -91,37 +91,46 @@ export class GHError extends Error {
 function noopComplete(_meta: OnCompleteMetadata, _cb: OnCompleteFinalCallback): void {}
 function noopError(_error: Error): void {}
 
-async function swap(old_file: string, new_file: string, version: string): Promise<void> {
+export async function swap(old_file: string, new_file: string, version: string): Promise<void> {
+  const backup_file = `${old_file}.${version}`
 
-  // On windows you cannot remove a file while it is running
-  // We can rename, and remove later
+  // On windows you cannot remove or overwrite a file while it is running
+  // We can rename, and remove later. Keeping the original around until
+  // the new file is in place also gives us something to roll back to
+  debug('file swap', {old_file, new_file, backup_file})
+  await Deno.rename(old_file, backup_file)
+  debug('file renamed %s', backup_file)
+
+  try {
+    // copy tmp file to <file>
+    // moving / and $HOME likely spans devices, which makes simple rename not possible
+    // poor mans mv (copy + remove)
+    debug(`copy %s to %s`, new_file, old_file)
+    await Deno.copyFile(new_file, old_file)
+  } catch (err) {
+    // put the original back, replacing anything that was partially written
+    debug('swap failed. restoring %s', old_file)
+    await Deno.rename(backup_file, old_file)
+    await Promise.allSettled([Deno.remove(new_file)])
+    throw err
+  }
+
   if (Deno.build.os === 'windows') {
-    const target_file = `${old_file}.${version}`
-    debug('windows file swap', {old_file, new_file})
-    await Deno.rename(old_file, target_file)
-    debug('file renamed %s', target_file)
-
     // attempt to make the file hidden
     const command = new Deno.Command('cmd', {
-      args: ['/c', 'attrib', '+h', target_file]
+      args: ['/c', 'attrib', '+h', backup_file]
     })
 
     // its ok if this fails
     await Promise.allSettled([command.output()])
 
     // the command entry point attempts to remove this file on the next run
-    await storage.set('upgrade.cleanup.file', target_file)
-    debug('store previous file location %s', target_file)
+    await storage.set('upgrade.cleanup.file', backup_file)
+    debug('store previous file location %s', backup_file)
     debug('windows executable swap complete')
   } else {
-    await Deno.remove(old_file)
+    await Promise.allSettled([Deno.remove(backup_file)])
   }
-
-  // copy tmp file to <file>
-  // moving / and $HOME likely spans devices, which makes simple rename not possible
-  // poor mans mv (copy + remove)
-  debug(`copy %s to %s`, new_file, old_file)
-  await Deno.copyFile(new_file, old_file)
 
   // its not terribly important that the temp file is removed
   await Promise.allSettled([Deno.remove(new_file)])
@@ -160,6 +169,11 @@ export default class GithubReleaseProvider extends Provider {
     , timeout: 1000 * 60 * 10
     , responseType: 'json'
     })
+  }
+
+  // here to appease the abstract class implementation. not used for anything
+  hasRequiredPermissions(): Promise<boolean> {
+    return Promise.resolve(true)
   }
 
   // this is here to appease the abstract class implementation

@@ -14,8 +14,10 @@ interface GithubReleasesUpgradeOptions {
  */
 export default class GithubReleasesUpgradeCommand extends UpgradeCommand {
   constructor(options: GithubReleasesUpgradeOptions) {
+    // cliffy routes compiled binaries to its own asset installer and skips provider.upgrade().
+    // standalone: false keeps the upgrade going through GithubReleaseProvider.upgrade()
     // @ts-ignore work around for command subclassing
-    super(options)
+    super({...options, standalone: false})
   }
 
   override getVersion(): string | undefined {
