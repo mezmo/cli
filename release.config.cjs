@@ -54,18 +54,14 @@ module.exports = {
       changelogTitle: '## Changelog'
     }]
   , ['@semantic-release/npm', null]
-  , ['@semantic-release/exec', {
-      "prepareCmd": "release/write-info"
-    }]
-  , ['@semantic-release/exec', {
-      "verifyConditionsCmd": "deno task compile:local"
-    , "prepareCmd": "deno task compile"
-    }]
+    // The executables in dist are compiled, signed and run by the build before
+    // the release starts (see Jenkinsfile). release.json was written at that
+    // point with the version being released, and is what they report
   , ['@semantic-release/exec', {
       "prepareCmd": "release/shasum.sh"
     }]
   , ['@semantic-release/git', {
-      assets: ['package.json', 'package-lock.json', 'CHANGELOG.md', '!**/node_modules/**', 'release.json']
+      assets: ['package.json', 'CHANGELOG.md', '!**/node_modules/**', 'release.json']
     , message: `release: ${year}-${month}-${day}, `
         + 'Version <%= nextRelease.version %> [skip ci]'
     }]

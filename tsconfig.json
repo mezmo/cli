@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "types": ["bun"]
   },
-  "include": ["main.ts", "@mzm/**/*.ts"],
+  "include": ["main.ts", "build.ts", "@mzm/**/*.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
 }

@@ -23,6 +23,9 @@ log('opening configuration store: %s', config_file)
 // low level sqlite interface
 const db: Database = connect(config_file)
 
+// macos uses the copy of sqlite that ships with the operating system, so the version varies
+log('sqlite version: %o', db.query('SELECT sqlite_version() AS version').get())
+
 // sql tag wrapper + query interace for easier prepared statements
 const sql = SQL(db)
 

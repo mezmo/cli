@@ -28,6 +28,9 @@ lib-cov
 *.lcov
 /.tap*
 
+# Written by the build on CI: the bun install cache
+/.bun
+
 # nyc test coverage
 .nyc_output
 # Dependency directories

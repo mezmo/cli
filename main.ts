@@ -1,11 +1,9 @@
+import * as fs from 'node:fs/promises'
 import {debuglog, format} from 'node:util'
 import {CompletionsCommand, MZMCommand, Table, Cell, colors} from '@mzm/core'
 import {info} from '@mzm/core/release'
-import {LogCommand} from '@mzm/command-log'
 import {ConfigCommand} from '@mzm/command-config'
 import GetCommand from '@mzm/command-get'
-import CreateCommand from '@mzm/command-create'
-import DeleteCommand from '@mzm/command-delete'
 import EditCommand from '@mzm/command-edit'
 import SetCommand from '@mzm/command-set'
 import AskCommand from '@mzm/command-ask'
@@ -37,14 +35,13 @@ const upgrade = new GithubReleasesUpgradeCommand({
     }
   })
 })
-// Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   const previous_version: string | null = await storage.getOne('upgrade.cleanup.file') as string | null
   if (previous_version) {
     debug('previous version cleanup: %s', previous_version)
-    Deno
-      .remove(previous_version)
-      .catch((error) => {
+    fs
+      .rm(previous_version)
+      .catch((error: unknown) => {
         debug('unable to remove previous version', error)
       })
       .finally(() => {
@@ -53,6 +50,7 @@ if (import.meta.main) {
       })
   }
 
+  // create, delete and log are added back as their packages are converted to bun
   const cmd = new MZMCommand()
     .globalOption('--account <account:string>', 'Run the command as a specific account (enterprise access keys)')
     .globalEnv(
@@ -62,7 +60,7 @@ if (import.meta.main) {
     )
     .globalAction(function (options: {account?: string}) {
       // the flag takes precedence over the environment variable
-      if (options.account) Deno.env.set('MZM_ACCOUNT_ID', options.account)
+      if (options.account) process.env.MZM_ACCOUNT_ID = options.account
     })
     .action(function () {
       const output = new Table().padding(8)
@@ -82,24 +80,21 @@ if (import.meta.main) {
     .command('ask', AskCommand)
     .command('completions', new CompletionsCommand())
     .command('config', ConfigCommand)
-    .command('create', CreateCommand)
-    .command('delete', DeleteCommand)
     .command('edit', EditCommand)
     .command('get', GetCommand)
-    .command('log', LogCommand)
     .command('set', SetCommand)
     .command('upgrade', upgrade)
     .command('version', VersionCommand)
 
   try {
-    await cmd.parse(Deno.args)
+    await cmd.parse(process.argv.slice(2))
   } catch (err: any) {
-    if (debug.enabled) console.dir(err)
+    debug('%O', err)
 
     cmd.showHelp()
     if (err.cause?.help) {
       console.error(String(err))
-      Deno.exitCode = err.exit_code ?? 1
+      process.exitCode = err.exit_code ?? 1
     } else {
       throw err
     }

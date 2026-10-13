@@ -79,3 +79,32 @@ test('swap - leaves everything alone when the original is missing', async () => 
 
   assertEquals(files(), ['mzm-download'], 'downloaded file is not removed')
 })
+
+test('swap - hands the new file to verify once it is in place', async () => {
+  fs.writeFileSync(new_file, 'version 2.0.0', {mode: 0o776})
+  const seen: Array<{file: string, content: string, backup: boolean}> = []
+
+  await swap(old_file, new_file, '1.0.0', async (file: string) => {
+    seen.push({
+      file: file
+    , content: fs.readFileSync(file, 'utf8')
+    , backup: fs.existsSync(backup_file)
+    })
+  })
+
+  assertEquals(seen, [{file: old_file, content: 'version 2.0.0', backup: true}], 'verify saw the new file')
+  assertEquals(fs.readFileSync(old_file, 'utf8'), 'version 2.0.0', 'new content is in place')
+})
+
+test('swap - restores the original when the new file is turned down by verify', async () => {
+  fs.writeFileSync(new_file, 'version 2.0.0', {mode: 0o776})
+
+  await assertRejects(async () => {
+    await swap(old_file, new_file, '1.0.0', async () => {
+      throw new Error('does not run here')
+    })
+  }, Error, 'does not run here')
+
+  assertEquals(files(), ['mzm'], 'only the original file remains')
+  assertEquals(fs.readFileSync(old_file, 'utf8'), 'version 1.0.0', 'original content is restored')
+})

@@ -14,6 +14,7 @@ import {CommunicationError, GenericError, NotFoundError} from '../../error.ts'
 import {os, arch, isCompiled, type OS, type Arch} from '../../platform.ts'
 import {download, isExecutable} from '../download.ts'
 import {swap} from '../swap.ts'
+import {verify} from '../verify.ts'
 import {
   createClient
 , RequestClient
@@ -240,7 +241,19 @@ export default class GithubReleaseProvider extends Provider {
 
       // remove the current one
       debug('removing %s', running_bin)
-      const backup_file = await swap(running_bin, tmp_file, from)
+      const backup_file = await swap(running_bin, tmp_file, from, async (file: string) => {
+        try {
+          await verify(file)
+        } catch (err) {
+          debug('the new version could not be run: %s', (err as Error).message)
+          throw GenericError.from(
+            `The ${to} release does not run on this machine`
+          , `Version ${from} was put back and is still installed. `
+            + `Check the requirements of the release at ${colors.brightBlue(this.getRepositoryUrl('mzm'))}`
+          , err
+          )
+        }
+      })
 
       if (backup_file) {
         // the command entry point attempts to remove this file on the next run

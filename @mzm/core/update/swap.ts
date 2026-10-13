@@ -18,11 +18,19 @@ async function hide(file: string): Promise<void> {
  * @param old_file - location of the file to be replaced
  * @param new_file - location of the file replacing it. It is removed when the swap is done
  * @param version - version of the file being replaced. Used to name the backup copy
+ * @param verify - called with the location of the new file once it is in place.
+ *  The original file is restored if it throws
  * @returns the location of the backup copy when it could not be removed (windows), otherwise null.
  *  It is left to the caller to arrange for it to be removed later
- * @throws when the new file could not be put in place. The original file is restored first
+ * @throws when the new file could not be put in place, or was rejected by `verify`.
+ *  The original file is restored first
  */
-export async function swap(old_file: string, new_file: string, version: string): Promise<string | null> {
+export async function swap(
+  old_file: string
+, new_file: string
+, version: string
+, verify?: (file: string) => Promise<void>
+): Promise<string | null> {
   const backup_file = `${old_file}.${version}`
 
   // On windows you cannot remove or overwrite a file while it is running
@@ -38,8 +46,11 @@ export async function swap(old_file: string, new_file: string, version: string):
     // poor mans mv (copy + remove)
     debug(`copy %s to %s`, new_file, old_file)
     await fs.copyFile(new_file, old_file)
+
+    // the original is still around. This is the last point the new file can be turned down
+    if (verify) await verify(old_file)
   } catch (err) {
-    // put the original back, replacing anything that was partially written
+    // put the original back, replacing anything that was partially written or turned down
     debug('swap failed. restoring %s', old_file)
     await fs.rename(backup_file, old_file)
     await Promise.allSettled([fs.rm(new_file)])
