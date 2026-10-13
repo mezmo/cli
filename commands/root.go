@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"mzm/commands/config"
 	"mzm/commands/create"
 	"mzm/commands/delete"
 	"mzm/commands/get"
@@ -78,6 +79,7 @@ func init() {
 
 	viper.BindEnv("access-key")
 	rootCmd.AddCommand(log.Command)
+	rootCmd.AddCommand(config.Command)
 	rootCmd.AddCommand(get.Command)
 	rootCmd.AddCommand(create.Command)
 	rootCmd.AddCommand(delete.Command)
