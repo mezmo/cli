@@ -534,8 +534,9 @@ there is ignored.
 
 ### Checking an executable
 
-`release/smoke.sh` runs a compiled executable through the things that differ between operating
-systems, including replacing itself with a published release. It uses a home directory of its own.
+`release/smoke.sh` checks that a compiled executable runs on the machine it is run on: it starts,
+reports the expected version, and opens its settings with that system's SQLite. It uses a home
+directory of its own.
 
 ```bash
 release/smoke.sh ./mzm

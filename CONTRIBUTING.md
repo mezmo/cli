@@ -52,7 +52,9 @@ Do this before opening a pull request that does any of the following:
 
 * changes the version in `.bun-version`
 * changes `build.ts`, or anything under `release/`
-* changes the `upgrade` command, or anything under `@mzm/core/update`
+* changes the `upgrade` command, or anything under `@mzm/core/update`. Also run
+  `mzm upgrade --version <an older release>` with a copy of the windows executable, and check
+  that the copy was replaced and still runs
 
 ```bash
 bun run compile:windows

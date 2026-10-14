@@ -5,6 +5,9 @@
 # usage: release/sign-darwin.sh <executable> [executable...]
 #
 # environment:
+#   ADHOC=1               sign without a certificate, with the same hardened runtime and
+#                         entitlements. For builds of code that is not merged, which never get the
+#                         certificate. An ad-hoc signed executable cannot be notarized
 #   APPLE_CERT_P12        location of the Developer ID Application certificate (.p12)
 #   APPLE_CERT_PASSWORD   password of the certificate
 #   SIGNING_KEYCHAIN      location for a keychain that only exists while this runs
@@ -36,9 +39,17 @@ if [ "$#" -eq 0 ]; then
   exit 2
 fi
 
-require APPLE_CERT_P12
-require APPLE_CERT_PASSWORD
-require SIGNING_KEYCHAIN
+if [ "${ADHOC:-}" = 1 ]; then
+  if [ "${NOTARIZE:-}" = 1 ]; then
+    echo 'error: an ad-hoc signed executable cannot be notarized' >&2
+    exit 1
+  fi
+else
+  require APPLE_CERT_P12
+  require APPLE_CERT_PASSWORD
+  require SIGNING_KEYCHAIN
+fi
+
 if [ "${NOTARIZE:-}" = 1 ]; then
   require NOTARY_APPLE_ID
   require NOTARY_PASSWORD
@@ -49,32 +60,41 @@ WORK=$(mktemp -d "${TMPDIR:-/tmp}/mzm-sign-XXXXXX")
 
 cleanup() {
   # the certificate does not outlive the signing
-  security delete-keychain "$SIGNING_KEYCHAIN" 2>/dev/null || true
+  if [ "${ADHOC:-}" != 1 ]; then
+    security delete-keychain "$SIGNING_KEYCHAIN" 2>/dev/null || true
+  fi
   rm -rf "$WORK"
 }
 trap cleanup EXIT
 
-# the keychain is thrown away, and so is its password
-KEYCHAIN_PASSWORD=$(openssl rand -hex 24)
-security create-keychain -p "$KEYCHAIN_PASSWORD" "$SIGNING_KEYCHAIN"
-security set-keychain-settings "$SIGNING_KEYCHAIN"
-security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$SIGNING_KEYCHAIN"
-# shellcheck disable=SC2046
-security list-keychains -d user -s "$SIGNING_KEYCHAIN" $(security list-keychains -d user | sed 's/"//g')
-security import "$APPLE_CERT_P12" -f pkcs12 -k "$SIGNING_KEYCHAIN" -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign
-security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$SIGNING_KEYCHAIN" >/dev/null
+if [ "${ADHOC:-}" = 1 ]; then
+  # no certificate and no keychain. There is no secure timestamp without an identity
+  IDENTITY=-
+  TIMESTAMP=--timestamp=none
+else
+  # the keychain is thrown away, and so is its password
+  KEYCHAIN_PASSWORD=$(openssl rand -hex 24)
+  security create-keychain -p "$KEYCHAIN_PASSWORD" "$SIGNING_KEYCHAIN"
+  security set-keychain-settings "$SIGNING_KEYCHAIN"
+  security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$SIGNING_KEYCHAIN"
+  # shellcheck disable=SC2046
+  security list-keychains -d user -s "$SIGNING_KEYCHAIN" $(security list-keychains -d user | sed 's/"//g')
+  security import "$APPLE_CERT_P12" -f pkcs12 -k "$SIGNING_KEYCHAIN" -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign
+  security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$SIGNING_KEYCHAIN" >/dev/null
 
-IDENTITY=$(security find-identity -v -p codesigning "$SIGNING_KEYCHAIN" | awk '/Developer ID Application/ {print $2; exit}')
-if [ -z "$IDENTITY" ]; then
-  echo 'error: no valid Developer ID Application identity in the keychain' >&2
-  security find-identity -p codesigning "$SIGNING_KEYCHAIN" >&2
-  exit 1
+  IDENTITY=$(security find-identity -v -p codesigning "$SIGNING_KEYCHAIN" | awk '/Developer ID Application/ {print $2; exit}')
+  if [ -z "$IDENTITY" ]; then
+    echo 'error: no valid Developer ID Application identity in the keychain' >&2
+    security find-identity -p codesigning "$SIGNING_KEYCHAIN" >&2
+    exit 1
+  fi
+  TIMESTAMP=--timestamp
 fi
 
 for BIN in "$@"; do
   echo "signing $BIN"
   # replaces the signature the executable was compiled with
-  codesign --force --timestamp --options runtime \
+  codesign --force "$TIMESTAMP" --options runtime \
     --entitlements "$ENTITLEMENTS" \
     --sign "$IDENTITY" \
     "$BIN"

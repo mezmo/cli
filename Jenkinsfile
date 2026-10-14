@@ -34,16 +34,10 @@ pipeline {
     BRANCH_NAME = "${DRY_RUN ? BRANCH_ACTUAL : env.BRANCH_NAME}"
     CHANGE_ID = "${DRY_RUN ? '' : CHANGE_ID}"
     BUILD_TAG = "${BUILD_SLUG}"
-    // bun keeps the runtimes it downloads for cross compiling in ~/.bun by default,
-    // which is shared by every job on the agent
-    BUN_INSTALL_CACHE_DIR = "${WORKSPACE}/.bun/cache"
   }
 
-  tools {
-    nodejs 'NodeJS 22'
-    bun 'Bun 1.4'
-  }
-
+  // Tools are pinned to the stages that use them. Tools declared for the whole pipeline
+  // are also installed for a stage running on another agent, like Darwin, which needs none
   stages {
     stage('Validate PR Source') {
       when {
@@ -56,68 +50,91 @@ pipeline {
         error("A maintainer needs to approve this PR for CI by commenting")
       }
     }
-   
 
-    stage('Install') {
-      steps {
-        sh 'bun --version'
-        sh 'bun install --frozen-lockfile'
+    // Every stage in here gets these tools
+    stage('Linux') {
+      tools {
+        nodejs 'NodeJS 22'
+        bun 'Bun 1.4'
       }
-    }
 
-    stage('Test') {
-      steps {
-        sh 'bun run reports'
+      environment {
+        // bun caches the packages it installs, and the runtimes it downloads to cross
+        // compile, in ~/.bun/install/cache by default. That is shared by every job on the
+        // agent, and the runtimes end up inside the executables that are released.
+        // This one belongs to this build alone, and is removed when the stages are done
+        BUN_INSTALL_CACHE_DIR = "${WORKSPACE}/.bun/cache"
       }
+
+      stages {
+        stage('Install') {
+          steps {
+            sh 'bun --version'
+            sh 'bun install --frozen-lockfile'
+          }
+        }
+
+        stage('Test') {
+          steps {
+            sh 'bun run reports'
+          }
+          post {
+            always {
+              withChecks('Tests') {
+                junit checksName: 'Tests', testResults: 'coverage/test.xml', allowEmptyResults: true
+              }
+              // the html report is only written when genhtml (lcov) is installed on the agent
+              publishHTML target: [
+                allowMissing: true,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'coverage/html',
+                reportFiles: 'index.html',
+                reportName: "coverage-${BUILD_SLUG}"
+              ]
+            }
+          }
+        }
+
+        stage('Release Version') {
+          when {
+            expression { !DRY_RUN }
+          }
+          steps {
+            script {
+              // Empty when nothing on the branch calls for a release
+              env.NEXT_RELEASE_VERSION = sh(
+                script: 'npm run --silent release:version',
+                returnStdout: true
+              ).trim()
+
+              echo env.NEXT_RELEASE_VERSION ? "Release version: ${env.NEXT_RELEASE_VERSION}" : 'No release version determined'
+            }
+          }
+        }
+
+        stage('Build') {
+          steps {
+            // The executables report the version found in release.json. It is
+            // written before package.json is updated for the release, so the
+            // version is handed over. Without one, the version in package.json is used
+            sh 'release/write-info "${NEXT_RELEASE_VERSION:-}"'
+            sh 'bun run compile'
+            sh 'release/smoke.sh ./mzm "${NEXT_RELEASE_VERSION:-}"'
+
+            stash(
+              name: 'release-artifacts',
+              includes: 'dist/**, release.json',
+              allowEmpty: false
+            )
+          }
+        }
+      }
+
       post {
         always {
-          withChecks('Tests') {
-            junit checksName: 'Tests', testResults: 'coverage/test.xml', allowEmptyResults: true
-          }
-          // the html report is only written when genhtml (lcov) is installed on the agent
-          publishHTML target: [
-            allowMissing: true,
-            alwaysLinkToLastBuild: false,
-            keepAll: true,
-            reportDir: 'coverage/html',
-            reportFiles: 'index.html',
-            reportName: "coverage-${BUILD_SLUG}"
-          ]
+          sh 'rm -rf "$BUN_INSTALL_CACHE_DIR"'
         }
-      }
-    }
-
-    stage('Release Version') {
-      when {
-        expression { !DRY_RUN }
-      }
-      steps {
-        script {
-          // Empty when nothing on the branch calls for a release
-          env.NEXT_RELEASE_VERSION = sh(
-            script: 'npm run --silent release:version',
-            returnStdout: true
-          ).trim()
-
-          echo env.NEXT_RELEASE_VERSION ? "Release version: ${env.NEXT_RELEASE_VERSION}" : 'No release version determined'
-        }
-      }
-    }
-
-    stage('Build') {
-      steps {
-        // The executables report the version found in release.json. It is
-        // written before package.json is updated for the release, so the
-        // version is handed over. Without one, the version in package.json is used
-        sh 'release/write-info "${NEXT_RELEASE_VERSION:-}"'
-        sh 'bun run compile'
-        sh 'release/smoke.sh ./mzm "${NEXT_RELEASE_VERSION:-}"'
-
-        stash(
-          name: 'release-artifacts',
-          includes: 'dist/**, release.json',
-          allowEmpty: false
-        )
       }
     }
 
@@ -132,19 +149,29 @@ pipeline {
       }
 
       environment {
-        SIGNING_KEYCHAIN = "/tmp/mzm-signing-${BUILD_SLUG}.keychain-db"
+        // holds the signing certificate while the executables are signed
+        SIGNING_KEYCHAIN = "${WORKSPACE}/signing.keychain-db"
       }
 
       steps {
         unstash 'release-artifacts'
 
-        // As they were compiled, before the signing certificate is anywhere near this machine
         sh 'release/smoke-darwin.sh "${NEXT_RELEASE_VERSION:-}"'
 
         script {
-          // Signed on every build so a problem with signing fails a pull request
-          // rather than a release. Only a release is sent to apple to be notarized
-          def notarize = !DRY_RUN && env.NEXT_RELEASE_VERSION
+          // The certificate is only used on merged code. Anything else is signed ad-hoc
+          // with the same hardened runtime and entitlements, which is what the second
+          // smoke run needs to catch a missing entitlement
+          if (DRY_RUN) {
+            withEnv(['ADHOC=1']) {
+              sh 'release/sign-darwin.sh dist/mzm-darwin-x86_64 dist/mzm-darwin-aarch64'
+            }
+            return
+          }
+
+          // Every build of main is signed, so a problem with the certificate shows up
+          // when a change is merged rather than at release. Only a release is notarized
+          def notarize = env.NEXT_RELEASE_VERSION ? true : false
           def credentials = [
             certificate(
               credentialsId: 'apple-signing-certificate',
@@ -154,7 +181,9 @@ pipeline {
           ]
 
           if (notarize) {
-            credentials.add(string(credentialsId: 'apple-notarytool-password', variable: 'NOTARY_PASSWORD'))
+            credentials.add(
+              string(credentialsId: 'apple-notarytool-password', variable: 'NOTARY_PASSWORD')
+            )
           }
 
           withCredentials(credentials) {
@@ -169,7 +198,7 @@ pipeline {
           }
         }
 
-        // What is released. The hardened runtime they are signed with is in effect here
+        // As they are released (or would be). The hardened runtime is in effect here
         sh 'release/smoke-darwin.sh "${NEXT_RELEASE_VERSION:-}"'
 
         stash(
@@ -188,6 +217,11 @@ pipeline {
     }
 
     stage ('Release') {
+      // semantic-release. Bun is not needed once the executables are built
+      tools {
+        nodejs 'NodeJS 22'
+      }
+
       steps {
         // replaces the macos executables in dist with the signed ones
         unstash 'darwin-artifacts'
