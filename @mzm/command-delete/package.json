@@ -6,7 +6,6 @@
   "exports": "./mod.ts",
   "license": "MIT",
   "dependencies": {
-    "@mzm/core": "workspace:*",
-    "@std/path": "npm:@jsr/std__path@^1.1.3"
+    "@mzm/core": "workspace:*"
   }
 }

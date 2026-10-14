@@ -1,17 +1,16 @@
-import {MZMCommand, EnumType, colors} from '@mzm/core'
+import {debuglog} from 'node:util'
+import {MZMCommand, EnumType, colors, pprint} from '@mzm/core'
 import type {RequestError} from '@mzm/core'
 import {WebsocketProtocol as PROTOCOL, Socket} from './web-socket.ts'
 import {AuthorizationError} from '@mzm/core/error'
 import type {SocketOptions} from './web-socket.ts'
 import {storage} from '@mzm/config'
-import {pprint} from '@mzm/log'
 import {toArray} from '@mzm/core/lang'
+import {WINDOWS} from '@mzm/core/platform'
 import {DELEGATE_HEADER, delegateAccount} from '@mzm/core/resource/auth'
-import {getLogger} from '@mzm/log'
 
-const log = getLogger('default')
+const debug = debuglog('core:command:log:tail')
 const OutputFormat = new EnumType(['json', 'pretty'])
-const WINDOWS = Deno.build.os === 'windows'
 function messageCallback(event: CustomEvent) {
   const payload = JSON.parse(event.detail.data)
   // ignore meta message
@@ -23,8 +22,8 @@ function closeCallback(event: CustomEvent) {
   // Normal-ish
   if (event.detail.code === 1005 || event.detail.code === 1000) return
 
-  log.error('lost connection')
-  log.error(`[${event.detail.code}]: ${event.detail.reason}`)
+  console.error('lost connection')
+  console.error(`[${event.detail.code}]: ${event.detail.reason}`)
 }
 
 const tail = new MZMCommand()
@@ -56,7 +55,7 @@ const tail = new MZMCommand()
     )
     const STREAM_HOST = await storage.getOne('core.host.stream')
     const headers = new Headers()
-    log.debug(`stream host: ${STREAM_HOST}`)
+    debug('stream host: %s', STREAM_HOST)
 
     // TODO(esatterwhite): to remove when IAM key support lands on livetail
     const tail_params: SocketOptions = {
@@ -78,10 +77,10 @@ const tail = new MZMCommand()
         options.app = view.apps
       } catch (err) {
         const error = err as RequestError
-        log.error('Unable to retrieve views')
+        console.error('Unable to retrieve views')
         console.dir(err)
         //@ts-ignore these errors are mostly defined as unknown
-        return log.error(`[${error.response?.data?.code}] ${error.response?.data.error}`)
+        return console.error(`[${error.response?.data?.code}] ${error.response?.data.error}`)
       }
     }
 
@@ -104,25 +103,25 @@ const tail = new MZMCommand()
     )
 
     ws.addEventListener('open', () => {
-      log.info(`web socket connected: ${STREAM_HOST}`)
+      debug('web socket connected: %s', STREAM_HOST)
     })
 
     ws.addEventListener('message', messageCallback as EventListener)
     ws.addEventListener('close', closeCallback as EventListener)
 
     ws.addEventListener('error', () => {
-      log.error('error encountered')
+      console.error('error encountered')
     })
 
-    if (!WINDOWS) Deno.addSignalListener('SIGTERM', () => {
+    if (!WINDOWS) process.on('SIGTERM', () => {
       ws.close()
     })
 
-    Deno.addSignalListener('SIGINT', () => {
+    process.on('SIGINT', () => {
       ws.close()
     })
 
-    Deno.addSignalListener('SIGHUP', () => {
+    process.on('SIGHUP', () => {
       ws.close()
     })
 

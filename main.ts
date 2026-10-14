@@ -2,8 +2,11 @@ import * as fs from 'node:fs/promises'
 import {debuglog, format} from 'node:util'
 import {CompletionsCommand, MZMCommand, Table, Cell, colors} from '@mzm/core'
 import {info} from '@mzm/core/release'
+import {LogCommand} from '@mzm/command-log'
 import {ConfigCommand} from '@mzm/command-config'
 import GetCommand from '@mzm/command-get'
+import CreateCommand from '@mzm/command-create'
+import DeleteCommand from '@mzm/command-delete'
 import EditCommand from '@mzm/command-edit'
 import SetCommand from '@mzm/command-set'
 import AskCommand from '@mzm/command-ask'
@@ -50,7 +53,6 @@ if (import.meta.main) {
       })
   }
 
-  // create, delete and log are added back as their packages are converted to bun
   const cmd = new MZMCommand()
     .globalOption('--account <account:string>', 'Run the command as a specific account (enterprise access keys)')
     .globalEnv(
@@ -80,8 +82,11 @@ if (import.meta.main) {
     .command('ask', AskCommand)
     .command('completions', new CompletionsCommand())
     .command('config', ConfigCommand)
+    .command('create', CreateCommand)
+    .command('delete', DeleteCommand)
     .command('edit', EditCommand)
     .command('get', GetCommand)
+    .command('log', LogCommand)
     .command('set', SetCommand)
     .command('upgrade', upgrade)
     .command('version', VersionCommand)

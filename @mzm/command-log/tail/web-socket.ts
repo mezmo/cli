@@ -1,3 +1,8 @@
+import {info} from '@mzm/core/release'
+
+const {version} = info()
+const USER_AGENT = `@mzm-cli/${version}`
+
 export enum WebsocketProtocol {
   JSON = 'json',
   XML = 'xml',
@@ -19,7 +24,7 @@ export class Socket extends EventTarget {
   connected: boolean = false
   controller: AbortController
   headers: Headers
-  reconnect_timer: number | undefined
+  reconnect_timer: ReturnType<typeof setTimeout> | undefined
   reconnect_delay: number = 2000
   json: boolean = false
   constructor(
@@ -35,10 +40,7 @@ export class Socket extends EventTarget {
     this.headers = extra_headers
     this.json = json
 
-    // workaround for duplicate header problemA
-    // SEE https://github.com/denoland/deno/issues/26866
-    this.headers.set('X-User-Agent', '@mzm-cli/0.0.0')
-    this.headers.set('User-Agent', '@mzm-cli/0.0.0')
+    this.headers.set('User-Agent', USER_AGENT)
 
     if (protocols) this.protocols = protocols
 
@@ -52,7 +54,7 @@ export class Socket extends EventTarget {
 
   open() {
     this.ws = new WebSocket(this.url.toString(), {
-      headers: this.headers
+      headers: Object.fromEntries(this.headers)
     })
     this.ws.addEventListener('open', this.onOpen.bind(this))
     this.ws.addEventListener('close', this.onClose.bind(this))

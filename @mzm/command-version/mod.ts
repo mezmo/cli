@@ -1,4 +1,4 @@
-import {EOL} from '@std/fs'
+import {EOL} from 'node:os'
 import {parse} from '@std/semver'
 import {difference} from '@std/datetime'
 import {ResourceCommand} from '@mzm/core'

@@ -1,4 +1,4 @@
-import {EOL} from '@std/fs'
+import {EOL} from 'node:os'
 import * as remote from '@mzm/core/remote'
 import {MZMCommand, EditFormat} from '@mzm/core'
 import ViewCommand from './view/command.ts'

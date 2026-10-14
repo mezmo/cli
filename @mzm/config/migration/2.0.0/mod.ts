@@ -1,7 +1,5 @@
-// deno-coverage-ignore-file
 import type {Database} from 'bun:sqlite'
 
-// deno-lint-ignore require-await
 export async function up(context: any) {
   const db: Database = context.db as Database
   db.exec(`
@@ -28,7 +26,6 @@ export async function up(context: any) {
   `)
 }
 
-// deno-lint-ignore require-await
 export async function down(context: any) {
   const db: Database = context.db as Database
   db.exec(`

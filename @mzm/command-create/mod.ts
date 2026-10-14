@@ -1,8 +1,7 @@
+import * as fs from 'node:fs/promises'
 import {EOL} from 'node:os'
-import {join, isAbsolute} from '@std/path'
+import * as path from 'node:path'
 import {MZMCommand, ValidationError} from '@mzm/core'
-import {default as resource} from '@mzm/core/resource'
-import {parse, type IResourceTemplate} from '@mzm/core/resource'
 import * as remote from '@mzm/core/remote'
 
 import ViewCommand from './view/mod.ts'
@@ -25,9 +24,8 @@ export default new MZMCommand()
     if (typeof options.file !== 'string') {
       throw new ValidationError('file option is required and must be a string;')
     }
-    const file: string = options.file
-    const location: string = isAbsolute(file) ? options.file : join(Deno.cwd(), file)
-    const content = await Deno.readTextFile(location)
+    const location: string = path.resolve(options.file)
+    const content = await fs.readFile(location, 'utf8')
     const result: ResourceResponse = await remote.applyTemplate(content)
     console.log(result.pk)
   })

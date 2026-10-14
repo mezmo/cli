@@ -22,7 +22,7 @@ function valueType ({label, name, value}: ArgumentValue): JSValue {
 const set = new MZMCommand()
   .name('set')
   .type('configvalue', valueType)
-  .example('Set a specific configuration value:', 'mzm config set core.log.level DEBUG')
+  .example('Set a specific configuration value:', 'mzm config set search.page.limit 100')
   .description('set one or more configuration values')
   .arguments('<key:string> <value:configvalue>')
   .action(async function (_, key: string, value: JSValue) {
