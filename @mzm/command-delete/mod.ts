@@ -1,5 +1,6 @@
+import * as fs from 'node:fs/promises'
 import {EOL} from 'node:os'
-import * as path from '@std/path'
+import * as path from 'node:path'
 import {MZMCommand, ValidationError} from '@mzm/core'
 import {default as resource} from '@mzm/core/resource'
 import {parse} from '@mzm/core/resource'
@@ -18,9 +19,8 @@ export default new MZMCommand()
     if (typeof options.file !== 'string') {
       throw new ValidationError('file option is required and must be a string;')
     }
-    const file: string = options.file
-    const location: string = path.isAbsolute(file) ? options.file : path.join(Deno.cwd(), file)
-    const content = await Deno.readTextFile(location)
+    const location: string = path.resolve(options.file)
+    const content = await fs.readFile(location, 'utf8')
     const definition = parse(content)
 
     if (!definition) return

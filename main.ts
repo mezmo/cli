@@ -1,3 +1,4 @@
+import * as fs from 'node:fs/promises'
 import {debuglog, format} from 'node:util'
 import {CompletionsCommand, MZMCommand, Table, Cell, colors} from '@mzm/core'
 import {info} from '@mzm/core/release'
@@ -37,19 +38,18 @@ const upgrade = new GithubReleasesUpgradeCommand({
     }
   })
 })
-// Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   const previous_version: string | null = await storage.getOne('upgrade.cleanup.file') as string | null
   if (previous_version) {
     debug('previous version cleanup: %s', previous_version)
-    Deno
-      .remove(previous_version)
-      .catch((error) => {
+    fs
+      .rm(previous_version)
+      .catch((error: unknown) => {
         debug('unable to remove previous version', error)
       })
       .finally(() => {
-        return storage.unset('upgrade.cleanup.file')
         debug('previous version cleanup complete')
+        return storage.unset('upgrade.cleanup.file')
       })
   }
 
@@ -62,7 +62,7 @@ if (import.meta.main) {
     )
     .globalAction(function (options: {account?: string}) {
       // the flag takes precedence over the environment variable
-      if (options.account) Deno.env.set('MZM_ACCOUNT_ID', options.account)
+      if (options.account) process.env.MZM_ACCOUNT_ID = options.account
     })
     .action(function () {
       const output = new Table().padding(8)
@@ -92,14 +92,14 @@ if (import.meta.main) {
     .command('version', VersionCommand)
 
   try {
-    await cmd.parse(Deno.args)
+    await cmd.parse(process.argv.slice(2))
   } catch (err: any) {
-    if (debug.enabled) console.dir(err)
+    debug('%O', err)
 
     cmd.showHelp()
     if (err.cause?.help) {
       console.error(String(err))
-      Deno.exitCode = err.exit_code ?? 1
+      process.exitCode = err.exit_code ?? 1
     } else {
       throw err
     }

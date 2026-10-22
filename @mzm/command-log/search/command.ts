@@ -2,14 +2,12 @@
 //TODO(esatterwhite): move views functions to core/resource
 import {EOL} from 'node:os'
 import {debuglog} from 'node:util'
-import {MZMCommand, EnumType} from '@mzm/core'
+import {MZMCommand, EnumType, pprint} from '@mzm/core'
 import {toArray, date} from '@mzm/core/lang'
 import {client} from '@mzm/core/resource'
-import {pprint, getLogger} from '@mzm/log';
+import {WINDOWS} from '@mzm/core/platform'
 import {storage} from '@mzm/config'
 
-const WINDOWS = Deno.build.os === 'windows'
-const log = getLogger('default')
 const debug = debuglog('core:command:log:search')
 const StartPrefernce = new EnumType(['head', 'tail'])
 const OutputFormat = new EnumType(['json', 'pretty'])
@@ -106,8 +104,8 @@ const search = new MZMCommand()
         options.level = view.levels
         options.app = view.apps
       } catch (err) {
-        log.error('Unable to retrieve views')
-        return log.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
+        console.error('Unable to retrieve views')
+        return console.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
       }
     }
 
@@ -131,15 +129,15 @@ const search = new MZMCommand()
 
     const controller = new AbortController()
 
-    if (!WINDOWS) Deno.addSignalListener('SIGTERM', () => {
+    if (!WINDOWS) process.on('SIGTERM', () => {
       controller.abort()
     })
 
-    Deno.addSignalListener('SIGINT', () => {
+    process.on('SIGINT', () => {
       controller.abort()
     })
 
-    Deno.addSignalListener('SIGHUP', () => {
+    process.on('SIGHUP', () => {
       controller.abort()
     })
 
@@ -176,9 +174,9 @@ const search = new MZMCommand()
         for (const line of lines) console.log(pprint(line, options.output === 'json'))
         if (!options.all || !pagination_id) controller.abort()
       } catch (err) {
-        log.error('Unable to retrieve search results')
+        console.error('Unable to retrieve search results')
         debug(err)
-        return log.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
+        return console.error(`[${err.response?.data?.code}] ${err.response?.data.error}`)
       }
     } while (!controller.signal.aborted && params.pagination_id)
   })

@@ -1,11 +1,17 @@
 #!/usr/bin/env node
 'use strict'
 
+// usage: release/write-info [version]
+//
+// The version is passed when the executables are compiled before package.json
+// has been updated for the release. It defaults to the version in package.json
+
 const path = require('node:path')
 const fs = require('node:fs/promises')
 const pkg = require('../package.json')
 
-const info = {release_date: new Date().toISOString(), version: pkg.version}
+const version = process.argv[2] || pkg.version
+const info = {release_date: new Date().toISOString(), version: version}
 const location = path.join(__dirname, '..', 'release.json')
 const content = JSON.stringify(info, null, 2)
 console.log('writing version info %s %j', location, info)

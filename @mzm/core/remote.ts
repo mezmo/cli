@@ -1,14 +1,17 @@
-import {join} from '@std/path'
+import * as fs from 'node:fs/promises'
+import {tmpdir} from 'node:os'
+import {join} from 'node:path'
 import {ulid} from '@std/ulid'
 import {colors} from '@cliffy/ansi/colors'
 import {GenericError} from './error.ts'
 import resource, {parse, stringify, type StringifyFormat} from './resource/mod.ts'
 import type {IResourceTemplate} from './resource/types.ts'
+import {WINDOWS} from './platform.ts'
 
-const DEFAULT_EDITOR: string = Deno.build.os == 'windows' ? 'notepad.exe' : 'vi'
+const DEFAULT_EDITOR: string = WINDOWS ? 'notepad.exe' : 'vi'
 
 export async function load(version: string, type: string, identifier: string, format: StringifyFormat): Promise<string> {
-    const editor = Deno.env.get('EDITOR') ?? DEFAULT_EDITOR
+    const editor = process.env.EDITOR ?? DEFAULT_EDITOR
 
    //@ts-ignore work around for array index typing
     const api_version = resource[version]
@@ -19,63 +22,53 @@ export async function load(version: string, type: string, identifier: string, fo
     const fn = module.get
 
     const spec = new Spec(await fn(identifier))
-    const dirname = await Deno.makeTempDir({prefix: 'mzm-edit'})
+    const dirname = await fs.mkdtemp(join(tmpdir(), 'mzm-edit'))
     const tmpfile = join(dirname,`${type}.${ulid()}.${format}`)
 
-    await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
     const source = spec.toTemplate()
-    await file.write(new TextEncoder().encode(stringify(source, format)))
+    await Bun.write(tmpfile, stringify(source, format))
 
-    file[Symbol.dispose]()
-
-    const cmd = new Deno.Command(editor, {
-      args: [tmpfile]
-    , stdout: 'inherit'
+    const child = Bun.spawn([editor, tmpfile], {
+      stdout: 'inherit'
     , stderr: 'inherit'
     , stdin: 'inherit'
     })
 
-    const process = cmd.spawn()
-    const status = await process.status
-    if (status.code !== 0) throw GenericError.from(
+    const code = await child.exited
+    if (code !== 0) throw GenericError.from(
       'Unable to save resource file'
     , `Make sure the directory ${dirname} accessible and can be written to`
     , {code: 'ENOIO'}
     )
-    const content = await Deno.readTextFile(tmpfile)
-    await Deno.remove(tmpfile)
+    const content = await Bun.file(tmpfile).text()
+    await fs.rm(tmpfile)
     return content
 }
 
 export async function fromString(content: string, format?: StringifyFormat, file_name: string = 'from-string'): Promise<string> {
-  const editor = Deno.env.get('EDITOR') ?? DEFAULT_EDITOR
+  const editor = process.env.EDITOR ?? DEFAULT_EDITOR
 
-  //@ts-ignore work around for array index typing
-  const dirname = await Deno.makeTempDir({prefix: 'mzm-staging'})
+  const dirname = await fs.mkdtemp(join(tmpdir(), 'mzm-staging'))
   const tmpfile = join(dirname,`${file_name}.${ulid()}.${format}`)
 
-  await using file: Deno.FsFile = await Deno.open(tmpfile, {write: true, createNew: true})
   //TODO(esatterwhite): this should throw if we can't parse it
   const transformed: string = format === 'json' ? stringify(parse(content) ?? {}, format) : content
-  await file.write(new TextEncoder().encode(transformed))
-  file[Symbol.dispose]()
+  await Bun.write(tmpfile, transformed)
 
-  const cmd = new Deno.Command(editor, {
-    args: [tmpfile]
-  , stdout: 'inherit'
+  const child = Bun.spawn([editor, tmpfile], {
+    stdout: 'inherit'
   , stderr: 'inherit'
   , stdin: 'inherit'
   })
 
-  const process = cmd.spawn()
-  const status = await process.status
-  if (status.code !== 0) throw GenericError.from(
+  const code = await child.exited
+  if (code !== 0) throw GenericError.from(
     'Unable to save resource file'
   , `Make sure the directory ${dirname} accessible and can be written to`
   , {code: 'ENOIO'}
   )
-  const output = await Deno.readTextFile(tmpfile)
-  await Deno.remove(tmpfile)
+  const output = await Bun.file(tmpfile).text()
+  await fs.rm(tmpfile)
   return output
 }
 

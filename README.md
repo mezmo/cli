@@ -155,6 +155,34 @@ sudo mv mzm-linux-aarch64 /usr/local/bin/mzm
 # Download mzm-windows-x86_64.exe and add to PATH
 ```
 
+#### System requirements
+
+| Platform | Requirement |
+|---|---|
+| macOS | 13.0 or later, Apple Silicon or Intel |
+| Linux | x86_64 or ARM64 with glibc 2.17 or later. Alpine and other musl based distributions are not supported |
+| Windows | Windows 10 version 1809 or later, x86_64 |
+
+Versions before 3.0.0 run on older systems. If you are on one of those systems, or upgraded and
+the new version does not start, install the last 2.x release. Replace the file name with the one
+for your platform:
+
+```bash
+curl -LO https://github.com/mezmo/cli/releases/download/v2.1.0/mzm-darwin-x86_64
+```
+
+#### Notes for Windows
+
+The Windows executable is not signed. When it is downloaded with a browser, Windows SmartScreen
+may stop it the first time it is run with "Windows protected your PC". Choose **More info**, then
+**Run anyway**.
+
+#### Notes for macOS
+
+The macOS executables are signed and notarized. The settings file is a SQLite database opened with
+the copy of SQLite that ships with macOS, which leaves `mzm.cfg-wal` and `mzm.cfg-shm` beside
+`~/.config/mezmo/mzm.cfg`. That is expected, and they should be left alone.
+
 ### Option 2: Build from Source
 
 ```bash
@@ -162,25 +190,31 @@ sudo mv mzm-linux-aarch64 /usr/local/bin/mzm
 git clone https://github.com/mezmo/cli.git
 cd cli
 
-# Install Deno if not already installed
-curl -fsSL https://deno.land/install.sh | sh
+# Install bun if not already installed. The version to use is in .bun-version
+curl -fsSL https://bun.com/install | bash -s "bun-v$(cat .bun-version)"
+
+# Install dependencies
+bun install
 
 # Compile the CLI for your platform
-deno task compile:local
+bun run compile:local
 
 # Move binary to PATH
 sudo mv mzm /usr/local/bin/
 ```
 
-### Option 3: Run with Deno (Development)
+### Option 3: Run with Bun (Development)
 
 ```bash
 # Clone the repository
 git clone https://github.com/mezmo/cli.git
 cd cli
 
-# Run directly with Deno
-deno task local <command> [options]
+# Install dependencies
+bun install
+
+# Run directly with bun
+bun run local <command> [options]
 ```
 
 ## Configuration
@@ -454,8 +488,8 @@ done
 ## Development
 
 ### Prerequisites
-- Deno 2.0+
-- Node.js 18+ (for release management)
+- [Bun](https://bun.com) at the version found in `.bun-version`
+- Node.js 22+ (for release management)
 
 ### Setup Development Environment
 ```bash
@@ -463,43 +497,65 @@ done
 git clone https://github.com/mezmo/cli.git
 cd cli
 
-# Install dependencies (Deno downloads automatically)
-deno cache main.ts
+# Install dependencies
+bun install
 
 # Run tests
-deno task test
+bun run test
 
 # Generate coverage reports
-deno task reports
+bun run reports
 
-# Run locally with environment variables
-deno task local <command>
+# Run locally with environment variables loaded from env/local.env
+bun run local <command>
 ```
 
 ### Building
 
+Every executable is compiled on the machine doing the build, whatever its operating system.
+
 ```bash
-# Build all platforms
-deno task compile
+# Build all platforms into dist/, plus ./mzm for this machine
+bun run compile
 
 # Build specific platform
-deno task compile:linux:x86
-deno task compile:osx:arm
-deno task compile:windows
+bun run compile:linux:x86
+bun run compile:linux:arm
+bun run compile:osx:x86
+bun run compile:osx:arm
+bun run compile:windows
 
 # Build for local testing
-deno task compile:local
+bun run compile:local
 ```
+
+An executable reads nothing from the directory it is run from. A `.env` or `bunfig.toml` found
+there is ignored.
+
+### Checking an executable
+
+`release/smoke.sh` checks that a compiled executable runs on the machine it is run on: it starts,
+reports the expected version, and opens its settings with that system's SQLite. It uses a home
+directory of its own.
+
+```bash
+release/smoke.sh ./mzm
+
+# the windows executable can be run from WSL
+release/smoke.sh dist/mzm-windows-x86_64.exe
+```
+
+### Testing
 
 ```bash
 # Run all tests
-deno task test
+bun run test
 
 # Run with coverage
-deno task reports
+bun run reports
 
 # Run specific test file
-deno test @mzm/core/error.test.ts
+bun test @mzm/core/error.test.ts
 ```
 
 

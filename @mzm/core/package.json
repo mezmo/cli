@@ -1,0 +1,37 @@
+{
+  "name": "@mzm/core",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./mod.ts",
+    "./assets": "./assets.ts",
+    "./release": "./release.ts",
+    "./lang": "./lang/mod.ts",
+    "./resource": "./resource/mod.ts",
+    "./resource/auth": "./resource/auth.ts",
+    "./resource/types": "./resource/types.ts",
+    "./error": "./error.ts",
+    "./platform": "./platform.ts",
+    "./remote": "./remote.ts",
+    "./update": "./update/mod.ts",
+    "./update/providers": "./update/providers/mod.ts"
+  },
+  "dependencies": {
+    "@anitrend/request-client": "npm:@jsr/anitrend__request-client@^0.1.5",
+    "@cliffy/ansi": "npm:@jsr/cliffy__ansi@^1.3.1",
+    "@cliffy/command": "npm:@jsr/cliffy__command@^1.3.1",
+    "@cliffy/prompt": "npm:@jsr/cliffy__prompt@^1.3.1",
+    "@cliffy/table": "npm:@jsr/cliffy__table@^1.3.1",
+    "@cliffy/upgrade": "npm:@jsr/cliffy__upgrade@^1.3.1",
+    "@mzm/config": "workspace:*",
+    "@std/assert": "npm:@jsr/std__assert@^1.0.15",
+    "@std/datetime": "npm:@jsr/std__datetime@^0.225.5",
+    "@std/jsonc": "npm:@jsr/std__jsonc@^1.0.2",
+    "@std/semver": "npm:@jsr/std__semver@^1.0.7",
+    "@std/text": "npm:@jsr/std__text@^1.0.16",
+    "@std/ulid": "npm:@jsr/std__ulid@^1.0.0",
+    "@std/yaml": "npm:@jsr/std__yaml@^1.0.10",
+    "chrono-node": "^2.9.0"
+  }
+}

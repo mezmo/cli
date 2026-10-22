@@ -1,25 +1,38 @@
-
+import {Database} from 'bun:sqlite'
 import type {
-  DatabaseSync
-, StatementSync
-, SQLOutputValue
-, SQLInputValue
-, StatementResultingChanges
-} from 'node:sqlite'
+  Statement
+, SQLQueryBindings
+, Changes
+} from 'bun:sqlite'
 
-type QueryParams = Array<SQLInputValue> | Array<Record<string, SQLInputValue>>
+export type SQLOutputValue = string | number | bigint | boolean | null | Uint8Array
+type QueryParams = Array<SQLQueryBindings>
 
 type QueryEngine = {
-  query: StatementSync // prepared statement
+  query: Statement // prepared statement
 , values: (...arg1: QueryParams) => QueryEngine // set value parameters
-, run: () => StatementResultingChanges // run a query that doesn't return rows (DML)
+, run: () => Changes // run a query that doesn't return rows (DML)
 , get: (...values: QueryParams) => Record<string, SQLOutputValue> | undefined // get first row
 , all: (...values: QueryParams) => Array<Record<string, SQLOutputValue>> // return many rows
 }
 
-type StringTemplate = (arg1: TemplateStringsArray, ...arg2: Array<SQLInputValue>) => QueryEngine
+type StringTemplate = (arg1: TemplateStringsArray, ...arg2: QueryParams) => QueryEngine
 
-export function SQL(db: DatabaseSync): StringTemplate {
+/**
+ * Opens a sqlite database with the settings the rest of the application expects
+ * @param file - location of the database file. It is created when it does not exist
+ */
+export function connect(file: string): Database {
+  // strict allows named parameters to be passed with out a prefix - {name: 'value'}
+  const db = new Database(file, {strict: true})
+
+  // sqlite does not enforce foreign keys unless asked to for each connection.
+  // node:sqlite, which releases built on deno used, asked by default
+  db.run('PRAGMA foreign_keys = ON')
+  return db
+}
+
+export function SQL(db: Database): StringTemplate {
   return function(strings: TemplateStringsArray, ...values: QueryParams): QueryEngine {
     const sql = strings.join('?')
     try {
@@ -31,23 +44,19 @@ export function SQL(db: DatabaseSync): StringTemplate {
           return this
         }
 
-      , run(): StatementResultingChanges {
-          //@ts-ignore ignore polymorphic warnings
+      , run(): Changes {
           return stmt.run(...values)
         }
 
       , get(...vals: QueryParams): Record<string, SQLOutputValue> | undefined {
-          //@ts-ignore ignore polymorphic warnings
           const inputs = vals.length ? vals : values
-          //@ts-ignore ignore polymorphic warnings
-          return stmt.get(...inputs)
+          // bun returns null when there is no matching row
+          return (stmt.get(...inputs) as Record<string, SQLOutputValue> | null) ?? undefined
         }
 
       , all(...vals: QueryParams): Array<Record<string, SQLOutputValue>> {
-          //@ts-ignore ignore polymorphic warnings
           const inputs = vals.length ? vals : values
-          //@ts-ignore ignore polymorphic warnings
-          return stmt.all(...inputs)
+          return stmt.all(...inputs) as Array<Record<string, SQLOutputValue>>
         }
       }
     } catch (err) {

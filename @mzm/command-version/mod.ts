@@ -1,4 +1,4 @@
-import {EOL} from '@std/fs'
+import {EOL} from 'node:os'
 import {parse} from '@std/semver'
 import {difference} from '@std/datetime'
 import {ResourceCommand} from '@mzm/core'
@@ -28,7 +28,7 @@ export default new ResourceCommand('version')
   .column({name: 'AGE', property: 'date', render: renderAge})
   .example('print version information', 'mzm version')
   .example('print version information in json format', 'mzm version -o json')
-  .example('print version information in yaml format', 'mzm version -o json')
+  .example('print version information in yaml format', 'mzm version -o yaml')
   .action(function(options: any) {
     const version_info = info()
     if (options.quiet) return console.log(version_info.version)

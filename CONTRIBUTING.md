@@ -25,6 +25,55 @@ proposing a change.
 
 Thank you for your contributions; we appreciate you!
 
+## Building
+
+The command is built with [Bun](https://bun.com). The version it is expected
+to be built with is found in `.bun-version`.
+
+```bash
+bun install            # install dependencies
+bun run test           # run the tests
+bun run local -- help  # run from source
+bun run compile:local  # compile ./mzm for your machine
+bun run compile        # compile every platform into dist/
+```
+
+Every platform is compiled on linux by the build, which means most of the executables
+cannot be run where they are made. Each build makes up for that in a few ways:
+
+* The linux executable is run through `release/smoke.sh`
+* The macOS executables are run on a mac, as compiled and again after they are signed
+* The windows executable is **not run by the build**
+
+### Changes that need a run on windows
+
+Until the build has a way to run the windows executable, it has to be done by hand.
+Do this before opening a pull request that does any of the following:
+
+* changes the version in `.bun-version`
+* changes `build.ts`, or anything under `release/`
+* changes the `upgrade` command, or anything under `@mzm/core/update`. Also run
+  `mzm upgrade --version <an older release>` with a copy of the windows executable, and check
+  that the copy was replaced and still runs
+
+```bash
+bun run compile:windows
+
+# from WSL
+release/smoke.sh dist/mzm-windows-x86_64.exe
+
+# from Git Bash on windows
+release/smoke.sh dist/mzm-windows-x86_64.exe
+```
+
+Include the output in the pull request.
+
+### Upgrading bun
+
+The version of bun used for a release is the one set up as a tool on the build server.
+`.bun-version` records that version, so everyone knows what to expect. Change it in a pull
+request of its own when the tool changes.
+
 ## License
 
 Note that we use a standard [MIT](./LICENSE) license on this repo.

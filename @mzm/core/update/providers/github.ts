@@ -1,3 +1,6 @@
+import * as fs from 'node:fs/promises'
+import {tmpdir} from 'node:os'
+import * as path from 'node:path'
 import {debuglog} from 'node:util'
 import {storage} from '@mzm/config'
 import {date} from '@mzm/core/lang'
@@ -5,9 +8,13 @@ import {colors} from '@mzm/core'
 import {equals as semverEqual, parse, compare, tryParse, format} from '@std/semver'
 import {Table, Cell, type RowType} from '@cliffy/table'
 import {ValidationError} from '@cliffy/command'
-import {Provider} from "@cliffy/command/upgrade"
-import type {GithubProviderOptions} from "@cliffy/command/upgrade/provider/github"
-import {GenericError, NotFoundError} from '../../error.ts'
+import {Provider} from '@cliffy/upgrade'
+import type {GithubProviderOptions} from '@cliffy/upgrade/provider/github'
+import {CommunicationError, GenericError, NotFoundError} from '../../error.ts'
+import {os, arch, isCompiled, type OS, type Arch} from '../../platform.ts'
+import {download, isExecutable} from '../download.ts'
+import {swap} from '../swap.ts'
+import {verify} from '../verify.ts'
 import {
   createClient
 , RequestClient
@@ -17,12 +24,10 @@ import {
 
 const debug = debuglog('core:command:upgrade:provider')
 const DEFAULT_DOWNLOAD_TIMEOUT = 1000 * 60 * 5
-type CurrentOS = typeof Deno.build.os
-type CurrentArch = typeof Deno.build.arch
 
 type AssetMap = {
-  [OS in CurrentOS]?: {
-    [ARCH in CurrentArch]: string | null
+  [OS_NAME in OS]?: {
+    [ARCH_NAME in Arch]: string | null
   }
 }
 
@@ -91,41 +96,6 @@ export class GHError extends Error {
 function noopComplete(_meta: OnCompleteMetadata, _cb: OnCompleteFinalCallback): void {}
 function noopError(_error: Error): void {}
 
-async function swap(old_file: string, new_file: string, version: string): Promise<void> {
-
-  // On windows you cannot remove a file while it is running
-  // We can rename, and remove later
-  if (Deno.build.os === 'windows') {
-    const target_file = `${old_file}.${version}`
-    debug('windows file swap', {old_file, new_file})
-    await Deno.rename(old_file, target_file)
-    debug('file renamed %s', target_file)
-
-    // attempt to make the file hidden
-    const command = new Deno.Command('cmd', {
-      args: ['/c', 'attrib', '+h', target_file]
-    })
-
-    // its ok if this fails
-    await Promise.allSettled([command.output()])
-
-    // the command entry point attempts to remove this file on the next run
-    await storage.set('upgrade.cleanup.file', target_file)
-    debug('store previous file location %s', target_file)
-    debug('windows executable swap complete')
-  } else {
-    await Deno.remove(old_file)
-  }
-
-  // copy tmp file to <file>
-  // moving / and $HOME likely spans devices, which makes simple rename not possible
-  // poor mans mv (copy + remove)
-  debug(`copy %s to %s`, new_file, old_file)
-  await Deno.copyFile(new_file, old_file)
-
-  // its not terribly important that the temp file is removed
-  await Promise.allSettled([Deno.remove(new_file)])
-}
 export default class GithubReleaseProvider extends Provider {
   name: string = "GithubReleaseProvider"
   spinner: boolean = true
@@ -160,6 +130,11 @@ export default class GithubReleaseProvider extends Provider {
     , timeout: 1000 * 60 * 10
     , responseType: 'json'
     })
+  }
+
+  // here to appease the abstract class implementation. not used for anything
+  hasRequiredPermissions(): Promise<boolean> {
+    return Promise.resolve(true)
   }
 
   // this is here to appease the abstract class implementation
@@ -225,39 +200,76 @@ export default class GithubReleaseProvider extends Provider {
     // user input is string, us resolving a version from latest is ReleaseMetadata
     const to = typeof options.to === 'string' ? options.to : options.to.tag
     const from = options.from
-    const {os, arch} = Deno.build
-    const running_bin = await Deno.realPath(Deno.execPath())
+    const running_bin = await fs.realpath(process.execPath)
     // HACK: The calling parent is a top level function that expectes this to be a string
     // And there is no way to change it
     options.to = to
 
     debug('%o', {to, from, os, arch})
-    if (Deno.execPath().endsWith('deno')) {
+    if (!isCompiled()) {
       throw GenericError.from('In-Place upgrade is only supported for compiled binaries')
     }
 
-    const os_map = this.asset_map[os]
+    const os_map = this.asset_map[os as OS]
     if (!os_map) throw GenericError.from(`unsupported os: ${os}`)
 
-    const asset_name = os_map[arch]
+    const asset_name = os_map[arch as Arch]
     if (!asset_name) throw GenericError.from(`unsupported architecture [${arch}] on ${os}`)
 
     try {
       const timeout = parseInt(await storage.getOne('core.upgrade.timeout') as string)
-      const tmp_file = await Deno.makeTempFile({prefix: 'mzm-'})
+      const tmp_file = path.join(tmpdir(), `mzm-${crypto.randomUUID()}`)
       const normalized_to: string = to.startsWith('v') ? to : `v${to}`
-      const response = await fetch(`https://github.com/${this.owner}/${this.repo}/releases/download/${normalized_to}/${asset_name}`, {
-        signal: AbortSignal.timeout(isNaN(timeout) ? DEFAULT_DOWNLOAD_TIMEOUT : timeout)
+      await download(
+        `https://github.com/${this.owner}/${this.repo}/releases/download/${normalized_to}/${asset_name}`
+      , tmp_file
+      , isNaN(timeout) ? DEFAULT_DOWNLOAD_TIMEOUT : timeout
+      )
+
+      // a proxy or sign in page can be served with a successful status.
+      // Make sure what arrived is a program before it replaces the one that is running
+      if (!await isExecutable(tmp_file)) {
+        await Promise.allSettled([fs.rm(tmp_file)])
+        throw GenericError.from(
+          `There was a problem downloading the ${to} release`
+        , 'What was downloaded is not a program that can be run. '
+          + `Make sure the release is currently available from ${colors.brightBlue(this.getRepositoryUrl('mzm'))}`
+        )
+      }
+
+      await fs.chmod(tmp_file, 0o776)
+
+      // remove the current one
+      debug('removing %s', running_bin)
+      const backup_file = await swap(running_bin, tmp_file, from, async (file: string) => {
+        try {
+          await verify(file)
+        } catch (err) {
+          debug('the new version could not be run: %s', (err as Error).message)
+          throw GenericError.from(
+            `The ${to} release does not run on this machine`
+          , `Version ${from} was put back and is still installed. `
+            + `Check the requirements of the release at ${colors.brightBlue(this.getRepositoryUrl('mzm'))}`
+          , err
+          )
+        }
       })
 
-      debug('upgrade status %s', response.status)
+      if (backup_file) {
+        // the command entry point attempts to remove this file on the next run
+        await storage.set('upgrade.cleanup.file', backup_file)
+        debug('store previous file location %s', backup_file)
+      }
+    } catch (err: any) {
+      const repository_url = colors.brightBlue(this.getRepositoryUrl('mzm'))
+      if (err.name === 'TimeoutError') throw GenericError.from(
+        `There was a problem downloading the ${to} release\n`
+        + 'Looks like it just took too long. Make sure your internet connection is reasonably fast\n'
+        + `Additionally, verify there are no current problems reported on ${colors.yellow('https://status.github.com')}`
+      )
 
-      switch (response.status) {
-        case 200: {
-          break
-        }
-
-        case 404: {
+      if (err instanceof CommunicationError) {
+        if (err.status_code === 404) {
           const error = NotFoundError.from(
             `No matching version for: ${to}`
           , `Use ${colors.yellow('mzm')} upgrade --list-versions for acceptable upgrade targets`
@@ -266,22 +278,13 @@ export default class GithubReleaseProvider extends Provider {
           error.message = `Version ${to} Not Found`
           throw error
         }
+
+        throw GenericError.from(
+          `There was a problem downloading the ${to} release`
+        , `The download server responded with status ${err.status_code}. `
+          + `Verify there are no current problems reported on ${colors.yellow('https://status.github.com')}`
+        )
       }
-      await using file_handle: Deno.FsFile = await Deno.open(tmp_file, {create: true, write: true})
-      if (response.body) await response.body.pipeTo(file_handle.writable)
-
-      await Deno.chmod(tmp_file, 0o776)
-
-      // remove the current one
-      debug('removing %s', running_bin)
-      await swap(running_bin, tmp_file, from)
-    } catch (err: any) {
-      const repository_url = colors.brightBlue(this.getRepositoryUrl('mzm'))
-      if (err.name === 'TimeoutError') throw GenericError.from(
-        `There was a problem downloading the ${to} release\n`
-        + 'Looks like it just took too long. Make sure your internet connection is reasonably fast\n'
-        + `Additionally, verify there are no current problems reported on ${colors.yellow('https://status.github.com')}`
-      )
 
       if (err instanceof GenericError) throw err
 

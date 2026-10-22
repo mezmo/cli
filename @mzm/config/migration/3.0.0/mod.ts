@@ -1,6 +1,3 @@
-
-// deno-coverage-ignore-file
-
 import {debuglog} from 'node:util'
 const log = debuglog('config:migrate')
 

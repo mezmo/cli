@@ -1,0 +1,13 @@
+{
+  "name": "@mzm/config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@marianmeres/migrate": "npm:@jsr/marianmeres__migrate@^1.0.2",
+    "@std/assert": "npm:@jsr/std__assert@^1.0.15",
+    "@std/semver": "npm:@jsr/std__semver@^1.0.7"
+  }
+}

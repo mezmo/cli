@@ -49,7 +49,6 @@ const active_conversation = sql`
   WHERE active IS TRUE
   LIMIT 1
 `
-// deno-lint-ignore require-await
 export async function active(): Promise<Conversation> {
   //@ts-ignore typescript is wrong
   const record: Conversation | undefined = active_conversation.get() as Conversation
@@ -66,7 +65,6 @@ const set_conversation_active = sql`
   , active
 `
 
-// deno-lint-ignore require-await
 export async function activate(conversation_session_id:string): Promise<Conversation | undefined> {
   try {
     sqlite.exec('BEGIN TRANSACTION')
@@ -76,7 +74,7 @@ export async function activate(conversation_session_id:string): Promise<Conversa
     //@ts-ignore typescript is wrong
     return result as Conversation
   } catch(err) {
-    if (sqlite.isTransaction) sqlite.exec('ROLLBACK')
+    if (sqlite.inTransaction) sqlite.exec('ROLLBACK')
     throw err
   }
 }
@@ -150,7 +148,6 @@ AND conversation_history.role = 'user'
 AND active >= :active_only -- BOOLEANS are really number so you can compare TRUE / FALSE as if they have a value
 ;
 `
-// deno-lint-ignore require-await
 export async function list(active_only: boolean = false): Promise<Array<ChatHistory>> {
   //@ts-ignore typescript is wrong
   return conversation_list.all({active_only: active_only ? 1 : 0}) as Array<ChatHistory>
@@ -192,7 +189,6 @@ WHERE conversation_history.first_message IS TRUE AND conversation_history.role =
   AND conversation_history.conversation_session_id = :conversation_session_id
 ;
 `
-// deno-lint-ignore require-await
 export async function get(conversation_session_id: string): Promise<ChatHistory> {
   //@ts-ignore typescript is wrong
   const record: ChatHistory = conversation_get.get({conversation_session_id}) as ChatHistory
@@ -203,11 +199,10 @@ export async function get(conversation_session_id: string): Promise<ChatHistory>
   return payload
 }
 
-// deno-lint-ignore require-await
 export async function remove(identifiers: Array<string>): Promise<Array<Record<string, unknown>>> {
   const placholders = identifiers.map(() => {
     return '?'
   })
   const query = `DELETE FROM conversation WHERE conversation_session_id IN (${placholders}) RETURNING conversation_session_id as pk`
-  return sqlite.prepare(query).all(...identifiers)
+  return sqlite.prepare(query).all(...identifiers) as Array<Record<string, unknown>>
 }

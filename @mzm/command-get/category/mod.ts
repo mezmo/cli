@@ -1,6 +1,6 @@
 // @ts-nocheck ignore until command sub class types are figured out
 
-import {EOL} from '@std/fs'
+import {EOL} from 'node:os'
 import {ResourceCommand} from '@mzm/core'
 import {type Category, default as resource} from '@mzm/core/resource'
 

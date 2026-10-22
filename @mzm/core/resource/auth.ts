@@ -4,17 +4,17 @@
  * @module
  */
 import {colors} from '@cliffy/ansi/colors'
-import {kvdb} from '@mzm/config'
+import {storage} from '@mzm/config'
 import {AuthorizationError, InputError} from '../error.ts'
 
 /** Header used by enterprise access keys to route a request as a specific child account */
 export const DELEGATE_HEADER: string = 'x-delegate-account-id'
 
-/** Config key of the active enterprise account. Written with kvdb directly as the config store typecasts numeric ids */
-export const ACCOUNT_KEY: Array<string> = ['core', 'account', 'current']
+/** Config key of the active enterprise account */
+export const ACCOUNT_KEY: string = 'core.account.current'
 
 /** The access key provided by the environment */
-export const ACCESS_KEY: string = Deno.env.get('MZM_ACCESS_KEY') ?? ''
+export const ACCESS_KEY: string = process.env.MZM_ACCESS_KEY ?? ''
 
 /**
  * Indicates if an access key is an enterprise access key
@@ -29,10 +29,11 @@ export function isEnterpriseKey(key: string = ACCESS_KEY): boolean {
  * Returns the active account of an enterprise: `--account` / `MZM_ACCOUNT_ID`, then `mzm set account`
  */
 export async function activeAccount(): Promise<string | null> {
-  const override = Deno.env.get('MZM_ACCOUNT_ID')
+  const override = process.env.MZM_ACCOUNT_ID
   if (override) return override
-  const {value} = await kvdb.get<string>(ACCOUNT_KEY)
-  return value || null
+  // an id made up of digits comes back as a number when it was stored with `mzm config set`
+  const value = await storage.getOne(ACCOUNT_KEY)
+  return value ? String(value) : null
 }
 
 /**
@@ -40,7 +41,7 @@ export async function activeAccount(): Promise<string | null> {
  */
 export async function delegateAccount(): Promise<string | null> {
   if (!isEnterpriseKey()) {
-    if (Deno.env.get('MZM_ACCOUNT_ID')) throw InputError.from(
+    if (process.env.MZM_ACCOUNT_ID) throw InputError.from(
       `${colors.magenta('--account')} and ${colors.magenta('MZM_ACCOUNT_ID')} can only be used with an enterprise`
       + ' access key. The active account is determined by the access key in use'
     )
